@@ -72,6 +72,7 @@ const set_name = () => {
 /**
  *
  */
+/*
 window.onload = () => {
     console.log(`window.onload()`);
 
@@ -86,3 +87,4 @@ window.onload = () => {
     const el_name = document.getElementById(ID_MY_NAME);
     el_name.value = myName;
 };
+*/

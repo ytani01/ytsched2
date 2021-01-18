@@ -12,6 +12,7 @@ import os
 import tornado.ioloop
 import tornado.httpserver
 import tornado.web
+from .handler import Handler
 from .handler1 import Handler1
 from .wshandler1 import WsHandler1
 from .my_logger import get_logger
@@ -25,11 +26,13 @@ class WebServer:
 
     DEF_PORT = 10085
     DEF_WEBROOT = './webroot/'
-    DEF_WORKDIR = '/tmp/ytsched'
+    DEF_WORKDIR = '~/ytsched'
+    DEF_DATADIR = DEF_WORKDIR + '/data'
+    
     DEF_SIZE_LIMIT = 100*1024*1024  # 100MB
 
     def __init__(self, port=DEF_PORT,
-                 webroot=DEF_WEBROOT, workdir=DEF_WORKDIR,
+                 webroot=DEF_WEBROOT, datadir=DEF_DATADIR,
                  size_limit=DEF_SIZE_LIMIT,
                  version='(current)',
                  debug=False):
@@ -41,7 +44,7 @@ class WebServer:
             port number
         webroot: str
 
-        workdir: str
+        datadir: str
 
         size_limit: int
             max upload size
@@ -50,27 +53,34 @@ class WebServer:
         """
         self._dbg = debug
         self._log = get_logger(self.__class__.__name__, self._dbg)
-        self._log.info('port=%s, webroot=%s, workdir=%s, size_limit=%s',
-                       port, webroot, workdir, size_limit)
+        self._log.info('port=%s, webroot=%s, datadir=%s, size_limit=%s',
+                       port, webroot, datadir, size_limit)
         self._log.info('version=%s', version)
 
         self._port = port
-        self._webroot = webroot
-        self._workdir = workdir
+        self._webroot = os.path.expanduser(webroot)
+        self._datadir = os.path.expanduser(datadir)
         self._size_limit = size_limit
         self._version = version
 
         try:
-            os.makedirs(self._workdir, exist_ok=True)
+            os.makedirs(self._datadir, exist_ok=True)
         except Exception as ex:
             raise ex
 
         self._app = tornado.web.Application(
             [
-                (r'/', Handler1),
-                (r'%s' % self.URL_PREFIX, Handler1),
-                (r'%s/' % self.URL_PREFIX, Handler1),
+                (r'/', Handler),
+                (r'%s' % self.URL_PREFIX, Handler),
+                (r'%s/' % self.URL_PREFIX, Handler),
+
+                (r'%s/page1' % self.URL_PREFIX, Handler1),
+                (r'%s/page1/' % self.URL_PREFIX, Handler1),
+
                 (r'%s/ws.*' % self.URL_PREFIX, WsHandler1),
+
+                (r'%s/page2' % self.URL_PREFIX, Handler),
+                (r'%s/page2/' % self.URL_PREFIX, Handler),
             ],
             static_path=os.path.join(self._webroot, "static"),
             static_url_prefix=self.URL_PREFIX + '/static/',
@@ -81,7 +91,7 @@ class WebServer:
 
             url_prefix=self.URL_PREFIX + '/',
 
-            workdir=self._workdir,
+            datadir=self._datadir,
             webroot=self._webroot,
             size_limit=self._size_limit,
             version=self._version,

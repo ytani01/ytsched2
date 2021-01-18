@@ -11,6 +11,8 @@ __date__    = '2021/01'
 import time
 import os
 import shutil
+import re
+import datetime
 import html2text
 from .my_logger import get_logger
 
@@ -25,8 +27,12 @@ def htmlstr2text(intext: str) -> str:
     -------
     outtext: str
     """
-    outtext = html2text.html2text(intext)
+    outtext = intext
+    #outtext = html2text.html2text(intext)
+    outtext = outtext.replace('&amp;', '&')
+    outtext = outtext.replace('&nbsp;', ' ')
     outtext = outtext.replace('&#160;', ' ')
+    outtext = re.sub(r'<BR */*>', '\n', outtext, flags=re.IGNORECASE)
     return outtext
 
 
@@ -39,83 +45,92 @@ class SchedDataEnt:
     TYPE_HOLYDAY           = ['休日', '祝日']
     TITLE_PREFIX_IMPORTANT = ['★', '☆']
 
-    def __init__(self, sde_id='', sde_date='', sde_time='',
-                 sde_type='', sde_title='', sde_place='', sde_text='',
+    def __init__(self, id='',
+                 date: datetime.date = datetime.date.today(),
+                 time_start: datetime.time = None,
+                 time_end: datetime.time = None,
+                 sde_type='', title='', place='', text='',
                  debug=False):
         self.debug = debug
         self._log = get_logger(self.__class__.__name__, self.debug)
-        self._log.debug('%s, %s, %s, %s, %s, %s, %s',
-                        sde_id, sde_date, sde_time,
-                        sde_type, sde_title, sde_place, sde_text)
+        self._log.debug('(%s)%s %s-%s [%s] %s @%s: %s.',
+                        id, date, time_start, time_end,
+                        sde_type, title, place, text)
 
-        self.sde_id = sde_id
-        self.sde_date = sde_date
-        self.sde_time = sde_time
-        self.sde_type = sde_type
-        self.sde_title = sde_title
-        self.sde_place = sde_place
-        self.sde_text = sde_text
+        self.id = id
+        self.date = date
+        self.time_start = time_start
+        self.time_end = time_end
+        self.type = sde_type
+        self.title = title
+        self.place = place
+        self.text = htmlstr2text(text)
 
-        if self.sde_id == '':
-            self.sde_id = self.new_id()
+        if self.id == '':
+            self.id = self.new_id()
 
-        if self.sde_date == '':
-            lt = time.localtime()
-            self.sde_date = '%04d/%02d/%02d' % (lt.tm_year,
-                                                lt.tm_mon,
-                                                lt.tm_mday)
+    def __str__(self):
+        """ str(self) """
+        out_str = '(%s) ' % (self.id)
+        out_str += self.date.strftime('%Y/%m/%d ')
 
-        if self.sde_time == '':
-            self.sde_time = self.TIME_NULL
+        if self.time_start:
+            out_str += self.time_start.strftime('%H:%M-')
+        else:
+            out_str += ':-'
+
+        if self.time_end:
+            out_str += self.time_end.strftime('%H:%M ')
+        else:
+            out_str += ': '
+
+        out_str += '[%s]%s@%s: ' % (self.type, self.title, self.place)
+        out_str += htmlstr2text(self.text)
+
+        return out_str
 
     def mk_dataline(self):
-        '''
+        """
         ファイル保存用の文字列を生成
-        '''
+        """
         self._log.debug('')
-        return '\t'.join((self.sde_id, self.sde_date, self.sde_time,
-                          self.sde_type, self.sde_title, self.sde_place,
-                          self.sde_text))
+        date_str = self.date.strftime('%Y/%m/%d')
 
-    def print1(self):
-        self._log.debug('')
+        time_start_str = ':'
+        if self.time_start:
+            time_start_str = self.time_start.strftime('%H:%M')
 
-        print('=====')
-        print('ID=%s' % self.sde_id)
-        print('%s, %s' % (self.sde_date, self.sde_time))
-        print('[%s]%s@%s' % (self.sde_type, self.sde_title,
-                             self.sde_place))
-        if self.is_todo():
-            print('*ToDo')
-        if self.is_holiday():
-            print('*Holiday')
-        if self.is_important():
-            print('*Important')
-        print('-----')
-        print('%s' % htmlstr2text(self.sde_text))
+        time_end_str = ':'
+        if self.time_end:
+            time_end_str = self.time_end.strftime('%H:%M')
+
+        time_str = time_start_str + '-' + time_end_str
+
+        return '\t'.join((self.id, date_str, time_str,
+                          self.type, self.title, self.place, self.text))
 
     def new_id(self):
         self._log.debug('')
-        sde_id = str(time.time()).replace('.', '-')
-        return sde_id
+        id = str(time.time()).replace('.', '-')
+        return id
 
     def is_todo(self):
         self._log.debug('')
-        if self.sde_type == '':
+        if self.type == '':
             return False
-        return self.sde_type.startswith(self.TYPE_PREFIX_TODO)
+        return self.type.startswith(self.TYPE_PREFIX_TODO)
 
     def is_holiday(self):
         self._log.debug('')
-        if self.sde_type == '':
+        if self.type == '':
             return False
-        return self.sde_type in self.TYPE_HOLYDAY
+        return self.type in self.TYPE_HOLYDAY
 
     def is_important(self):
         self._log.debug('')
-        if self.sde_title == '':
+        if self.title == '':
             return False
-        return self.sde_title[0] in self.TITLE_PREFIX_IMPORTANT
+        return self.title[0] in self.TITLE_PREFIX_IMPORTANT
 
     def get_date(self):
         '''
@@ -124,53 +139,43 @@ class SchedDataEnt:
         (year, month, day)
         '''
         self._log.debug('')
-        return [int(i) for i in self.sde_date.split('/')]
+        return (self.date.year, self.date.month, self.date.day)
 
-    def set_date(self, d=None):
+    def set_date(self, d: datetime.date = None):
         '''
-        d = (year, month, day)
+        Parameters
+        ----------
+        d: datetime.date
+
         '''
         self._log.debug('d=%s', d)
 
-        if d is None or len(d) < 3:
-            lt = time.localtime()
-            yyyy = lt.tm_year
-            mm = lt.tm_month
-            dd = lt.tm_mday
-        else:
-            (yyyy, mm, dd) = d
+        if d is None:
+            self.date = datetime.date.today()
+            return
 
-        self.sde_date = '%04d/%02d/%02d' % (yyyy, mm, dd)
+        self.date = d
 
-    def get_time(self):
+    def get_timestr(self) -> str:
         '''
         Returns
         -------
-        ((hour1, minute1), (hour2, minute2))
-
-        if not specified, return None
-        ex.
-        ((houre1, minute2), None)
-        (None, (hour2, minute2))
-        (None, None)
+        'HH:MM-HH:MM' : str
+        ':-:', ':-HH:MM', 'HH:MM-'
 
         '''
-        self._log.debug('')
+        time_start_str = ':'
+        if self.time_start:
+            time_start_str = self.time_start.strftime('%H:%M')
 
-        (t1, t2) = self.sde_time.split('-')
-        if t1 == ':':
-            t1 = None
-        else:
-            (h1, m1) = t1.split(':')
-            t1 = (int(h1), int(m1))
+        time_end_str = ':'
+        if self.time_end:
+            time_end_str = self.time_end.strftime('%H:%M')
 
-        if t2 == ':':
-            t2 = None
-        else:
-            (h2, m2) = t2.split(':')
-            t2 = (int(h2), int(m2))
+        time_str = '%s-%s' % (time_start_str, time_end_str)
 
-        return (t1, t2)
+        self._log.debug('time_str=%s', time_str)
+        return time_str
 
     def set_time(self, t1=None, t2=None):
         '''
@@ -187,6 +192,7 @@ class SchedDataEnt:
         else:
             h1 = '02d' % t1[0]
             m1 = '02d' % t1[1]
+
         if t2 is None or len(t2) < 2:
             h2 = ''
             m2 = ''
@@ -194,7 +200,7 @@ class SchedDataEnt:
             h2 = '02d' % t2[0]
             m2 = '02d' % t2[1]
 
-        self.sde_time = '%s:%s-%s:%s' % (h1, m1, h2, m2)
+        self.time = '%s:%s-%s:%s' % (h1, m1, h2, m2)
 
 
 class SchedDataFile:
@@ -202,37 +208,54 @@ class SchedDataFile:
     スケジュール・データ・ファイル
     '''
     DEF_TOP_DIR = '/home/ytani/ytsched/data'
-    PATH_FORMAT = '%s/%04d/%02d/%02d.cgi'
+    PATH_FORMAT = '%s/%04s/%02s/%02s.cgi'
     BACKUP_EXT = '.bak'
     ENCODE = ['utf-8', 'euc_jp']
 
-    def __init__(self, y=None, m=None, d=None, topdir=DEF_TOP_DIR,
+    def __init__(self, date: datetime.date = None, topdir=DEF_TOP_DIR,
                  debug=False):
+        """
+        date: datetime.date
+
+        topdir: str
+
+        """
         self._dbg = debug
         self._log = get_logger(__class__.__name__, self._dbg)
-        self._log.debug('y/m/d = %s/%s/%s', y, m, d)
+        self._log.debug('date=%s, topdir=%s', date, topdir)
 
+        self.date = date
         self.topdir = topdir
-        self.y = y
-        self.m = m
-        self.d = d
 
-        self.pathname = self.date2path(self.y, self.m, self.d,
-                                       self.topdir)
+        self.pathname = self.date2path(self.date, self.topdir)
 
         pl = self.pathname.split('/')
         self.filename = pl.pop()
         self.dirname  = '/'.join(pl)
 
-        self.sde_list = self.load()
+        self.sde = self.load()
 
-    def date2path(self, y, m, d, topdir=''):
-        self._log.debug('y/m/d = %s/%s/%s', y, m, d)
+    def date2path(self,
+                  date: datetime.date =None,
+                  topdir=DEF_TOP_DIR) -> str:
+        """
+        Parameters
+        ----------
+        date: datetime.date
 
-        if topdir == '':
-            topdir = self.topdir
+        Returns
+        -------
+        path: str
 
-        return self.PATH_FORMAT % (topdir, self.y, self.m, self.d)
+        """
+        self._log.debug('date=%s, topdir=%s', date, topdir)
+
+        pathname = self.PATH_FORMAT % (topdir,
+                                       date.strftime('%Y'),
+                                       date.strftime('%m'),
+                                       date.strftime('%d'))
+                                   
+        return pathname
 
     def load(self):
         '''
@@ -263,10 +286,38 @@ class SchedDataFile:
         out = []
         for l in lines:
             d = l.split('\t')
-            sde = SchedDataEnt(*d, debug=self._dbg)
+
+            date1 = d[1].split('/')
+            date2 = datetime.date(int(date1[0]),
+                                  int(date1[1]),
+                                  int(date1[2]))
+
+            time1 = d[2].split('-')
+
+            time_start1 = time1[0].split(':')
+            self._log.debug('time_start1=%s', time_start1)
+
+            time_end1 = time1[1].split(':')
+            self._log.debug('time_end1=%s', time_end1)
+
+            if time_start1[0]:
+                time_start2 = datetime.time(
+                    int(time_start1[0]), int(time_start1[1]))
+            else:
+                time_start2 = None
+
+            if time_end1[0]:
+                time_end2 = datetime.time(
+                    int(time_end1[0]), int(time_end1[1]))
+            else:
+                time_end2 = None
+
+            sde = SchedDataEnt(d[0], date2, time_start2, time_end2,
+                               d[3], d[4], d[5], d[6], debug=self._dbg)
             out.append(sde)
 
-        return out
+        out2 = sorted(out, key=lambda x: x.get_timestr())
+        return out2
 
     def save(self):
         '''
@@ -284,7 +335,7 @@ class SchedDataFile:
             shutil.move(self.pathname, backup_pathname)
 
         f = open(self.pathname, mode='w')
-        for sde in self.sde_list:
+        for sde in self.list:
             line = self.mk_dataline(sde)
             f.write(line)
         f.close()

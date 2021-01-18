@@ -23,14 +23,15 @@ class DataFileApp:
                                  debug=self._dbg)
 
     def main(self):
-        self._log.debug('')
+        self._log.debug('sdf.sde=%s', self.sdf.sde)
 
-        if self.sdf.sde_list == []:
+        if self.sdf.sde:
+            for sde in sorted(self.sdf.sde, key=lambda x: x.get_timestr()):
+                print(sde)
+                print('%s' % (sde.mk_dataline()))
+        else:
             print('===== No data =====')
 
-        else:
-            for sde in self.sdf.sde_list:
-                sde.print1()
 
     def end(self):
         self._log.debug('')
@@ -83,9 +84,9 @@ Web server""")
 @click.option('--webroot', '-r', 'webroot', type=click.Path(exists=True),
               default=WebServer.DEF_WEBROOT,
               help='Web root directory')
-@click.option('--workdir', '-w', 'workdir', type=click.Path(),
-              default=WebServer.DEF_WORKDIR,
-              help='work directory')
+@click.option('--datadir', '-w', 'datadir', type=click.Path(),
+              default=WebServer.DEF_DATADIR,
+              help='data directory')
 @click.option('--size_limit', '-l', 'size_limit', type=int,
               default=100*1024*1024,
               help='upload size limit, default=%s' % (
@@ -94,11 +95,11 @@ Web server""")
               help='version string')
 @click.option('--debug', '-d', 'debug', is_flag=True, default=False,
               help='debug flag')
-def webapp(port, webroot, workdir, size_limit, version, debug):
+def webapp(port, webroot, datadir, size_limit, version, debug):
     """ cmd1  """
     log = get_logger(__name__, debug)
 
-    app = WebServer(port, webroot, workdir, size_limit, version,
+    app = WebServer(port, webroot, datadir, size_limit, version,
                     debug=debug)
     try:
         app.main()

@@ -7,7 +7,7 @@ MY_PKG="%%% MY_PKG %%%"
 
 MY_VERSION="%%% MY_VERSION %%%"
 VENVDIR="%%% VENVDIR %%%"
-WORKDIR="%%% WORKDIR %%%"
+DATADIR="%%% DATADIR %%%"
 WEBROOT="%%% WEBROOT %%%"
 DATADIR="%%% DATADIR %%%"
 
@@ -33,7 +33,7 @@ shift
 if [ x$SUBCMD = xwebapp ]; then
     exec python -m $MY_PKG $SUBCMD \
          --version $MY_VERSION \
-         --workdir $WORKDIR --webroot $WEBROOT $*
+         --datadir $DATADIR --webroot $WEBROOT $*
 fi
 
 if [ x$SUBCMD = xdata ]; then

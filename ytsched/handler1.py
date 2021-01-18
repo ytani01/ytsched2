@@ -91,16 +91,11 @@ class Handler1(tornado.web.RequestHandler):
         self._mylog.debug('param1=%s', param1)
         self._mylog.debug('request=%s', self.request)
 
-        if self.request.uri != self._url_prefix:
-            self._mylog.warning('redirect: %s', self._url_prefix)
-            self.redirect(self._url_prefix)
-            return
-
         size_limit, size_unit = get_size_unit(self._size_limit)
         self._mylog.debug('size_limit=%s', size_limit)
 
         self.render(self.HTML_FILE,
-                    title="Mypkg",
+                    title="ytsched",
                     author=__author__,
                     version=self._version,
                     param1=param1,
