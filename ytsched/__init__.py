@@ -11,7 +11,8 @@ __prog_name__ = 'Ytsched'
 
 from .ytsched import SchedDataEnt, SchedDataFile
 from .webapp import WebServer
-from .handler import Handler
+from .main_handler import MainHandler
+from .edit_handler import EditHandler
 from .handler1 import Handler1
 from .wshandler1 import WsHandler1
 

@@ -10,6 +10,8 @@ const ID_MY_MSG = "my_msg";
 const cookieObj = new MyCookie();
 let myName = "";
 
+let curDay = new Date();
+
 /**
  * 'http://host:port/aaa/bbb/' -> 'ws://host:port/aaa/ws'
  * 'https://host:port/aaa/bbb/' -> 'wss://host:port/aaa/ws'
@@ -69,13 +71,90 @@ const set_name = () => {
     cookieObj.set(ID_MY_NAME, myName);
 };
 
+/***********************************************************/
+
 /**
  *
  */
-/*
+const execGet = (path, data) => {
+    let url = `${location.protocol}//${location.host}${path}?`
+
+    for (let param in data) {
+        url += `${param}=${data[param]}&`
+    }
+    url = url.replace(/&$/, '');
+    console.log(`url=${url}`);
+    window.location.href=url;
+};
+
+const scrollToId = (id) => {
+    console.log(`id=${id}`);
+
+    const el = document.getElementById(id);
+    if (el == null) {
+        return false;
+    }
+
+    const tail = el.offsetTop + window.innerHeight;
+
+    if (tail > document.body.clientHeight) {
+        return false;
+    }
+
+    el.scrollIntoView(true);
+    scrollBy(0,-60);
+    return true;
+};
+
+const scrollToDate = (path, date) => {
+    if (scrollToId(`date-${date}`)) {
+        const el = document.getElementById("cur-day");
+        el.innerHTML = date;
+        return true;
+    }
+    execGet(path, {date: date});
+    return false;
+};
+
+const moveDays = (path, days) => {
+    const el = document.getElementById("cur-day");
+    let d1 = new Date(el.innerHTML);
+    d1.setDate(d1.getDate() + days);
+    console.log(`d1=${d1}`);
+
+    d1_str = d1.toISOString().replace(/T.*$/, '');
+    scrollToDate(path, d1_str);
+};
+
+window.addEventListener('load', function() {
+    console.log(`window.onload()`);
+    const el = document.getElementById("cur-day");
+    scrollToDate(location.pathname, el.innerHTML);
+});
+
+window.addEventListener('scroll', function() {
+    const y = window.pageYOffset;
+    const tail = window.pageYOffset + window.innerHeight;
+    const bodyH = document.body.clientHeight;
+    console.log(`${y}-${bodyH - tail}`);
+
+    if (y < 60) {
+        el = document.getElementById("date_from");
+        date = el.innerHTML;
+        console.log(`date=${date}`);
+        execGet('/ytsched/', {date: date});
+    }
+    if (bodyH - tail < 60) {
+        el = document.getElementById("date_to");
+        date = el.innerHTML;
+        console.log(`date=${date}`);
+        execGet('/ytsched/', {date: date});
+    }
+});
+                        
+/**
 window.onload = () => {
     console.log(`window.onload()`);
-
     connect_ws();
 
     myName = cookieObj.get(ID_MY_NAME);

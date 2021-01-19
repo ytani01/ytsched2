@@ -12,7 +12,8 @@ import os
 import tornado.ioloop
 import tornado.httpserver
 import tornado.web
-from .handler import Handler
+from .main_handler import MainHandler
+from .edit_handler import EditHandler
 from .handler1 import Handler1
 from .wshandler1 import WsHandler1
 from .my_logger import get_logger
@@ -70,17 +71,14 @@ class WebServer:
 
         self._app = tornado.web.Application(
             [
-                (r'/', Handler),
-                (r'%s' % self.URL_PREFIX, Handler),
-                (r'%s/' % self.URL_PREFIX, Handler),
+                (r'/', MainHandler),
+                (r'%s' % self.URL_PREFIX, MainHandler),
+                (r'%s/' % self.URL_PREFIX, MainHandler),
+                (r'%s/main' % self.URL_PREFIX, MainHandler),
+                (r'%s/main/' % self.URL_PREFIX, MainHandler),
 
-                (r'%s/page1' % self.URL_PREFIX, Handler1),
-                (r'%s/page1/' % self.URL_PREFIX, Handler1),
-
-                (r'%s/ws.*' % self.URL_PREFIX, WsHandler1),
-
-                (r'%s/page2' % self.URL_PREFIX, Handler),
-                (r'%s/page2/' % self.URL_PREFIX, Handler),
+                (r'%s/edit' % self.URL_PREFIX, EditHandler),
+                (r'%s/edit/' % self.URL_PREFIX, EditHandler),
             ],
             static_path=os.path.join(self._webroot, "static"),
             static_url_prefix=self.URL_PREFIX + '/static/',

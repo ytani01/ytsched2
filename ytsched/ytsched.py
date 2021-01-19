@@ -45,6 +45,8 @@ class SchedDataEnt:
     TYPE_HOLYDAY           = ['休日', '祝日']
     TITLE_PREFIX_IMPORTANT = ['★', '☆']
 
+    _log = get_logger(__name__, False)
+
     def __init__(self, id='',
                  date: datetime.date = datetime.date.today(),
                  time_start: datetime.time = None,
@@ -52,7 +54,7 @@ class SchedDataEnt:
                  sde_type='', title='', place='', text='',
                  debug=False):
         self.debug = debug
-        self._log = get_logger(self.__class__.__name__, self.debug)
+        self.__class__._log = get_logger(self.__class__.__name__, self.debug)
         self._log.debug('(%s)%s %s-%s [%s] %s @%s: %s.',
                         id, date, time_start, time_end,
                         sde_type, title, place, text)
@@ -67,7 +69,7 @@ class SchedDataEnt:
         self.text = htmlstr2text(text)
 
         if self.id == '':
-            self.id = self.new_id()
+            self.id = SchedDataEnt.new_id()
 
     def __str__(self):
         """ str(self) """
@@ -84,7 +86,9 @@ class SchedDataEnt:
         else:
             out_str += ': '
 
-        out_str += '[%s]%s@%s: ' % (self.type, self.title, self.place)
+        out_str += '[%s]' % (htmlstr2text(self.type))
+        out_str += '%s' % (htmlstr2text(self.title))
+        out_str += '@%s: ' % (htmlstr2text(self.place))
         out_str += htmlstr2text(self.text)
 
         return out_str
@@ -109,9 +113,10 @@ class SchedDataEnt:
         return '\t'.join((self.id, date_str, time_str,
                           self.type, self.title, self.place, self.text))
 
-    def new_id(self):
-        self._log.debug('')
+    @classmethod
+    def new_id(cls):
         id = str(time.time()).replace('.', '-')
+        cls._log.debug('id=%s', id)
         return id
 
     def is_todo(self):
@@ -285,7 +290,7 @@ class SchedDataFile:
 
         out = []
         for l in lines:
-            d = l.split('\t')
+            d = [htmlstr2text(d1) for d1 in l.split('\t')]
 
             date1 = d[1].split('/')
             date2 = datetime.date(int(date1[0]),
@@ -302,13 +307,13 @@ class SchedDataFile:
 
             if time_start1[0]:
                 time_start2 = datetime.time(
-                    int(time_start1[0]), int(time_start1[1]))
+                    int(time_start1[0]) % 24, int(time_start1[1]) % 60)
             else:
                 time_start2 = None
 
             if time_end1[0]:
                 time_end2 = datetime.time(
-                    int(time_end1[0]), int(time_end1[1]))
+                    int(time_end1[0]) % 24, int(time_end1[1]) % 60)
             else:
                 time_end2 = None
 
@@ -339,3 +344,18 @@ class SchedDataFile:
             line = self.mk_dataline(sde)
             f.write(line)
         f.close()
+
+    def get_sde(self, sde_id=None):
+        """
+        Parameters
+        ----------
+        sde_id: str
+
+        """
+        self._log.debug('sde_id=%s', sde_id)
+
+        for sde in self.sde:
+            if sde_id == sde.id:
+                return sde
+
+        return None

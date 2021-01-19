@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block content %}
+<header>
+  <div class="container-fluid p-0 fixed-top my-bar">
+    <div class="row p-0 m-0">
+
+      <div class="col-4">
+        <i class="fas fa-undo-alt fa-2x"
+           onclick="scrollToDate('{{ url_prefix }}', '{{ sde.date }}');"></i>
+      </div><!-- col -->
+      <div class="col-2">
+        <i class="fas fa-plus-square fa-2x"></i>
+      </div><!-- col -->
+
+      <div class="col-2">
+        <i class="fas fa-check-square fa-2x"></i>
+      </div><!-- col -->
+
+      <div class="col-4 text-right">
+        <i class="fas fa-trash-alt fa-2x"></i>
+      </div><!-- col -->
+
+    </div><!-- row -->
+  </div><!-- container -->
+</header>
+<main style="background-color: #FFF; padding-top: 40px;">
+  <form id="input_form" name="input_form" action="/edit/" method="GET">
+    <div class="container-fluid"
+         style="background-color: #FFF;">
+
+      <div class="row" style="font-size: large">
+        <div class="col">
+          <input id="date" name="date"
+                 type="date" value="{{ sde.date }}" />
+          ({{ date.strftime('%a') }})
+        </div><!-- col -->
+      </div><!-- row -->
+
+      <div class="row" style="font-size: large">
+        <div class="col">
+          <input id="time_start" name="time_start" style="width: 90px;"
+                 type="time" value="{{ sde.time_start }}" />
+          ～
+          <input id="time_end" name="time_end" style="width: 90px;"
+                 type="time" value="{{ sde.time_end }}" />
+        </div><!-- col -->
+      </div><!-- row -->
+
+      <div class="row" style="font-size: medium;">
+        <div class="col">
+          <span style="font-size: large; font-width: bold">【</span>
+          <input id="sde_type" name="sde_type"
+                 type="text" value="{{ sde.type }}" />
+          <span style="font-size: large; font-width: bold">】</span>
+        </div><!-- col -->
+      </div><!-- row -->
+
+      <div class="row" style="font-size: medium;">
+        <div class="col">
+          <input id="title" name="title" style="width: 100%;"
+                 type="text" value="{{ sde.title }}" />
+        </div><!-- col -->
+      </div><!-- row -->
+
+      <div class="row" style="font-size: medium;">
+        <div class="col">
+          <span style="font-size: large">@</span>
+          <input id="place" name="place" style="width: 90%;"
+                 type="text" value="{{ sde.place }}" size="30" />
+        </div><!-- col -->
+      </div><!-- row -->
+
+      <div class="row" style="font-size: medium;">
+        <div class="col">
+          <textarea id="text" name="text" style="width: 100%;"
+                    rows="8">
+            {{ sde.text }}
+          </textarea>
+        </div><!-- col -->
+      </div><!-- row -->
+
+      <div class="row" style="font-size: x-small">
+        <div class="col">
+          <input id="sde_id" name="sde_id"
+                 type="text" value="{{ sde.id }}" readonly>
+        </div><!-- col -->
+      </div><!-- row -->
+
+    </div><!-- container -->
+  </form>
+</main>
+{% end %}

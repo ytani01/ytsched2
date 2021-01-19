@@ -3,7 +3,7 @@
 # (c) 2021 Yoichi Tanibayashi
 #
 """
-Handler
+MainHandler
 """
 __author__ = 'Yoichi Tanibayashi'
 __date__ = '2021/01'
@@ -15,7 +15,7 @@ from . import SchedDataEnt, SchedDataFile
 from .my_logger import get_logger
 
 
-class Handler(tornado.web.RequestHandler):
+class MainHandler(tornado.web.RequestHandler):
     """
     Web request handler
     """
@@ -43,42 +43,58 @@ class Handler(tornado.web.RequestHandler):
 
         super().__init__(app, req)
 
-    def get(self, date_from=None, days=90):
+    def get(self, date=None, days=30):
         """
         GET method and rendering
+
+        date priority
+        1. parameter
+        2. get_argument('date')
+        3. get_argument('year', 'month', 'day')
+        4. today
+
+        Parameters
+        ----------
+        date: str
+
+        days: int
+            +/- days
         """
         self._mylog.debug('request=%s', self.request)
 
-        delta_day1 = datetime.timedelta(1)
+        if not date:
+            date_str = self.get_argument('date', None)
+            if date_str:
+                date = datetime.date.fromisoformat(date_str)
 
-        sde_data = []
-
-        if not date_from:
-            date_from_value = self.get_argument('date_from', None)
-            if date_from_value:
-                (year, month, day) = date_from_value.split('-')
-                date_from = datetime.date(int(year), int(month), int(day))
-
-        if not date_from:
+        if not date:
             year = self.get_argument('year', None)
             month = self.get_argument('month', None)
             day = self.get_argument('day', None)
 
             if year and month and day:
-                date_from = datetime.date(int(year), int(month), int(day))
+                date = datetime.date(int(year), int(month), int(day))
 
-        if not date_from:
-            date_from = datetime.date.today()
+        if not date:
+            date = datetime.date.today()
 
-        self._mylog.debug('date_from=%s', date_from)
+        self._mylog.debug('date=%s', date)
 
-        for d in range(days):
-            date = date_from + delta_day1 * d
-            sdf = SchedDataFile(date, self._datadir, debug=self._dbg)
-            sde_data.append({'date': date, 'sde': sdf.sde})
+        sched = []
+        delta_day1 = datetime.timedelta(1)
+
+        date_from = date - delta_day1 * days;
+        date_to = date + delta_day1 * (days - 1);
+
+        for d in range(-days, days):
+            date1 = date + delta_day1 * d
+            self._mylog.debug('date1=%s', date)
+            sdf = SchedDataFile(date1, self._datadir, debug=self._dbg)
+            self._mylog.debug('sdf=%s', sdf)
+            sched.append({'date': date1, 'sde': sdf.sde})
 
         if self._dbg:
-            for dent in sde_data:
+            for dent in sched:
                 self._mylog.debug('date:%s', dent['date'])
                 for sde in dent['sde']:
                     self._mylog.debug('%s', sde)
@@ -93,12 +109,12 @@ class Handler(tornado.web.RequestHandler):
                     title="ytsched",
                     author=__author__,
                     url_prefix=self._url_prefix,
-                    year=year,
-                    month=month,
                     today=datetime.date.today(),
-                    delta_day1=datetime.timedelta(1),
+                    delta_day1=delta_day1,
+                    date=date,
                     date_from=date_from,
-                    data=sde_data,
+                    date_to=date_to,
+                    sched=sched,
                     version=self._version)
 
     async def post(self):
