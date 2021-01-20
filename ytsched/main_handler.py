@@ -93,6 +93,8 @@ class MainHandler(tornado.web.RequestHandler):
             self._mylog.debug('sdf=%s', sdf)
             sched.append({'date': date1, 'sde': sdf.sde})
 
+        top_bottom = self.get_argument('top_bottom', None)
+
         if self._dbg:
             for dent in sched:
                 self._mylog.debug('date:%s', dent['date'])
@@ -115,6 +117,7 @@ class MainHandler(tornado.web.RequestHandler):
                     date_from=date_from,
                     date_to=date_to,
                     sched=sched,
+                    top_bottom=top_bottom,
                     version=self._version)
 
     async def post(self):

@@ -28,7 +28,7 @@ def htmlstr2text(intext: str) -> str:
     outtext: str
     """
     outtext = intext
-    #outtext = html2text.html2text(intext)
+    # outtext = html2text.html2text(intext)
     outtext = outtext.replace('&amp;', '&')
     outtext = outtext.replace('&nbsp;', ' ')
     outtext = outtext.replace('&#160;', ' ')
@@ -36,14 +36,34 @@ def htmlstr2text(intext: str) -> str:
     return outtext
 
 
+def text2htmlstr(intext: str) -> str:
+    """
+    Parameters
+    ----------
+    intext: str
+        normal text string
+
+    Returns
+    -------
+    outtext: str
+        HTML text
+    """
+    outtext = intext.rstrip('\n')
+    outtext = outtext.replace('&', '&amp;')
+    outtext = outtext.replace(' ', '&nbsp;')
+    outtext = outtext.replace('\n', '<br />')
+    return outtext
+
+
 class SchedDataEnt:
     '''
     スケジュール・データ・エンティティ
     '''
-    TIME_NULL              = ':-:'
-    TYPE_PREFIX_TODO       = '□'
-    TYPE_HOLYDAY           = ['休日', '祝日']
+    TIME_NULL = ':-:'
+    TYPE_PREFIX_TODO = '□'
+    TYPE_HOLYDAY = ['休日', '祝日']
     TITLE_PREFIX_IMPORTANT = ['★', '☆']
+    TITLE_PREFIX_CANCELED = ['(キャンセル', '(欠', '(中止', '(休']
 
     _log = get_logger(__name__, False)
 
@@ -97,7 +117,6 @@ class SchedDataEnt:
         """
         ファイル保存用の文字列を生成
         """
-        self._log.debug('')
         date_str = self.date.strftime('%Y/%m/%d')
 
         time_start_str = ':'
@@ -111,7 +130,8 @@ class SchedDataEnt:
         time_str = time_start_str + '-' + time_end_str
 
         return '\t'.join((self.id, date_str, time_str,
-                          self.type, self.title, self.place, self.text))
+                          self.type, self.title, self.place,
+                          text2htmlstr(self.text)))
 
     @classmethod
     def new_id(cls):
@@ -132,10 +152,23 @@ class SchedDataEnt:
         return self.type in self.TYPE_HOLYDAY
 
     def is_important(self):
-        self._log.debug('')
         if self.title == '':
             return False
-        return self.title[0] in self.TITLE_PREFIX_IMPORTANT
+        for start_str in self.TITLE_PREFIX_IMPORTANT:
+            if self.title.lower().startswith(start_str):
+                return True
+
+        return False
+
+    def is_canceled(self):
+        if self.title == '':
+            return False
+
+        for start_str in self.TITLE_PREFIX_CANCELED:
+            if self.title.lower().startswith(start_str):
+                return True
+
+        return False
 
     def get_date(self):
         '''
@@ -274,15 +307,17 @@ class SchedDataFile:
 
         ok = False
         for e in self.ENCODE:
+            self._log.debug('e=%s', e)
             try:
                 with open(self.pathname, encoding=e) as f:
                     lines = f.readlines()
                     ok = True
+                    break
             except FileNotFoundError:
                 self._log.error('%s: not found', self.pathname)
                 return []
             except UnicodeDecodeError:
-                self._log.warning('%s: decode error', e)
+                self._log.warning('%s: decode error .. try next ..', e)
 
         if not ok:
             self._log.warning('%s: invalid encoding', self.pathname)
@@ -339,18 +374,21 @@ class SchedDataFile:
             backup_pathname = self.pathname + self.BACKUP_EXT
             shutil.move(self.pathname, backup_pathname)
 
-        f = open(self.pathname, mode='w')
-        for sde in self.list:
-            line = self.mk_dataline(sde)
-            f.write(line)
-        f.close()
+        with open(self.pathname, mode='w') as f:
+            for sde in self.list:
+                line = self.mk_dataline(sde)
+                f.write(line)
 
-    def get_sde(self, sde_id=None):
+    def get_sde(self, sde_id: str = None) -> SchedDataEnt:
         """
         Parameters
         ----------
         sde_id: str
 
+        Returns
+        -------
+        sde: SchedDataEnt
+        
         """
         self._log.debug('sde_id=%s', sde_id)
 

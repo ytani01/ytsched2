@@ -85,7 +85,7 @@ const execGet = (path, data) => {
     window.location.href=url;
 };
 
-const scrollToId = (id) => {
+const scrollToId = (id, bottom) => {
     console.log(`id=${id}`);
 
     const el = document.getElementById(id);
@@ -99,8 +99,19 @@ const scrollToId = (id) => {
         return false;
     }
 
-    el.scrollIntoView(true);
-    scrollBy(0,-60);
+    const el2 = document.getElementById("top_bottom");
+    if (el2.value == "bottom") {
+        el.scrollIntoView({block: "end", inline: "nearest",
+                           behavior:"auto"});
+        scrollBy({left: 0, top: +3, behavior: "auto"});
+    } else {
+        el.scrollIntoView({block:"start", inline: "nearest",
+                           behavior: "auto"});
+        scrollBy({left: 0, top: -65, behavior: "auto"});
+
+    }
+    
+    //el.scrollIntoView(true);
     return true;
 };
 
@@ -140,13 +151,13 @@ window.addEventListener('scroll', function() {
         el = document.getElementById("date_from");
         date = el.value;
         console.log(`date=${date}`);
-        execGet('/ytsched/', {date: date});
+        execGet('/ytsched/', {date: date, top_bottom: "top"});
     }
-    if (bodyH - tail < 60) {
+    if (bodyH - tail < 25) {
         el = document.getElementById("date_to");
         date = el.value;
         console.log(`date=${date}`);
-        execGet('/ytsched/', {date: date});
+        execGet('/ytsched/', {date: date, top_bottom: "bottom"});
     }
 });
                         

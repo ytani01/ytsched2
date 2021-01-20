@@ -5,6 +5,7 @@
 main for musicbox package
 """
 import click
+import datetime
 from . import SchedDataEnt, SchedDataFile
 from . import WebServer, __prog_name__
 from .my_logger import get_logger
@@ -17,9 +18,11 @@ class DataFileApp:
     def __init__(self, yyyy, mm, dd, topdir='', debug=False):
         self._dbg = debug
         self._log = get_logger(__class__.__name__, self._dbg)
-        self._log.debug('')
+        self._log.debug('yyyy/mm/dd=%s/%s/%s', yyyy, mm, dd)
+        self._log.debug('topdir=%s', topdir)
 
-        self.sdf = SchedDataFile(yyyy, mm, dd, topdir=topdir,
+        self.sdf = SchedDataFile(datetime.date(yyyy, mm, dd),
+                                 topdir=topdir,
                                  debug=self._dbg)
 
     def main(self):
@@ -28,10 +31,9 @@ class DataFileApp:
         if self.sdf.sde:
             for sde in sorted(self.sdf.sde, key=lambda x: x.get_timestr()):
                 print(sde)
-                print('%s' % (sde.mk_dataline()))
+                print('%s' % (sde.mk_dataline().replace('\t', '<tab>')))
         else:
             print('===== No data =====')
-
 
     def end(self):
         self._log.debug('')
@@ -91,7 +93,7 @@ Web server""")
               default=100*1024*1024,
               help='upload size limit, default=%s' % (
                   WebServer.DEF_SIZE_LIMIT))
-@click.option('--version', 'version', type=str, default='<current>',
+@click.option('--version', 'version', type=str, default='(current)',
               help='version string')
 @click.option('--debug', '-d', 'debug', is_flag=True, default=False,
               help='debug flag')

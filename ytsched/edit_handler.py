@@ -43,7 +43,6 @@ class EditHandler(tornado.web.RequestHandler):
 
         super().__init__(app, req)
 
-
     def get(self, date=None, sde_id=None):
         """
         ``date``の優先順位
@@ -99,3 +98,11 @@ class EditHandler(tornado.web.RequestHandler):
                     today=datetime.date.today(),
                     delta_day1=datetime.timedelta(1),
                     version=self._version)
+
+    def post(self):
+        """ POST method """
+        self._mylog.debug('request=%s', self.request.__dict__)
+        self._mylog.debug('request.body_arguments=%s',
+                          self.request.body_arguments)
+
+        self.redicret(self._url_prefix + '/?date=%s')

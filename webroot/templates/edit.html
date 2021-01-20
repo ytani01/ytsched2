@@ -3,21 +3,30 @@
 {% block content %}
 <header>
   <div class="container-fluid p-0 fixed-top my-bar">
-    <div class="row p-0 m-0">
+    <div class="row p-0 m-1">
 
-      <div class="col-4">
-        <i class="fas fa-undo-alt fa-2x"
-           onclick="scrollToDate('{{ url_prefix }}', '{{ sde.date }}');"></i>
+      <div class="col-2 text-center"
+           onclick="scrollToDate(
+                    '{{ url_prefix }}', '{{ sde.date }}');">
+
+        <i class="fas fa-reply fa-2x" ></i>
       </div><!-- col -->
+
       <div class="col-2">
+      </div>
+      
+      <div class="col-2 text-center">
         <i class="fas fa-plus-square fa-2x"></i>
       </div><!-- col -->
 
-      <div class="col-2">
+      <div class="col-2 text-center">
         <i class="fas fa-check-square fa-2x"></i>
       </div><!-- col -->
 
-      <div class="col-4 text-right">
+      <div class="col-2">
+      </div>
+      
+      <div class="col-2 text-center">
         <i class="fas fa-trash-alt fa-2x"></i>
       </div><!-- col -->
 
@@ -29,7 +38,8 @@
     <div class="container-fluid"
          style="background-color: #FFF;">
 
-      <div class="row" style="font-size: large">
+      <!-- 日付 -->
+      <div class="row" style="font-size: x-large">
         <div class="col">
           <input id="date" name="date"
                  type="date" value="{{ sde.date }}" />
@@ -37,41 +47,47 @@
         </div><!-- col -->
       </div><!-- row -->
 
-      <div class="row" style="font-size: large">
+      <!-- 時刻 -->
+      <div class="row" style="font-size: x-large">
         <div class="col">
-          <input id="time_start" name="time_start" style="width: 90px;"
+          <input id="time_start" name="time_start" style="width: 100px;"
                  type="time" value="{{ sde.time_start }}" />
           ～
-          <input id="time_end" name="time_end" style="width: 90px;"
+          <input id="time_end" name="time_end" style="width: 100px;"
                  type="time" value="{{ sde.time_end }}" />
         </div><!-- col -->
       </div><!-- row -->
 
-      <div class="row" style="font-size: medium;">
+      <!-- Type -->
+      <div class="row" style="font-size: x-large;">
         <div class="col">
-          <span style="font-size: large; font-width: bold">【</span>
+          <span style="font-size: xx-large; font-width: bold;">【</span>
           <input id="sde_type" name="sde_type"
-                 type="text" value="{{ sde.type }}" />
-          <span style="font-size: large; font-width: bold">】</span>
+                 type="text" value="{{ sde.type }}"
+                 style="width:70%;" />
+          <span style="font-size: xx-large; font-width: bold">】</span>
         </div><!-- col -->
       </div><!-- row -->
 
-      <div class="row" style="font-size: medium;">
+      <!-- タイトル -->
+      <div class="row" style="font-size: x-large;">
         <div class="col">
           <input id="title" name="title" style="width: 100%;"
                  type="text" value="{{ sde.title }}" />
         </div><!-- col -->
       </div><!-- row -->
 
-      <div class="row" style="font-size: medium;">
+      <!-- 場所 -->
+      <div class="row" style="font-size: x-large;">
         <div class="col">
           <span style="font-size: large">@</span>
-          <input id="place" name="place" style="width: 90%;"
+          <input id="place" name="place" style="width: 93.5%;"
                  type="text" value="{{ sde.place }}" size="30" />
         </div><!-- col -->
       </div><!-- row -->
 
-      <div class="row" style="font-size: medium;">
+      <!-- 詳細 -->
+      <div class="row" style="font-size: large;">
         <div class="col">
           <textarea id="text" name="text" style="width: 100%;"
                     rows="8">
@@ -80,6 +96,7 @@
         </div><!-- col -->
       </div><!-- row -->
 
+      <!-- ID -->
       <div class="row" style="font-size: x-small">
         <div class="col">
           <input id="sde_id" name="sde_id"

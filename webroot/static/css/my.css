@@ -2,3 +2,18 @@
     color: white;
     background-color: #48C;
 }
+
+.longtext {
+     white-space: nowrap;
+     overflow: hidden;
+     text-overflow: ellipsis;
+
+}
+.longtext:focus {
+    border: 1px solid #FFF;
+    white-space: pre-wrap;
+    width: auto;
+    overflow: visible;
+    text-overflow: clip;
+
+}
