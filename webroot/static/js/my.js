@@ -1,6 +1,4 @@
 /**
- * simple chat
- *
  *   (c) 2021 Yoichi Tanibayashi
  */
 const ID_MSG_AREA = "message_area";
@@ -108,8 +106,8 @@ const scrollToId = (id) => {
 
 const scrollToDate = (path, date) => {
     if (scrollToId(`date-${date}`)) {
-        const el = document.getElementById("cur-day");
-        el.innerHTML = date;
+        const el = document.getElementById("cur_day");
+        el.value = date;
         return true;
     }
     execGet(path, {date: date});
@@ -117,8 +115,8 @@ const scrollToDate = (path, date) => {
 };
 
 const moveDays = (path, days) => {
-    const el = document.getElementById("cur-day");
-    let d1 = new Date(el.innerHTML);
+    const el = document.getElementById("cur_day");
+    let d1 = new Date(el.value);
     d1.setDate(d1.getDate() + days);
     console.log(`d1=${d1}`);
 
@@ -128,8 +126,8 @@ const moveDays = (path, days) => {
 
 window.addEventListener('load', function() {
     console.log(`window.onload()`);
-    const el = document.getElementById("cur-day");
-    scrollToDate(location.pathname, el.innerHTML);
+    const el = document.getElementById("cur_day");
+    scrollToDate(location.pathname, el.value);
 });
 
 window.addEventListener('scroll', function() {
@@ -140,13 +138,13 @@ window.addEventListener('scroll', function() {
 
     if (y < 60) {
         el = document.getElementById("date_from");
-        date = el.innerHTML;
+        date = el.value;
         console.log(`date=${date}`);
         execGet('/ytsched/', {date: date});
     }
     if (bodyH - tail < 60) {
         el = document.getElementById("date_to");
-        date = el.innerHTML;
+        date = el.value;
         console.log(`date=${date}`);
         execGet('/ytsched/', {date: date});
     }

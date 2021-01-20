@@ -1,13 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
 <header>
-  <a id="date_from">{{ date_from }}</a>
-  <a id="cur-day">{{ date }}</a>
-  <a id="date_to">{{ date_to }}</a>
+  <input id="date_from" name="date_from" value="{{ date_from }}" />
+  <input id="cur_day" name="cur_day" value="{{ date }}" />
+  <input id="date_to" name="date_to" value="{{ date_to}}" />
   <div class="container-fluid p-0 fixed-top my-bar">
     <div class="row p-0 m-0">
 
       <div class="col-7 p-0">
+
         <div class="row p-0 m-0">
           <div class="col-3 p-0 text-center">
             <i class="fas fa-caret-square-left fa-2x"
@@ -28,6 +29,7 @@
             &nbsp;
           </div><!-- col -->
         </div><!-- row -->
+
         <div class="row p-0 m-0">
           <div class="col-8 p-0 text-center">
             <small><input id="date" name="date"
@@ -38,9 +40,11 @@
             &nbsp;
           </div><!-- col -->
         </div><!-- row -->
+
       </div><!-- col -->
 
       <div class="col-5 text-right">
+
         <div class="row align-middle">
           <div class="col-3 text-right p-0">
             <i class="fas fa-filter"></i>
@@ -49,6 +53,7 @@
             <small><input type="text" size="9" /></small>
           </div><!-- col -->
         </div><!-- row -->
+
         <div class="row align-middle">
           <div class="col-3 text-right p-0">
             <i class="fas fa-search"></i>
@@ -67,47 +72,64 @@
     
     {% set sde_count = 0 %}
     {% for sched_ent in sched %}
-    <!-- {{ sched_ent['date'] }} -->
-    <div id="date-{{ sched_ent['date'] }}"
-         class="row p-0 m-0 border"
-         style="background-color: #DDD;">
+    {% set sched_date = sched_ent['date'] %}
+    <!-- {{ date }} -->
+    {% if sched_date == today %}
+    {% set border = 'border: 3px solid #0FF !important;' %}
+    {% else %}
+    {% set border = 'border: 1px solid #888 !important;' %}
+    {% end %}
+    <div id="date-{{ sched_date }}"
+         class="row p-0 m-0 border rounded"
+         style="background-color:#EEE;{{ border }}" >
+      {% set weekday = sched_date.weekday() %}
+      {% if weekday == 5 %}
+        {% set bg_color = '#CDF' %}
+      {% elif weekday == 6 %}
+        {% set bg_color = '#FCC' %}
+      {% else %}
+        {% set bg_color = '#EFF' %}
+      {% end %}
+
+      {% set url = url_prefix %}
+      {% set obj = {'date': sched_date } %}
       <div class="col-1 p-0 text-center"
-           {% if sched_ent['date'].weekday() == 5 %}
-           style="background-color:#CDF;"
-           {% elif sched_ent['date'].weekday() == 6 %}
-           style="background-color:#FCC;"
-           {% else %}
-           style="background-color:#EFF;"
-           {% end %}
-           onclick="execGet('{{ url_prefix }}', { date: '{{ sched_ent['date'] - delta_day1 }}' })">
+           style="background-color:{{ bg_color }};"
+           onclick="execGet(url, obj);">
         <span style="font-size: x-small; font-weight: unset;">
           {{ sched_ent['date'].month }} /<br />
         </span>
-        {% if sched_ent['date'] == today %}
-        <span style="font-size: large; font-weight: bold;">
-          {% else %}
-          <span style="font-size: small; font-weight: unset;">
-            {% end %}
-            {{ sched_ent['date'].day }}<br />
-          </span>
-          <span style="font-size: x-small; font-weight: unset;">
-            {{ sched_ent['date'].strftime('%a') }}
-          </span>
+        
+        {% if sched_date == today %}
+          {% set font_size = 'large' %}
+          {% set font_weight = 'bold' %}
+        {% else %}
+          {% set font_size = 'small' %}
+          {% set font_weight = 'unset' %}
+        {% end %}
+        <span
+          style="font-size:{{ font_size }};font-weight:{{ font_weight }};">
+          {{ sched_date.day }}<br />
+        </span>
+        <span style="font-size: x-small; font-weight: unset;">
+          {{ sched_date.strftime('%a') }}
+        </span>
       </div><!-- col -->
-
+      
       <div class="col-11 p-0">
-
         {% for sde in sched_ent['sde'] %}
-        <input type="hidden" id="sde_id" name="sde_id"
-               value="{{ sde.id }}" />
         {% set sde_count = sde_count + 1 %}
+        <input id="sde_id" name="sde_id"
+               type="hidden" value="{{ sde.id }}" />
+        {% if sde_count % 2 == 0 %}
+        {% set bg_color = '#FFF' %}
+        {% else %}
+        {% set bg_color = '#FFF' %}
+        {% end %}
+        {% set url = url_prefix + '/edit/' %}
         <div class="container-fluid p-0 border"
-             {% if sde_count % 2 == 0 %}
-             style="background-color:#FFF;"
-             {% else %}
-             style="background-color:#FFF;"
-             {% end %}
-             onclick="execGet('{{ url_prefix + '/edit/' }}', {date: '{{ sched_ent['date'] }}', sde_id: '{{ sde.id }}' })">
+             style="background-color:{{ bg_color }};"
+             onclick="execGet('{{ url }}', {date: '{{ sched_date }}', sde_id: '{{sde.id }}'})">
           <div class="row m-0">
             <div class="col p-0">
               <span style="font-size: x-small;">
@@ -124,6 +146,8 @@
               {% set important_flag = False %}
               {% if sde.title and sde.title[0] in ['★', '☆'] %}
               {% set important_flag = True %}
+              {% end %}
+              {% if important_flag %}
               <strong>
                 {% end %}
                 <span style="font-size: small;">
@@ -134,8 +158,8 @@
                   {% if sde.place %}
                   @{{ sde.place }}
                   {% end %}
-                  {% if important_flag %}
                 </span>
+                {% if important_flag %}
               </strong>
               {% end %}
             </div><!-- col -->
