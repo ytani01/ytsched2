@@ -68,12 +68,13 @@ class SchedDataEnt:
 
     def __init__(self, id='',
                  date: datetime.date = datetime.date.today(),
-                 time_start: datetime.time = None,
-                 time_end: datetime.time = None,
+                 time_start: datetime.time = '',
+                 time_end: datetime.time = '',
                  sde_type='', title='', place='', text='',
                  debug=False):
         self.debug = debug
-        self.__class__._log = get_logger(self.__class__.__name__, self.debug)
+        self.__class__._log = get_logger(self.__class__.__name__,
+                                         self.debug)
         self._log.debug('(%s)%s %s-%s [%s] %s @%s: %s.',
                         id, date, time_start, time_end,
                         sde_type, title, place, text)
@@ -313,10 +314,10 @@ class SchedDataFile:
                     ok = True
                     break
             except FileNotFoundError:
-                self._log.error('%s: not found', self.pathname)
+                self._log.debug('%s: not found', self.pathname)
                 return []
             except UnicodeDecodeError:
-                self._log.warning('%s: decode error .. try next ..', e)
+                self._log.debug('%s: decode error .. try next ..', e)
 
         if not ok:
             self._log.warning('%s: invalid encoding', self.pathname)

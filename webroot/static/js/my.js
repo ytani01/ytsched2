@@ -1,80 +1,31 @@
 /**
  *   (c) 2021 Yoichi Tanibayashi
  */
-const ID_MSG_AREA = "message_area";
-const ID_MY_NAME = "my_name";
-const ID_MY_MSG = "my_msg";
-
-const cookieObj = new MyCookie();
-let myName = "";
-
 let curDay = new Date();
 
 /**
- * 'http://host:port/aaa/bbb/' -> 'ws://host:port/aaa/ws'
- * 'https://host:port/aaa/bbb/' -> 'wss://host:port/aaa/ws'
- */
-const WS_PROTO = location.protocol.replace('http', 'ws');
-const WS_URL = `${WS_PROTO}//${location.host}/`
-      + `${location.pathname.split('/')[1]}/ws/`;
-console.log(`WS_URL=${WS_URL}`);
-
-/**
- * websocket は、常に open の状態にして、メッセージ待ち受ける
- *
- *  - ``window.onload``, ``ws.onclose`` で、``connect_ws()``
- *  - 送信時は、いきなり ``ws.send()``
- */
-let wsObj = undefined;
-
-/**
  *
  */
-const connect_ws = () => {
-    wsObj = new WebSocket(WS_URL);
+const doPost = (path, data) => {
+    const form = document.createElement("form");
+    form.setAttribute("action", path);
+    form.setAttribute("method", "POST");
+    form.style.display = "none";
+    document.body.appendChild(form);
 
-    wsObj.onclose = () => {
-        console.log(`onclose()`);
-        const el = document.getElementById(ID_MSG_AREA);
-        el.value = '';
-        connect_ws();  // reconnect
-    };
-
-    wsObj.onmessage = (event) => {
-        const msg = event.data;
-        console.log(`onmessage(): msg=${msg}`);
-
-        const el = document.getElementById(ID_MSG_AREA);
-        el.value += msg;
-        el.scrollTop = el.scrollHeight; // 最下部にスクロールする
-    };
+    if (data !== undefined) {
+        for (let param in data) {
+            const input = document.createElement("input");
+            input.setAttribute("type", "hidden");
+            input.setAttribute("name", param);
+            input.setAttribute("value", data[param]);
+            form.appendChild(input);
+        }
+    }
+    form.submit();
 };
 
-/**
- * @param {string} msg_id
- */
-const send_msg = () => {
-    const el_msg = document.getElementById(ID_MY_MSG);
-    wsObj.send(`${myName}>${el_msg.value}`);
-    el_msg.value = '';
-};
-
-/**
- * @param {string} name_id
- */
-const set_name = () => {
-    const el_name = document.getElementById(ID_MY_NAME);
-    myName = el_name.value;
-    console.log(`set_name("${ID_MY_NAME}"): ${myName}`);
-    cookieObj.set(ID_MY_NAME, myName);
-};
-
-/***********************************************************/
-
-/**
- *
- */
-const execGet = (path, data) => {
+const doGet = (path, data) => {
     let url = `${location.protocol}//${location.host}${path}?`
 
     for (let param in data) {
@@ -121,7 +72,7 @@ const scrollToDate = (path, date) => {
         el.value = date;
         return true;
     }
-    execGet(path, {date: date});
+    doPost(path, {date: date});
     return false;
 };
 
@@ -134,19 +85,3 @@ const moveDays = (path, days) => {
     d1_str = d1.toISOString().replace(/T.*$/, '');
     scrollToDate(path, d1_str);
 };
-
-/**
-window.onload = () => {
-    console.log(`window.onload()`);
-    connect_ws();
-
-    myName = cookieObj.get(ID_MY_NAME);
-    if (myName === undefined) {
-        myName = "";
-    }
-    console.log(`window.onload(): myName=${myName}`);
-
-    const el_name = document.getElementById(ID_MY_NAME);
-    el_name.value = myName;
-};
-*/

@@ -18,13 +18,13 @@
             el = document.getElementById("date_from");
             date = el.value;
             console.log(`date=${date}`);
-            execGet('/ytsched/', {date: date, top_bottom: "top"});
+            doPost('/ytsched/', {date: date, top_bottom: "top"});
         }
         if (bodyH - tail < 25) {
             el = document.getElementById("date_to");
             date = el.value;
             console.log(`date=${date}`);
-            execGet('/ytsched/', {date: date, top_bottom: "bottom"});
+            doPost('/ytsched/', {date: date, top_bottom: "bottom"});
         }
     });
   </script>
@@ -61,7 +61,7 @@
           </div><!-- col -->
 
           <div class="col-2 text-center"
-               onclick="execGet(
+               onclick="doPost(
                         '{{ url_prefix + 'edit/' }}',
                         {date: '{{ date }}', sde_id: ''} );">
             <i class="fas fa-plus-square fa-2x"></i>
@@ -77,7 +77,7 @@
             <small>
               <input id="date" name="date"
                      type="date" value="{{ date }}"
-                     onchange="execGet(
+                     onchange="doPost(
                                '{{ url_prefix }}', {date: this.value});"/>
             </small>
           </div><!-- col -->
@@ -150,7 +150,7 @@
       {% set obj = {'date': str(sched_date) } %}
       <div class="col-1 p-0 text-center"
            style="background-color:{{ bg_color }};"
-           onclick="execGet({{ url }}, {{ obj }});">
+           onclick="doPost({{ url }}, {{ obj }});">
 
         <div class="row p-0 m-0"
              style="font-size: xx-small; font-weight: unset;">
@@ -192,7 +192,7 @@
         {% else %}
         {% set bg_color = '#FFF' %}
         {% end %}
-        {% set url = url_prefix + '/edit/' %}
+        {% set url = url_prefix + 'edit/' %}
 
         {% if sde.is_canceled() %}
         {% set cancel_flag = True %}
@@ -207,7 +207,9 @@
               {% end %}
           <div class="row m-0">
             <div class="col p-0"
-             onclick="execGet('{{ url }}', {date: '{{ sched_date }}', sde_id: '{{sde.id }}'})">
+             onclick="doPost(
+                      '{{ url }}',
+                      {date:'{{ sched_date }}', sde_id:'{{sde.id }}'})">
               <span style="font-size: x-small;">
                 {% if sde.time_start or sde.time_end %}
                 {% if sde.time_start %}

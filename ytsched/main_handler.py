@@ -8,10 +8,9 @@ MainHandler
 __author__ = 'Yoichi Tanibayashi'
 __date__ = '2021/01'
 
-import os
 import datetime
 import tornado.web
-from . import SchedDataEnt, SchedDataFile
+from .ytsched import SchedDataFile
 from .my_logger import get_logger
 
 
@@ -83,8 +82,8 @@ class MainHandler(tornado.web.RequestHandler):
         sched = []
         delta_day1 = datetime.timedelta(1)
 
-        date_from = date - delta_day1 * days;
-        date_to = date + delta_day1 * (days - 1);
+        date_from = date - delta_day1 * days
+        date_to = date + delta_day1 * (days - 1)
 
         for d in range(-days, days):
             date1 = date + delta_day1 * d
@@ -100,13 +99,12 @@ class MainHandler(tornado.web.RequestHandler):
                 self._mylog.debug('date:%s', dent['date'])
                 for sde in dent['sde']:
                     self._mylog.debug('%s', sde)
-                
-        """
+
         elif self.request.uri != self._url_prefix:
             self._mylog.warning('redirect: %s', self._url_prefix)
             self.redirect(self._url_prefix)
             return
-        """
+
         self.render(self.HTML_FILE,
                     title="ytsched",
                     author=__author__,
@@ -120,14 +118,27 @@ class MainHandler(tornado.web.RequestHandler):
                     top_bottom=top_bottom,
                     version=self._version)
 
-    async def post(self):
-        """
-        POST method
-        """
+    def post(self):
+        """ POST """
         self._mylog.debug('request=%s', self.request.__dict__)
-        self._mylog.debug('request.files[\'file1\']=%s',
-                          self.request.files['file1'])
         self._mylog.debug('request.body_arguments=%s',
                           self.request.body_arguments)
 
-        self.get()
+        date_str = self.get_argument('date', None)
+        if date_str:
+            date = datetime.date.fromisoformat(date_str)
+
+        if not date:
+            year = self.get_argument('year', None)
+            month = self.get_argument('month', None)
+            day = self.get_argument('day', None)
+
+            if year and month and day:
+                date = datetime.date(int(year), int(month), int(day))
+
+        if not date:
+            date = datetime.date.today()
+
+        self._mylog.debug('date=%s', date)
+
+        self.get(date, days=30)

@@ -6,7 +6,7 @@ main for musicbox package
 """
 import click
 import datetime
-from . import SchedDataEnt, SchedDataFile
+from . import SchedDataFile
 from . import WebServer, __prog_name__
 from .my_logger import get_logger
 

@@ -8,10 +8,9 @@ EditHandler
 __author__ = 'Yoichi Tanibayashi'
 __date__ = '2021/01'
 
-import os
 import datetime
 import tornado.web
-from . import SchedDataEnt, SchedDataFile
+from .ytsched import SchedDataEnt, SchedDataFile
 from .my_logger import get_logger
 
 
@@ -63,10 +62,13 @@ class EditHandler(tornado.web.RequestHandler):
 
         """
         self._mylog.debug('date=%s, sde_id=%s', date, sde_id)
+        self._mylog.debug('request=%s', self.request)
 
+        #
+        # date
+        #
         if not date:
             date_str = self.get_argument('date', None)
-            self._mylog.debug('date_str=%s', date_str)
 
             if date_str:
                 date = datetime.date.fromisoformat(date_str)
@@ -74,8 +76,9 @@ class EditHandler(tornado.web.RequestHandler):
         if not date:
             date = datetime.date.today()
 
-        self._mylog.debug('date=%s', date)
-
+        #
+        # sde_id
+        #
         if not sde_id:
             sde_id = self.get_argument('sde_id', None)
 
@@ -86,7 +89,8 @@ class EditHandler(tornado.web.RequestHandler):
 
         else:
             sde = SchedDataEnt('', date, debug=self._dbg)
-            sde_id = sde.id
+
+        self._mylog.debug('date=%s, sde.id=%s', date, sde.id)
 
         self.render(self.HTML_FILE,
                     title="ytsched",
@@ -94,15 +98,23 @@ class EditHandler(tornado.web.RequestHandler):
                     url_prefix=self._url_prefix,
                     date=date,
                     sde=sde,
-                    sde_id=sde_id,
-                    today=datetime.date.today(),
-                    delta_day1=datetime.timedelta(1),
                     version=self._version)
 
     def post(self):
-        """ POST method """
-        self._mylog.debug('request=%s', self.request.__dict__)
+        """
+        """
         self._mylog.debug('request.body_arguments=%s',
                           self.request.body_arguments)
+        self._mylog.debug('request=%s', self.request)
 
-        self.redicret(self._url_prefix + '/?date=%s')
+        date = None
+        date_str = self.get_argument('date', None)
+
+        if date_str:
+            date = datetime.date.fromisoformat(date_str)
+
+        sde_id = self.get_argument('sde_id', None)
+
+        self._mylog.debug('date=%s, sde_id=%s', date, sde_id)
+
+        self.get(date, sde_id)
