@@ -40,7 +40,21 @@ class MainHandler(HandlerBase):
         """
         self._mylog.debug('request=%s', self.request)
 
-        self.exec_cmd()
+        if self.request.uri != self._url_prefix:
+            self._mylog.warning('redirect: %s', self._url_prefix)
+            self.redirect(self._url_prefix)
+            return
+
+        #
+        # exec command (add/fix/del)
+        #
+        todo_flag = self.exec_cmd()
+
+        #
+        # set Date
+        #
+        if todo_flag:
+            date = datetime.date.today()
 
         if not date:
             date_str = self.get_argument('date', None)
@@ -60,6 +74,9 @@ class MainHandler(HandlerBase):
 
         self._mylog.debug('date=%s', date)
 
+        #
+        # load schedule data
+        #
         sched = []
         delta_day1 = datetime.timedelta(1)
 
@@ -81,11 +98,11 @@ class MainHandler(HandlerBase):
                 for sde in dent['sde']:
                     self._mylog.debug('\'%s\'', sde)
 
-        elif self.request.uri != self._url_prefix:
-            self._mylog.warning('redirect: %s', self._url_prefix)
-            self.redirect(self._url_prefix)
-            return
-
+        #
+        # load ToDo
+        #
+        todo_sdf = SchedDataFile(None, self._datadir, debug=self._dbg)
+        
         self.render(self.HTML_FILE,
                     title="ytsched",
                     author=__author__,
@@ -96,6 +113,7 @@ class MainHandler(HandlerBase):
                     date_from=date_from,
                     date_to=date_to,
                     sched=sched,
+                    todo=todo_sdf.sde,
                     top_bottom=top_bottom,
                     version=self._version)
 
@@ -105,34 +123,26 @@ class MainHandler(HandlerBase):
         self._mylog.debug('request.body_arguments=%s',
                           self.request.body_arguments)
 
-        date_str = self.get_argument('date', None)
-        if date_str:
-            date = datetime.date.fromisoformat(date_str)
+        self.get()
 
-        if not date:
-            year = self.get_argument('year', None)
-            month = self.get_argument('month', None)
-            day = self.get_argument('day', None)
-
-            if year and month and day:
-                date = datetime.date(int(year), int(month), int(day))
-
-        if not date:
-            date = datetime.date.today()
-
-        self._mylog.debug('date=%s', date)
-
-        self.get(date, days=30)
-
-    def exec_cmd(self):
+    def exec_cmd(self) -> bool:
         """
+        Returns
+        -------
+        todo_flag: bool
+        
         """
         self._mylog.debug('')
 
+        todo_flag = False
+
         cmd = self.get_argument('cmd', None)
         if not cmd:
-            return
+            return todo_flag
 
+        #
+        # get orig_date
+        #
         orig_date_str = self.get_argument('orig_date', None)
         if orig_date_str:
             orig_date = datetime.date.fromisoformat(orig_date_str)
@@ -141,6 +151,9 @@ class MainHandler(HandlerBase):
 
         self._mylog.debug('orig_date=%s', orig_date)
 
+        #
+        # get (new) date
+        #
         date_str = self.get_argument('date', None)
         if date_str:
             date = datetime.date.fromisoformat(date_str)
@@ -149,6 +162,9 @@ class MainHandler(HandlerBase):
 
         self._mylog.debug('date=%s', date)
 
+        #
+        # get times
+        #
         time_start_str = self.get_argument('time_start', None)
         if time_start_str:
             time_start = datetime.time.fromisoformat(time_start_str)
@@ -164,46 +180,84 @@ class MainHandler(HandlerBase):
         self._mylog.debug('time_start, time_end: %s-%s',
                           time_start, time_end)
 
+        #
+        # get sde_type
+        #
         sde_type = self.get_argument('sde_type', '')
+        if SchedDataEnt.type_is_todo(sde_type):
+            orig_date = None
+            todo_flag = True
+
+        #
+        # title & place
+        #
         title = self.get_argument('title', '')
         place = self.get_argument('place', '')
         self._mylog.debug('[%s]%s@%s', sde_type, title, place)
 
+        #
+        # text
+        #
         text = self.get_argument('text', '')
         self._mylog.debug('test:\'%s\'', text)
         
+        #
+        # sde_id
+        #
         sde_id = self.get_argument('sde_id')
         self._mylog.debug('sde_id=%s', sde_id)
 
+        #
+        # exec cmd
+        #
         if cmd == 'add':
-            self._mylog.debug('EXEC [%s]', cmd)
-
-            sde_id = SchedDataEnt.new_id()
-
-            sdf = SchedDataFile(date, topdir=self._datadir,
-                                debug=self._dbg)
-            sdf.add_sde(sde_id, date, time_start, time_end,
-                        sde_type, title, place, text)
-            sdf.save()
+            self.cmd_add(None, date, time_start, time_end,
+                         sde_type, title, place, text)
 
         if cmd == 'del':
-            self._mylog.debug('EXEC [%s]', cmd)
-
-            orig_sdf = SchedDataFile(orig_date, topdir=self._datadir,
-                                     debug=self._dbg)
-            orig_sdf.del_sde(sde_id)
-            orig_sdf.save()
+            self.cmd_del(sde_id, orig_date)
 
         if cmd == 'fix':
             self._mylog.debug('EXEC [%s]', cmd)
+            self.cmd_del(sde_id, orig_date)
+            self.cmd_add(sde_id, date, time_start, time_end,
+                         sde_type, title, place, text)
 
-            orig_sdf = SchedDataFile(orig_date, topdir=self._datadir,
-                                     debug=self._dbg)
-            orig_sdf.del_sde(sde_id)
-            orig_sdf.save()
-            
+        return todo_flag
+
+    def cmd_add(self, sde_id, date, time_start, time_end,
+                sde_type, title, place, text):
+        """
+        Parameters
+        ----------
+        
+        """
+        self._mylog.debug('sde_id=%s, date=%s', sde_id, date)
+
+        new_sde = SchedDataEnt(sde_id, date, time_start, time_end,
+                               sde_type, title, place, text,
+                               debug=self._dbg)
+        if new_sde.is_todo():
+            sdf = SchedDataFile(None, topdir=self._datadir,
+                                debug=self._dbg)
+        else:
             sdf = SchedDataFile(date, topdir=self._datadir,
                                 debug=self._dbg)
-            sdf.add_sde(sde_id, date, time_start, time_end,
-                        sde_type, title, place, text)
-            sdf.save()
+
+        sdf.add_sde(new_sde)
+        sdf.save()
+        
+    def cmd_del(self, sde_id, date):
+        """
+        Parameters
+        ----------
+        sde_id: str
+
+        date:
+        
+        """
+        self._mylog.debug('sde_id=%s, date=%s', sde_id, date)
+
+        sdf = SchedDataFile(date, topdir=self._datadir, debug=self._dbg)
+        sdf.del_sde(sde_id)
+        sdf.save()

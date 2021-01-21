@@ -19,7 +19,7 @@ class EditHandler(HandlerBase):
     """
     HTML_FILE = 'edit.html'
 
-    def get(self, date=None, sde_id=None):
+    def get(self, date=None, sde_id=None, todo_flag=False):
         """
         ``date``の優先順位
           1. Parameter
@@ -37,8 +37,11 @@ class EditHandler(HandlerBase):
 
         sde_id: str
 
+        todo_flag: bool
+
         """
-        self._mylog.debug('date=%s, sde_id=%s', date, sde_id)
+        self._mylog.debug('date=%s, sde_id=%s, todo_flag=%s',
+                          date, sde_id, todo_flag)
         self._mylog.debug('request=%s', self.request)
 
         #
@@ -59,15 +62,30 @@ class EditHandler(HandlerBase):
         if not sde_id:
             sde_id = self.get_argument('sde_id', None)
 
+        #
+        # todo_flag
+        #
+        todo_flag = self.get_argument('todo_flag', False)
+        if todo_flag == 'true':
+            todo_flag = True
+        else:
+            todo_flag = False
+
+        self._mylog.debug('date=%s, sde_id=%s, todo_flag=%s',
+                          date, sde_id, todo_flag)
+
         if sde_id:
-            sdf = SchedDataFile(date, topdir=self._datadir,
-                                debug=self._dbg)
+            if todo_flag:
+                sdf = SchedDataFile(None, topdir=self._datadir,
+                                    debug=self._dbg)
+            else:
+                sdf = SchedDataFile(date, topdir=self._datadir,
+                                    debug=self._dbg)
+
             sde = sdf.get_sde(sde_id)
 
         else:
-            sde = SchedDataEnt('', date, debug=self._dbg)
-
-        self._mylog.debug('date=%s, sde.id=%s', date, sde.id)
+            sde = SchedDataEnt('', date, debug=self._dbg)        
 
         self.render(self.HTML_FILE,
                     title="ytsched",
@@ -75,23 +93,10 @@ class EditHandler(HandlerBase):
                     url_prefix=self._url_prefix,
                     date=date,
                     sde=sde,
+                    todo_flag=todo_flag,
                     version=self._version)
 
     def post(self):
         """
         """
-        self._mylog.debug('request.body_arguments=%s',
-                          self.request.body_arguments)
-        self._mylog.debug('request=%s', self.request)
-
-        date = None
-        date_str = self.get_argument('date', None)
-
-        if date_str:
-            date = datetime.date.fromisoformat(date_str)
-
-        sde_id = self.get_argument('sde_id', None)
-
-        self._mylog.debug('date=%s, sde_id=%s', date, sde_id)
-
-        self.get(date, sde_id)
+        self.get()

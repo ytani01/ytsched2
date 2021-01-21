@@ -1,0 +1,103 @@
+{% set sde_count = sde_count + 1 %}
+
+{% set bg_color = '#FFF' %}
+{% if todo_flag %}
+  {% set bg_color = '#FFD' %}
+  {% if sde.date < today %}
+    {% set bg_color = '#EEB' %}
+  {% elif sde.date <= today + delta_day1 * 7 %}
+    {% set bg_color = '#FFF' %}
+  {% end %}
+{% end %}
+
+{% set url = url_prefix + 'edit/' %}
+
+{% if sde.is_canceled() %}
+  {% set cancel_flag = True %}
+{% else %}
+  {% set cancel_flag = False %}
+{% end %}
+
+{% if sde.is_important() %}
+  {% set important_flag = True %}
+{% else %}
+  {% set important_flag = False %}
+{% end %}
+<input id="sde_id" name="sde_id"
+       type="hidden" value="{{ sde.id }}" />
+
+<div class="container-fluid p-0 border"
+     style="background-color:{{ bg_color }};">
+  {% if cancel_flag %}
+  <del>
+    {% end %}
+    <div class="row m-0">
+      <div class="col p-0"
+           onclick="doPost(
+                    '{{ url }}',
+                    {
+                    date:'{{ sched_date }}',
+                    sde_id: '{{sde.id }}',
+                    todo_flag: {{ str(todo_flag).lower() }}
+                    } );">
+        {% if not todo_flag %}
+        <span style="font-size: x-small;">
+          {% if sde.time_start or sde.time_end %}
+          {% if sde.time_start %}
+          {{ sde.time_start.strftime('%H:%M') }}
+          {% end %}
+          -
+          {% if sde.time_end %}
+          {{ sde.time_end.strftime('%H:%M') }}
+          {% end %}
+          {% end %}
+        </span>
+        {% end %}
+
+        {% if important_flag %}
+        <!-- <mark> -->
+          <strong>
+            {% end %}
+            <span style="font-size: small;">
+              {% if sde.type %}
+                [{{ sde.type }}]
+              {% end %}
+              {% if todo_flag %}
+                - {{ sde.date }}
+                {% if sde.time_start or sde.time_end %}
+                  {% if sde.time_start %}
+                    {{ sde.time_start.strftime('%H:%M') }}
+                  {% end %}
+                  -
+                  {% if sde.time_end %}
+                    {{ sde.time_end.strftime('%H:%M') }}
+                  {% end %}
+                {% end %}
+              {% end %}
+              {% if not sde.title %}
+              (no title)
+              {% else %}
+              {{ sde.title }}
+              {% end %}
+              {% if sde.place %}
+              @{{ sde.place }}
+              {% end %}
+            </span>
+            {% if important_flag %}
+          </strong>
+          <!-- </mark> -->
+        {% end %}
+      </div><!-- col -->
+    </div><!-- row -->
+    {% set detail = sde.text.rstrip('\n') %}
+    {% if detail %}
+    <div class="row m-0">
+      <div class="col longtext" tabindex="0"
+           style="font-size: small;">{{ detail }}
+      </div><!-- col -->
+    </div><!-- row -->
+    {% end %}
+    {% if cancel_flag %}
+  </del>
+  {% end %}
+</div><!-- container -->

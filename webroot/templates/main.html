@@ -4,6 +4,7 @@
   <script>
     window.addEventListener('load', function() {
         console.log(`window.onload()`);
+
         const el = document.getElementById("cur_day");
         scrollToDate(location.pathname, el.value);
     });
@@ -37,9 +38,10 @@
          type="hidden" value="{{ date }}" />
   <input id="date_to" name="date_to"
          type="hidden" value="{{ date_to}}" />
+  <input id="todo_days" value="">
 
   <div class="container-fluid p-0 fixed-top my-bar">
-    <div class="row p-0 m-1">
+    <div class="row p-0 m-0">
 
       <div class="col-7 p-0">
 
@@ -73,10 +75,11 @@
         </div><!-- row -->
 
         <div class="row p-0 m-0">
-          <div class="col-8 p-0 text-center">
+          <div class="col-8 p-0 text-left">
             <small>
               <input id="date" name="date"
                      type="date" value="{{ date }}"
+                     style="width: 119px"
                      onchange="doPost(
                                '{{ url_prefix }}', {date: this.value});"/>
             </small>
@@ -126,11 +129,18 @@
     {% for sched_ent in sched %}
 
     {% set sched_date = sched_ent['date'] %}
+
     <!-- {{ date }} -->
     {% if sched_date == today %}
-    {% set border = 'border: 3px solid #0FF !important;' %}
+      {% set today_flag = True %}
     {% else %}
-    {% set border = 'border: 1px solid #888 !important;' %}
+      {% set today_flag = False %}
+    {% end %}
+
+    {% if today_flag %}
+      {% set border = 'border: 3px solid #0FF !important;' %}
+    {% else %}
+      {% set border = 'border: 1px solid #888 !important;' %}
     {% end %}
     <div id="date-{{ sched_date }}"
          class="row p-0 m-0 border rounded"
@@ -154,12 +164,12 @@
 
         <div class="row p-0 m-0"
              style="font-size: xx-small; font-weight: unset;">
-          <div class="col p-0 text-left">
+          <div class="col p-0 m-0 text-left">
             &nbsp;{{ sched_ent['date'].month }} /
           </div>
         </div>
 
-        {% if sched_date == today %}
+        {% if today_flag %}
           {% set font_size = 'large' %}
           {% set font_weight = 'bold' %}
         {% else %}
@@ -183,85 +193,21 @@
 
       <!-- スケジュール -->
       <div class="col-11 p-0">
+        {% if today_flag %}
+
+        <!-- ToDo -->
+        {% set todo_flag = True %}
+        {% for sde in todo %}
+        {% if sde.date <= today + delta_day1 * 365 %}
+        {% include sde.html %}
+        {% end %}
+        {% end %}<!-- for sde -->
+        {% end %}<!-- if todo_flag -->
+
+        <!-- Normal Schedule -->
+        {% set todo_flag = False %}
         {% for sde in sched_ent['sde'] %}
-        {% set sde_count = sde_count + 1 %}
-        <input id="sde_id" name="sde_id"
-               type="hidden" value="{{ sde.id }}" />
-        {% if sde_count % 2 == 0 %}
-        {% set bg_color = '#FFF' %}
-        {% else %}
-        {% set bg_color = '#FFF' %}
-        {% end %}
-        {% set url = url_prefix + 'edit/' %}
-
-        {% if sde.is_canceled() %}
-        {% set cancel_flag = True %}
-        {% else %}
-        {% set cancel_flag = False %}
-        {% end %}
-
-        <div class="container-fluid p-0 border"
-             style="background-color:{{ bg_color }};">
-              {% if cancel_flag %}
-              <del>
-              {% end %}
-          <div class="row m-0">
-            <div class="col p-0"
-             onclick="doPost(
-                      '{{ url }}',
-                      {date:'{{ sched_date }}', sde_id:'{{sde.id }}'})">
-              <span style="font-size: x-small;">
-                {% if sde.time_start or sde.time_end %}
-                {% if sde.time_start %}
-                {{ sde.time_start.strftime('%H:%M') }}
-                {% end %}
-                -
-                {% if sde.time_end %}
-                {{ sde.time_end.strftime('%H:%M') }}
-                {% end %}
-                {% end %}
-              </span>
-              {% if sde.is_important() %}
-              {% set important_flag = True %}
-              {% else %}
-              {% set important_flag = False %}
-              {% end %}
-
-              {% if important_flag %}
-              <!-- <mark> -->
-                <strong>
-              {% end %}
-                <span style="font-size: small;">
-                 {% if sde.type %}
-                 [{{ sde.type }}]
-                 {% end %}
-                 {% if not sde.title %}
-                 (no title)
-                 {% else %}
-                 {{ sde.title }}
-                 {% end %}
-                 {% if sde.place %}
-                 @{{ sde.place }}
-                 {% end %}
-                </span>
-              {% if important_flag %}
-                </strong>
-              <!-- </mark> -->
-              {% end %}
-            </div><!-- col -->
-          </div><!-- row -->
-          {% set detail = sde.text.rstrip('\n') %}
-          {% if detail %}
-          <div class="row m-0">
-            <div class="col longtext" tabindex="0"
-                 style="font-size: small;">{{ detail }}
-            </div><!-- col -->
-          </div><!-- row -->
-          {% end %}
-          {% if cancel_flag %}
-              </del>
-              {% end %}
-        </div><!-- container -->
+        {% include sde.html %}
         {% end %}
         
       </div><!-- col -->

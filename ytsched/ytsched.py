@@ -70,7 +70,7 @@ class SchedDataEnt:
 
     _log = get_logger(__name__, False)
 
-    def __init__(self, id='',
+    def __init__(self, id=None,
                  date: datetime.date = datetime.date.today(),
                  time_start: datetime.time = '',
                  time_end: datetime.time = '',
@@ -149,11 +149,28 @@ class SchedDataEnt:
         cls._log.debug('id=%s', id)
         return id
 
+    @classmethod
+    def type_is_todo(cls, sde_type: str) -> bool:
+        """
+        Parameters
+        ----------
+        sde_type: str
+        
+        """
+        cls._log.debug('sde_type=%s', sde_type)
+        if sde_type:
+            return sde_type.startswith(cls.TYPE_PREFIX_TODO)
+
+        return False
+
     def is_todo(self):
+        """
+        """
         self._log.debug('')
-        if self.type == '':
-            return False
-        return self.type.startswith(self.TYPE_PREFIX_TODO)
+        if self.type:
+            return self.type.startswith(self.TYPE_PREFIX_TODO)
+
+        return False
 
     def is_holiday(self):
         self._log.debug('')
@@ -180,16 +197,23 @@ class SchedDataEnt:
 
         return False
 
+    def get_sortkey(self):
+        """
+        """
+        sort_key = '%s %s' % (self.get_date(), self.get_timestr())
+        self._log.debug('sort_key=%s', sort_key)
+        return sort_key
+
     def get_date(self):
-        '''
+        """
         Returns
         -------
         (year, month, day)
-        '''
+        """
         self._log.debug('')
         return (self.date.year, self.date.month, self.date.day)
 
-    def set_date(self, d: datetime.date = None):
+    def set_date(self, d: datetime.date = None) -> None:
         '''
         Parameters
         ----------
@@ -222,7 +246,6 @@ class SchedDataEnt:
 
         time_str = '%s-%s' % (time_start_str, time_end_str)
 
-        self._log.debug('time_str=%s', time_str)
         return time_str
 
     def set_time(self, t1=None, t2=None):
@@ -257,6 +280,8 @@ class SchedDataFile:
     '''
     DEF_TOP_DIR = '/home/ytani/ytsched/data'
     PATH_FORMAT = '%s/%04s/%02s/%02s.cgi'
+    TODO_PATH_FORMAT = '%s/ToDo.cgi'
+    
     BACKUP_EXT = '.bak'
     ENCODE = ['utf-8', 'euc_jp']
 
@@ -264,7 +289,7 @@ class SchedDataFile:
                  debug=False):
         """
         date: datetime.date
-
+            None: ToDo
         topdir: str
 
         """
@@ -290,7 +315,7 @@ class SchedDataFile:
         Parameters
         ----------
         date: datetime.date
-
+            None: ToDo
         Returns
         -------
         path: str
@@ -298,10 +323,13 @@ class SchedDataFile:
         """
         self._log.debug('date=%s, topdir=%s', date, topdir)
 
-        pathname = self.PATH_FORMAT % (topdir,
-                                       date.strftime('%Y'),
-                                       date.strftime('%m'),
-                                       date.strftime('%d'))
+        if date:
+            pathname = self.PATH_FORMAT % (topdir,
+                                           date.strftime('%Y'),
+                                           date.strftime('%m'),
+                                           date.strftime('%d'))
+        else:
+            pathname = self.TODO_PATH_FORMAT % (topdir)
 
         return pathname
 
@@ -345,10 +373,10 @@ class SchedDataFile:
             time1 = d[2].split('-')
 
             time_start1 = time1[0].split(':')
-            self._log.debug('time_start1=%s', time_start1)
+            # self._log.debug('time_start1=%s', time_start1)
 
             time_end1 = time1[1].split(':')
-            self._log.debug('time_end1=%s', time_end1)
+            # self._log.debug('time_end1=%s', time_end1)
 
             if time_start1[0]:
                 time_start2 = datetime.time(
@@ -366,7 +394,7 @@ class SchedDataFile:
                                d[3], d[4], d[5], d[6], debug=self._dbg)
             out.append(sde)
 
-        out2 = sorted(out, key=lambda x: x.get_timestr())
+        out2 = sorted(out, key=lambda x: x.get_sortkey())
         return out2
 
     def save(self):
@@ -389,20 +417,14 @@ class SchedDataFile:
                 line = sde.mk_dataline()
                 f.write(line + '\n')
 
-    def add_sde(self, sde_id='',
-                date: datetime.date = datetime.date.today(),
-                time_start: datetime.time = '',
-                time_end: datetime.time = '',
-                sde_type='', title='', place='', text='') -> None:
+    def add_sde(self, sde: SchedDataEnt) -> None:
         """
         Parameters
         ----------
+        sde: SchedDataEnt
 
         """
-        self._log.debug('')
-        sde = SchedDataEnt(sde_id, date, time_start, time_end,
-                           sde_type, title, place, text,
-                           debug=self._dbg)
+        self._log.debug('sde=%s', sde)
         self.sde.append(sde)
 
     def del_sde(self, sde_id: str = None) -> None:

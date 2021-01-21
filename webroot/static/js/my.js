@@ -1,7 +1,6 @@
 /**
  *   (c) 2021 Yoichi Tanibayashi
  */
-let curDay = new Date();
 
 /**
  *
@@ -25,6 +24,9 @@ const doPost = (path, data) => {
     form.submit();
 };
 
+/**
+ *
+ */
 const doGet = (path, data) => {
     let url = `${location.protocol}//${location.host}${path}?`
 
@@ -36,6 +38,9 @@ const doGet = (path, data) => {
     window.location.href=url;
 };
 
+/**
+ *
+ */
 const scrollToId = (id, bottom) => {
     console.log(`id=${id}`);
 
@@ -66,6 +71,9 @@ const scrollToId = (id, bottom) => {
     return true;
 };
 
+/**
+ *
+ */
 const scrollToDate = (path, date) => {
     if (scrollToId(`date-${date}`)) {
         const el = document.getElementById("cur_day");
@@ -76,6 +84,9 @@ const scrollToDate = (path, date) => {
     return false;
 };
 
+/**
+ *
+ */
 const moveDays = (path, days) => {
     const el = document.getElementById("cur_day");
     let d1 = new Date(el.value);
