@@ -135,32 +135,6 @@ const moveDays = (path, days) => {
     scrollToDate(path, d1_str);
 };
 
-window.addEventListener('load', function() {
-    console.log(`window.onload()`);
-    const el = document.getElementById("cur_day");
-    scrollToDate(location.pathname, el.value);
-});
-
-window.addEventListener('scroll', function() {
-    const y = window.pageYOffset;
-    const tail = window.pageYOffset + window.innerHeight;
-    const bodyH = document.body.clientHeight;
-    console.log(`${y}-${bodyH - tail}`);
-
-    if (y < 60) {
-        el = document.getElementById("date_from");
-        date = el.value;
-        console.log(`date=${date}`);
-        execGet('/ytsched/', {date: date, top_bottom: "top"});
-    }
-    if (bodyH - tail < 25) {
-        el = document.getElementById("date_to");
-        date = el.value;
-        console.log(`date=${date}`);
-        execGet('/ytsched/', {date: date, top_bottom: "bottom"});
-    }
-});
-                        
 /**
 window.onload = () => {
     console.log(`window.onload()`);

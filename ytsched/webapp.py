@@ -14,8 +14,6 @@ import tornado.httpserver
 import tornado.web
 from .main_handler import MainHandler
 from .edit_handler import EditHandler
-from .handler1 import Handler1
-from .wshandler1 import WsHandler1
 from .my_logger import get_logger
 
 

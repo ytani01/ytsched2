@@ -13,7 +13,6 @@ import os
 import shutil
 import re
 import datetime
-import html2text
 from .my_logger import get_logger
 
 
@@ -274,8 +273,8 @@ class SchedDataFile:
         self.sde = self.load()
 
     def date2path(self,
-                  date: datetime.date =None,
-                  topdir=DEF_TOP_DIR) -> str:
+                  date: datetime.date = None,
+                  topdir: str = DEF_TOP_DIR) -> str:
         """
         Parameters
         ----------
@@ -344,13 +343,13 @@ class SchedDataFile:
                 time_start2 = datetime.time(
                     int(time_start1[0]) % 24, int(time_start1[1]) % 60)
             else:
-                time_start2 = None
+                time_start2 = ''
 
             if time_end1[0]:
                 time_end2 = datetime.time(
                     int(time_end1[0]) % 24, int(time_end1[1]) % 60)
             else:
-                time_end2 = None
+                time_end2 = ''
 
             sde = SchedDataEnt(d[0], date2, time_start2, time_end2,
                                d[3], d[4], d[5], d[6], debug=self._dbg)
