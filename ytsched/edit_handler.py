@@ -74,6 +74,9 @@ class EditHandler(HandlerBase):
         self._mylog.debug('date=%s, sde_id=%s, todo_flag=%s',
                           date, sde_id, todo_flag)
 
+        #
+        # sde
+        #
         if sde_id:
             if todo_flag:
                 sdf = SchedDataFile(None, topdir=self._datadir,

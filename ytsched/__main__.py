@@ -96,7 +96,7 @@ Web server""")
               default=100*1024*1024,
               help='upload size limit, default=%s' % (
                   WebServer.DEF_SIZE_LIMIT))
-@click.option('--version', 'version', type=str, default='(current)',
+@click.option('--version', 'version', type=str, default='(cur)',
               help='version string')
 @click.option('--debug', '-d', 'debug', is_flag=True, default=False,
               help='debug flag')

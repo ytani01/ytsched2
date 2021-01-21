@@ -21,6 +21,17 @@ class MainHandler(HandlerBase):
 
     DEF_DAYS = 30
 
+    TODO_DAYS = {'off': 0,
+                 '1w': 7,
+                 '1mo': 30,
+                 '1yr': 365,
+                 '10yrs': 365 * 10 + 2,
+                 'all': 365 * 100
+                 }
+    DEF_TODO_DAYS = 365
+
+    COOKIE_TODO_DAYS = "todo_days"
+
     def get(self, date=None, days=DEF_DAYS):
         """
         GET method and rendering
@@ -45,10 +56,15 @@ class MainHandler(HandlerBase):
             self.redirect(self._url_prefix)
             return
 
+        todo_flag = False
+
         #
         # exec command (add/fix/del)
         #
-        todo_flag = self.exec_cmd()
+        cmd = self.get_argument('cmd', None)
+
+        if cmd in ['add', 'fix', 'del']:
+            todo_flag = self.exec_update(cmd)
 
         #
         # set Date
@@ -58,6 +74,7 @@ class MainHandler(HandlerBase):
 
         if not date:
             date_str = self.get_argument('date', None)
+            self._mylog.debug('date_str=%s', date_str)
             if date_str:
                 date = datetime.date.fromisoformat(date_str)
 
@@ -102,7 +119,29 @@ class MainHandler(HandlerBase):
         # load ToDo
         #
         todo_sdf = SchedDataFile(None, self._datadir, debug=self._dbg)
+
+        #
+        # todo_days_value
+        #
         
+        todo_days_value0 = self.get_cookie(self.COOKIE_TODO_DAYS)
+        self._mylog.debug('todo_days_value0=%s', todo_days_value0)
+        todo_days_value = self.get_argument('todo_days', None)
+        self._mylog.debug('todo_days_value=%s', todo_days_value)
+        if todo_days_value:
+            if todo_days_value != todo_days_value0:
+                self.set_cookie(self.COOKIE_TODO_DAYS, todo_days_value)
+            else:
+                pass
+
+        elif todo_days_value0:
+            todo_days_value = todo_days_value0
+        else:
+            todo_days_value = self.DEF_TODO_DAYS
+
+        todo_days_value = int(todo_days_value)
+        self._mylog.debug('todo_days_value=%a', todo_days_value)
+
         self.render(self.HTML_FILE,
                     title="ytsched",
                     author=__author__,
@@ -114,6 +153,8 @@ class MainHandler(HandlerBase):
                     date_to=date_to,
                     sched=sched,
                     todo=todo_sdf.sde,
+                    todo_days_list=self.TODO_DAYS,
+                    todo_days_value=todo_days_value,
                     top_bottom=top_bottom,
                     version=self._version)
 
@@ -125,20 +166,20 @@ class MainHandler(HandlerBase):
 
         self.get()
 
-    def exec_cmd(self) -> bool:
+    def exec_update(self, cmd: str) -> bool:
         """
+        Parameters
+        ----------
+        cmd: str
+
         Returns
         -------
         todo_flag: bool
-        
+
         """
         self._mylog.debug('')
 
         todo_flag = False
-
-        cmd = self.get_argument('cmd', None)
-        if not cmd:
-            return todo_flag
 
         #
         # get orig_date
@@ -200,7 +241,7 @@ class MainHandler(HandlerBase):
         #
         text = self.get_argument('text', '')
         self._mylog.debug('test:\'%s\'', text)
-        
+
         #
         # sde_id
         #
@@ -230,7 +271,7 @@ class MainHandler(HandlerBase):
         """
         Parameters
         ----------
-        
+
         """
         self._mylog.debug('sde_id=%s, date=%s', sde_id, date)
 
@@ -246,7 +287,7 @@ class MainHandler(HandlerBase):
 
         sdf.add_sde(new_sde)
         sdf.save()
-        
+
     def cmd_del(self, sde_id, date):
         """
         Parameters
@@ -254,7 +295,7 @@ class MainHandler(HandlerBase):
         sde_id: str
 
         date:
-        
+
         """
         self._mylog.debug('sde_id=%s, date=%s', sde_id, date)
 

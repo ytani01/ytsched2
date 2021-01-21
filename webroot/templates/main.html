@@ -38,7 +38,6 @@
          type="hidden" value="{{ date }}" />
   <input id="date_to" name="date_to"
          type="hidden" value="{{ date_to}}" />
-  <input id="todo_days" value="">
 
   <div class="container-fluid p-0 fixed-top my-bar">
     <div class="row p-0 m-0">
@@ -46,11 +45,8 @@
       <div class="col-7 p-0">
 
         <div class="row p-0 m-0">
-          <div class="col-3 p-0 text-center"
-               onclick="moveDays('{{ url_prefix }}', -7);">
-            <i class="fas fa-caret-square-left fa-2x"></i>
-          </div><!-- col -->
-          <div class="col-2 p-0 text-center">
+          <!-- home -->
+          <div class="col-3 p-0 text-center">
             <i class="fas fa-home fa-2x"
                onclick="scrollToDate(
                         '{{ url_prefix }}',
@@ -58,35 +54,52 @@
           </div><!-- col -->
           
           <div class="col-3 p-0 text-center"
-               onclick="moveDays('{{ url_prefix }}', +7);" >
-            <i class="fas fa-caret-square-right fa-2x"></i>
+               onclick="moveDays('{{ url_prefix }}', -7);">
+            <i class="fas fa-caret-square-up fa-2x"></i>
           </div><!-- col -->
 
-          <div class="col-2 text-center"
+          <div class="col-3 p-0 text-center"
+               onclick="moveDays('{{ url_prefix }}', +7);" >
+            <i class="fas fa-caret-square-down fa-2x"></i>
+          </div><!-- col -->
+
+          <div class="col-3 text-center"
                onclick="doPost(
                         '{{ url_prefix + 'edit/' }}',
                         {date: '{{ date }}', sde_id: ''} );">
             <i class="fas fa-plus-square fa-2x"></i>
           </div><!-- col -->
 
-          <div class="col-2 text-center">
-            &nbsp;
-          </div><!-- col -->
         </div><!-- row -->
 
-        <div class="row p-0 m-0">
-          <div class="col-8 p-0 text-left">
-            <small>
-              <input id="date" name="date"
-                     type="date" value="{{ date }}"
-                     style="width: 119px"
-                     onchange="doPost(
-                               '{{ url_prefix }}', {date: this.value});"/>
-            </small>
+        <div class="row p-0 m-0" style="font-size: x-small;">
+          <div class="col-6 p-0 text-left">
+            <input id="date" name="date"
+                   type="date" value="{{ date }}"
+                   style="width: 119px"
+                   onchange="doPost(
+                             '{{ url_prefix }}', {date: this.value});"/>
           </div><!-- col -->
 
-          <div class="col-4 p-0 text-center">
-            &nbsp;
+          <div class="col-6 p-0 text-center">
+            <form id="todo_days_form" name="todo_days_form"
+                  action="{{ url_prefix }}" method="POST">
+            ToDo
+            <select id="todo_days" name="todo_days"
+                    onchange="document.todo_days_form.submit();">
+              {% for opt in todo_days_list %}
+                {% if todo_days_list[opt] == todo_days_value %}
+                  <option value="{{ todo_days_list[opt] }}" selected>
+                    {{ opt }}
+                  </option>
+                {% else %}
+                  <option value="{{ todo_days_list[opt] }}">
+                    {{ opt }}
+                  </option>
+                {% end %}
+              {% end %}
+            </select>
+            </form>
           </div><!-- col -->
         </div><!-- row -->
 
@@ -193,16 +206,18 @@
 
       <!-- スケジュール -->
       <div class="col-11 p-0">
-        {% if today_flag %}
+        {% if today_flag and todo_days_value %}
 
         <!-- ToDo -->
         {% set todo_flag = True %}
         {% for sde in todo %}
-        {% if sde.date <= today + delta_day1 * 365 %}
+        {% if sde.date <= today + delta_day1 * todo_days_value %}
         {% include sde.html %}
-        {% end %}
+        {% end %}<!-- if sde.date -->
         {% end %}<!-- for sde -->
-        {% end %}<!-- if todo_flag -->
+
+        {% end %}<!-- if today_flag and todo_days_value -->
+                          
 
         <!-- Normal Schedule -->
         {% set todo_flag = False %}
