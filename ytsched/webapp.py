@@ -28,6 +28,8 @@ class WebServer:
     DEF_WORKDIR = '~/ytsched'
     DEF_DATADIR = DEF_WORKDIR + '/data'
 
+    CONF_FNAME = 'Conf.cgi'
+
     DEF_SIZE_LIMIT = 100*1024*1024  # 100MB
 
     def __init__(self, port: int = DEF_PORT,
@@ -92,6 +94,7 @@ class WebServer:
             url_prefix=self.URL_PREFIX + '/',
 
             datadir=self._datadir,
+            conffname=self.CONF_FNAME,
             webroot=self._webroot,
             days=self._days,
             size_limit=self._size_limit,

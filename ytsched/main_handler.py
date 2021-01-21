@@ -124,13 +124,13 @@ class MainHandler(HandlerBase):
         # todo_days_value
         #
         
-        todo_days_value0 = self.get_cookie(self.COOKIE_TODO_DAYS)
+        todo_days_value0 = self.get_conf('ToDo_Days')
         self._mylog.debug('todo_days_value0=%s', todo_days_value0)
         todo_days_value = self.get_argument('todo_days', None)
         self._mylog.debug('todo_days_value=%s', todo_days_value)
         if todo_days_value:
             if todo_days_value != todo_days_value0:
-                self.set_cookie(self.COOKIE_TODO_DAYS, todo_days_value)
+                self.set_conf('ToDo_Days', todo_days_value)
             else:
                 pass
 

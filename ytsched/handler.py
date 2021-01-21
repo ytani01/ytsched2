@@ -8,6 +8,7 @@ HandlerBase
 __author__ = 'Yoichi Tanibayashi'
 __date__ = '2021/01'
 
+import os
 import tornado.web
 from .my_logger import get_logger
 
@@ -31,6 +32,10 @@ class HandlerBase(tornado.web.RequestHandler):
         self._datadir = app.settings.get('datadir')
         self._mylog.debug('datadir=%s', self._datadir)
 
+        conf_fname = app.settings.get('conffname')
+        self._conf_file = os.path.join(self._datadir, conf_fname)
+        self._mylog.debug('conf_file=%s', self._conf_file)
+
         self._webroot = app.settings.get('webroot')
         self._mylog.debug('webroot=%s', self._webroot)
 
@@ -40,4 +45,51 @@ class HandlerBase(tornado.web.RequestHandler):
         self._version = app.settings.get('version')
         self._mylog.debug('version=%s', self._version)
 
+        self._conf = self.load_conf()
+                        
         super().__init__(app, req)
+
+    def load_conf(self):
+        """
+        """
+        self._mylog.debug('')
+
+        conf = {}
+        with open(self._conf_file) as f:
+            lines = f.readlines()
+            
+        for line in lines:
+            if line:
+                self._mylog.debug('line=%s', line)
+                (param, value) = line.split('\t', maxsplit=2)
+                value = value.rstrip('\n') 
+                self._mylog.debug('%a,%a.', param, value) 
+                conf[param] = value
+
+        return conf
+
+    def save_conf(self):
+        """
+        """
+        self._mylog.debug('')
+
+        with open(self._conf_file, mode='w') as f:
+            for p in self._conf:
+                f.write('%s\t%s\n' % (p, self._conf[p]))
+
+    def get_conf(self, name):
+        """
+        """
+        self._mylog.debug('name=%s', name)
+
+        try:
+            return self._conf[name]
+        except KeyError:
+            return None
+
+    def set_conf(self, name, value):
+        """
+        """
+        self._mylog.debug('name=%s, value=%s', name, value)
+        self._conf[name] = value
+        self.save_conf()
