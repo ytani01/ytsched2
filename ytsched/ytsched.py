@@ -50,6 +50,7 @@ def text2htmlstr(intext: str) -> str:
     outtext = intext.rstrip('\n')
     outtext = outtext.replace('&', '&amp;')
     outtext = outtext.replace(' ', '&nbsp;')
+    outtext = outtext.replace('\r', '')
     outtext = outtext.replace('\n', '<br />')
     return outtext
 
@@ -59,8 +60,11 @@ class SchedDataEnt:
     スケジュール・データ・エンティティ
     '''
     TIME_NULL = ':-:'
+    TITLE_NULL = ''
+
     TYPE_PREFIX_TODO = '□'
     TYPE_HOLYDAY = ['休日', '祝日']
+    
     TITLE_PREFIX_IMPORTANT = ['★', '☆']
     TITLE_PREFIX_CANCELED = ['(キャンセル', '(欠', '(中止', '(休']
 
@@ -70,12 +74,14 @@ class SchedDataEnt:
                  date: datetime.date = datetime.date.today(),
                  time_start: datetime.time = '',
                  time_end: datetime.time = '',
-                 sde_type='', title='', place='', text='',
+                 sde_type='', title=TITLE_NULL, place='', text='',
                  debug=False):
+        """ Constructor
+        """
         self.debug = debug
         self.__class__._log = get_logger(self.__class__.__name__,
                                          self.debug)
-        self._log.debug('(%s)%s %s-%s [%s] %s @%s: %s.',
+        self._log.debug('(%s)%s %s-%s [%s] %s @%s:\'%s\'',
                         id, date, time_start, time_end,
                         sde_type, title, place, text)
 
@@ -88,7 +94,10 @@ class SchedDataEnt:
         self.place = place
         self.text = htmlstr2text(text)
 
-        if self.id == '':
+        if not self.title:
+            self.title = self.TITLE_NULL
+
+        if not self.id:
             self.id = SchedDataEnt.new_id()
 
     def __str__(self):
@@ -128,10 +137,11 @@ class SchedDataEnt:
             time_end_str = self.time_end.strftime('%H:%M')
 
         time_str = time_start_str + '-' + time_end_str
-
-        return '\t'.join((self.id, date_str, time_str,
+        text_htmlstr = text2htmlstr(self.text)
+        
+        return '\t'.join([self.id, date_str, time_str,
                           self.type, self.title, self.place,
-                          text2htmlstr(self.text)))
+                          text_htmlstr])
 
     @classmethod
     def new_id(cls):
@@ -292,7 +302,7 @@ class SchedDataFile:
                                        date.strftime('%Y'),
                                        date.strftime('%m'),
                                        date.strftime('%d'))
-                                   
+
         return pathname
 
     def load(self):
@@ -360,14 +370,14 @@ class SchedDataFile:
         return out2
 
     def save(self):
-        '''
+        """
         データファイルへ保存
 
         Notes
         -----
         全て上書きされる。
         ファイルが存在する場合は、バックアップされる。
-        '''
+        """
         self._log.debug('')
 
         if os.path.exists(self.pathname):
@@ -375,9 +385,42 @@ class SchedDataFile:
             shutil.move(self.pathname, backup_pathname)
 
         with open(self.pathname, mode='w') as f:
-            for sde in self.list:
-                line = self.mk_dataline(sde)
-                f.write(line)
+            for sde in self.sde:
+                line = sde.mk_dataline()
+                f.write(line + '\n')
+
+    def add_sde(self, sde_id='',
+                date: datetime.date = datetime.date.today(),
+                time_start: datetime.time = '',
+                time_end: datetime.time = '',
+                sde_type='', title='', place='', text='') -> None:
+        """
+        Parameters
+        ----------
+
+        """
+        self._log.debug('')
+        sde = SchedDataEnt(sde_id, date, time_start, time_end,
+                           sde_type, title, place, text,
+                           debug=self._dbg)
+        self.sde.append(sde)
+
+    def del_sde(self, sde_id: str = None) -> None:
+        """
+        Parameters
+        ----------
+        sde_id: str
+
+        """
+        self._log.debug('sde_id=%s', sde_id)
+        for sde in self.sde:
+            if sde.id == sde_id:
+                self._log.debug('DEL:%s', sde)
+                self.sde.remove(sde)
+                break
+
+        for sde in self.sde:
+            self._log.debug('%s', sde)
 
     def get_sde(self, sde_id: str = None) -> SchedDataEnt:
         """
@@ -388,7 +431,7 @@ class SchedDataFile:
         Returns
         -------
         sde: SchedDataEnt
-        
+
         """
         self._log.debug('sde_id=%s', sde_id)
 

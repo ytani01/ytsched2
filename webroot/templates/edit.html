@@ -3,7 +3,22 @@
 {% block content %}
 <header>
   <script>
-    
+    const update_wday = () => {
+    };
+
+    const mkInput = (cmd) => {
+        const input = document.createElement("input");
+        input.setAttribute("type", "hidden");
+        input.setAttribute("name", "cmd");
+        input.setAttribute("value", cmd);
+        return input;
+    };
+
+    const doSubmit = (cmd) => {
+        form = document.forms["input_form"];
+        form.appendChild(mkInput(cmd));
+        form.submit();
+    };
   </script>
   
   <div class="container-fluid p-0 fixed-top my-bar">
@@ -16,18 +31,18 @@
       <div class="col-2">
       </div>
       
-      <div class="col-2 text-center">
+      <div class="col-2 text-center" onclick="doSubmit('add');">
         <i class="fas fa-plus-square fa-2x"></i>
       </div><!-- col -->
 
-      <div class="col-2 text-center">
+      <div class="col-2 text-center" onclick="doSubmit('fix');">
         <i class="fas fa-check-square fa-2x"></i>
       </div><!-- col -->
 
       <div class="col-2">
       </div>
       
-      <div class="col-2 text-center">
+      <div class="col-2 text-center" onclick="doSubmit('del');">
         <i class="fas fa-trash-alt fa-2x"></i>
       </div><!-- col -->
 
@@ -35,7 +50,10 @@
   </div><!-- container -->
 </header>
 <main style="background-color: #FFF; padding-top: 40px;">
-  <form id="input_form" name="input_form" action="/edit/" method="GET">
+  <form id="input_form" name="input_form"
+        action="{{ url_prefix }}" method="POST">
+    <input id="orig_date" name="orig_date"
+           type="hidden" value="{{ sde.date }}" />
     <div class="container-fluid"
          style="background-color: #FFF;">
 
@@ -43,8 +61,9 @@
       <div class="row" style="font-size: x-large">
         <div class="col">
           <input id="date" name="date"
-                 type="date" value="{{ sde.date }}" />
-          ({{ date.strftime('%a') }})
+                 type="date" value="{{ sde.date }}"
+                 onchange="update_wday();" />
+          (<span id="wday">{{ date.strftime('%a') }}</span>)
         </div><!-- col -->
       </div><!-- row -->
 

@@ -8,6 +8,7 @@ import click
 import datetime
 from . import SchedDataFile
 from . import WebServer, __prog_name__
+from . import MainHandler
 from .my_logger import get_logger
 
 __author__ = 'Yoichi Tanibayashi'
@@ -89,6 +90,8 @@ Web server""")
 @click.option('--datadir', '-w', 'datadir', type=click.Path(),
               default=WebServer.DEF_DATADIR,
               help='data directory')
+@click.option('--days', 'days', type=int, default=MainHandler.DEF_DAYS,
+              help='+/- days')
 @click.option('--size_limit', '-l', 'size_limit', type=int,
               default=100*1024*1024,
               help='upload size limit, default=%s' % (
@@ -97,11 +100,11 @@ Web server""")
               help='version string')
 @click.option('--debug', '-d', 'debug', is_flag=True, default=False,
               help='debug flag')
-def webapp(port, webroot, datadir, size_limit, version, debug):
+def webapp(port, webroot, datadir, days, size_limit, version, debug):
     """ cmd1  """
     log = get_logger(__name__, debug)
 
-    app = WebServer(port, webroot, datadir, size_limit, version,
+    app = WebServer(port, webroot, datadir, days, size_limit, version,
                     debug=debug)
     try:
         app.main()

@@ -11,9 +11,10 @@ __prog_name__ = 'Ytsched'
 
 from .ytsched import SchedDataEnt, SchedDataFile
 from .webapp import WebServer
+from .main_handler import MainHandler
 
 __all__ = [
     '__author__', '__version__', '__prog_name__',
     'SchedDataEnt', 'SchedDataFile',
-    'WebServer',
+    'WebServer', 'MainHandler'
 ]

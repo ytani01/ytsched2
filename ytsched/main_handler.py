@@ -9,40 +9,19 @@ __author__ = 'Yoichi Tanibayashi'
 __date__ = '2021/01'
 
 import datetime
-import tornado.web
-from .ytsched import SchedDataFile
-from .my_logger import get_logger
+from .handler import HandlerBase
+from .ytsched import SchedDataFile, SchedDataEnt
 
 
-class MainHandler(tornado.web.RequestHandler):
+class MainHandler(HandlerBase):
     """
     Web request handler
     """
     HTML_FILE = 'main.html'
 
-    def __init__(self, app, req):
-        """ Constructor """
-        self._dbg = app.settings.get('debug')
-        self._mylog = get_logger(self.__class__.__name__, self._dbg)
-        self._mylog.debug('debug=%s', self._dbg)
-        self._mylog.debug('app=%s', app)
-        self._mylog.debug('req=%s', req)
+    DEF_DAYS = 30
 
-        self._url_prefix = app.settings.get('url_prefix')
-        self._mylog.debug('url_prefix=%s', self._url_prefix)
-
-        self._datadir = app.settings.get('datadir')
-        self._mylog.debug('datadir=%s', self._datadir)
-
-        self._webroot = app.settings.get('webroot')
-        self._mylog.debug('webroot=%s', self._webroot)
-
-        self._version = app.settings.get('version')
-        self._mylog.debug('version=%s', self._version)
-
-        super().__init__(app, req)
-
-    def get(self, date=None, days=30):
+    def get(self, date=None, days=DEF_DAYS):
         """
         GET method and rendering
 
@@ -60,6 +39,8 @@ class MainHandler(tornado.web.RequestHandler):
             +/- days
         """
         self._mylog.debug('request=%s', self.request)
+
+        self.exec_cmd()
 
         if not date:
             date_str = self.get_argument('date', None)
@@ -98,7 +79,7 @@ class MainHandler(tornado.web.RequestHandler):
             for dent in sched:
                 self._mylog.debug('date:%s', dent['date'])
                 for sde in dent['sde']:
-                    self._mylog.debug('%s', sde)
+                    self._mylog.debug('\'%s\'', sde)
 
         elif self.request.uri != self._url_prefix:
             self._mylog.warning('redirect: %s', self._url_prefix)
@@ -142,3 +123,87 @@ class MainHandler(tornado.web.RequestHandler):
         self._mylog.debug('date=%s', date)
 
         self.get(date, days=30)
+
+    def exec_cmd(self):
+        """
+        """
+        self._mylog.debug('')
+
+        cmd = self.get_argument('cmd', None)
+        if not cmd:
+            return
+
+        orig_date_str = self.get_argument('orig_date', None)
+        if orig_date_str:
+            orig_date = datetime.date.fromisoformat(orig_date_str)
+        else:
+            orig_date = datetime.date.today()
+
+        self._mylog.debug('orig_date=%s', orig_date)
+
+        date_str = self.get_argument('date', None)
+        if date_str:
+            date = datetime.date.fromisoformat(date_str)
+        else:
+            date = datetime.date.today()
+
+        self._mylog.debug('date=%s', date)
+
+        time_start_str = self.get_argument('time_start', None)
+        if time_start_str:
+            time_start = datetime.time.fromisoformat(time_start_str)
+        else:
+            time_start = None
+
+        time_end_str = self.get_argument('time_end', None)
+        if time_end_str:
+            time_end = datetime.time.fromisoformat(time_end_str)
+        else:
+            time_end = None
+
+        self._mylog.debug('time_start, time_end: %s-%s',
+                          time_start, time_end)
+
+        sde_type = self.get_argument('sde_type', '')
+        title = self.get_argument('title', '')
+        place = self.get_argument('place', '')
+        self._mylog.debug('[%s]%s@%s', sde_type, title, place)
+
+        text = self.get_argument('text', '')
+        self._mylog.debug('test:\'%s\'', text)
+        
+        sde_id = self.get_argument('sde_id')
+        self._mylog.debug('sde_id=%s', sde_id)
+
+        if cmd == 'add':
+            self._mylog.debug('EXEC [%s]', cmd)
+
+            sde_id = SchedDataEnt.new_id()
+
+            sdf = SchedDataFile(date, topdir=self._datadir,
+                                debug=self._dbg)
+            sdf.add_sde(sde_id, date, time_start, time_end,
+                        sde_type, title, place, text)
+            sdf.save()
+
+        if cmd == 'del':
+            self._mylog.debug('EXEC [%s]', cmd)
+
+            orig_sdf = SchedDataFile(orig_date, topdir=self._datadir,
+                                     debug=self._dbg)
+            orig_sdf.del_sde(sde_id)
+            orig_sdf.save()
+
+        if cmd == 'fix':
+            self._mylog.debug('EXEC [%s]', cmd)
+
+            orig_sdf = SchedDataFile(orig_date, topdir=self._datadir,
+                                     debug=self._dbg)
+            orig_sdf.del_sde(sde_id)
+            orig_sdf.save()
+            
+            sdf = SchedDataFile(date, topdir=self._datadir,
+                                debug=self._dbg)
+            sdf.add_sde(sde_id, date, time_start, time_end,
+                        sde_type, title, place, text)
+            sdf.save()
