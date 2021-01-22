@@ -105,33 +105,47 @@
 
       </div><!-- col -->
 
-      <div class="col-5 text-right">
-
-        <div class="row align-middle">
-          <div class="col-1 p-0"></div>
-
-          <div class="col-2 text-center p-0">
-            <i class="fas fa-filter"></i>
-          </div><!-- col -->
+      <div class="col-5 p-0 text-right">
+        
+        <div class="container-fluid p-0">
           
-          <div class="col-9 text-center p-0">
-            <small><input type="text" size="9" /></small>
-          </div><!-- col -->
-        </div><!-- row -->
+          <form id="form_filter" name="form_filter"
+                  action="{{ url_prefix }}" method="POST">
+              
+            <div class="row p-0 m-0 align-middle">
 
-        <div class="row align-middle">
-          <div class="col-1 p-0"></div>
+              <div class="col-4 p-0 text-center"
+                   onclick="document.form_filter.submit();">
+                <i class="fas fa-filter fa-lg"></i>
+              </div><!-- col -->
+              
+              <div class="col-8 p-0 text-center" style="font-size: small">
+                <input id="filter" name="filter" type="text" size="9" />
+                
+              </div><!-- col -->
+            </div><!-- row -->
+          </form>
+          
+          <form id="form_search" name="form_search"
+                action="{{ url_prefix }}" method="POST">
+            
+            <div class="row p-0 m-0 align-middle">
+              
+              <div class="col-4 p-0 text-center"
+                   onclick="document.form_search.submit();">
+                <i class="fas fa-search fa-lg"></i>
+              </div><!-- col -->
+              
+              <div class="col-8 p-0 text-center" style="font-size: small">
+                <input id="search" name="search" type="text" size="9" />
 
-          <div class="col-2 text-center p-0">
-            <i class="fas fa-search"></i>
-          </div><!-- col -->
-
-          <div class="col-9 text-center p-0">
-            <small><input type="text" size="9" /></small>
-          </div><!-- col -->
-        </div><!-- row -->
-      </div><!-- col -->
-
+              </div><!-- col -->
+              
+            </div><!-- row -->
+          </form>
+            
+        </div><!-- col -->
+      </div><!-- container -->
     </div><!-- row -->
   </div><!-- container -->
 </header>

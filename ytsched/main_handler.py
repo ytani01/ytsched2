@@ -19,13 +19,14 @@ class MainHandler(HandlerBase):
     """
     HTML_FILE = 'main.html'
 
-    DEF_DAYS = 30
+    DEF_DAYS = 60
 
     TODO_DAYS = {'off': 0,
-                 '1w': 7,
-                 '1mo': 30,
-                 '1yr': 365,
-                 '10yrs': 365 * 10 + 2,
+                 '1W': 7,
+                 '1M': 30,
+                 '3M': 93,
+                 '1Y': 365,
+                 '10Y': 365 * 10 + 2,
                  'all': 365 * 100
                  }
     DEF_TODO_DAYS = 365
@@ -123,11 +124,12 @@ class MainHandler(HandlerBase):
         #
         # todo_days_value
         #
-        
         todo_days_value0 = self.get_conf('ToDo_Days')
         self._mylog.debug('todo_days_value0=%s', todo_days_value0)
+
         todo_days_value = self.get_argument('todo_days', None)
         self._mylog.debug('todo_days_value=%s', todo_days_value)
+
         if todo_days_value:
             if todo_days_value != todo_days_value0:
                 self.set_conf('ToDo_Days', todo_days_value)

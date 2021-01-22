@@ -64,7 +64,7 @@ class SchedDataEnt:
 
     TYPE_PREFIX_TODO = '□'
     TYPE_HOLYDAY = ['休日', '祝日']
-    
+
     TITLE_PREFIX_IMPORTANT = ['★', '☆']
     TITLE_PREFIX_CANCELED = ['(キャンセル', '(欠', '(中止', '(休']
 
@@ -138,7 +138,7 @@ class SchedDataEnt:
 
         time_str = time_start_str + '-' + time_end_str
         text_htmlstr = text2htmlstr(self.text)
-        
+
         return '\t'.join([self.id, date_str, time_str,
                           self.type, self.title, self.place,
                           text_htmlstr])
@@ -155,7 +155,7 @@ class SchedDataEnt:
         Parameters
         ----------
         sde_type: str
-        
+
         """
         cls._log.debug('sde_type=%s', sde_type)
         if sde_type:
@@ -281,7 +281,7 @@ class SchedDataFile:
     DEF_TOP_DIR = '/home/ytani/ytsched/data'
     PATH_FORMAT = '%s/%04s/%02s/%02s.cgi'
     TODO_PATH_FORMAT = '%s/ToDo.cgi'
-    
+
     BACKUP_EXT = '.bak'
     ENCODE = ['utf-8', 'euc_jp']
 

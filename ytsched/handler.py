@@ -46,7 +46,7 @@ class HandlerBase(tornado.web.RequestHandler):
         self._mylog.debug('version=%s', self._version)
 
         self._conf = self.load_conf()
-                        
+
         super().__init__(app, req)
 
     def load_conf(self):
@@ -57,13 +57,13 @@ class HandlerBase(tornado.web.RequestHandler):
         conf = {}
         with open(self._conf_file) as f:
             lines = f.readlines()
-            
+
         for line in lines:
             if line:
                 self._mylog.debug('line=%s', line)
                 (param, value) = line.split('\t', maxsplit=2)
-                value = value.rstrip('\n') 
-                self._mylog.debug('%a,%a.', param, value) 
+                value = value.rstrip('\n')
+                self._mylog.debug('%a,%a.', param, value)
                 conf[param] = value
 
         return conf

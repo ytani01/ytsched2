@@ -52,7 +52,7 @@ class EditHandler(HandlerBase):
 
             if date_str:
                 date = datetime.date.fromisoformat(date_str)
-                
+
         if not date:
             date = datetime.date.today()
 
@@ -88,7 +88,7 @@ class EditHandler(HandlerBase):
             sde = sdf.get_sde(sde_id)
 
         else:
-            sde = SchedDataEnt('', date, debug=self._dbg)        
+            sde = SchedDataEnt('', date, debug=self._dbg)
 
         self.render(self.HTML_FILE,
                     title="ytsched",
