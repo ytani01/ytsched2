@@ -15,6 +15,11 @@ from .my_logger import get_logger
 
 class HandlerBase(tornado.web.RequestHandler):
     """ HandlerBase """
+    CONF_FNAME = 'Conf.cgi'
+    CONF_KEY_TODO_DAYS = 'ToDo_Days'
+    CONF_KEY_FILTER_STR = 'FilterStr'
+    CONF_KEY_SEARCH_STR = 'SearchStr'
+
     def __init__(self, app, req):
         """ Constructor """
         self._dbg = app.settings.get('debug')
@@ -32,8 +37,7 @@ class HandlerBase(tornado.web.RequestHandler):
         self._datadir = app.settings.get('datadir')
         self._mylog.debug('datadir=%s', self._datadir)
 
-        conf_fname = app.settings.get('conffname')
-        self._conf_file = os.path.join(self._datadir, conf_fname)
+        self._conf_file = os.path.join(self._datadir, self.CONF_FNAME)
         self._mylog.debug('conf_file=%s', self._conf_file)
 
         self._webroot = app.settings.get('webroot')
@@ -90,6 +94,6 @@ class HandlerBase(tornado.web.RequestHandler):
     def set_conf(self, name, value):
         """
         """
-        self._mylog.debug('name=%s, value=%s', name, value)
+        self._mylog.debug('name=%s, value=\'%s\'', name, value)
         self._conf[name] = value
         self.save_conf()

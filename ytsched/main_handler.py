@@ -93,38 +93,9 @@ class MainHandler(HandlerBase):
         self._mylog.debug('date=%s', date)
 
         #
-        # load schedule data
-        #
-        sched = []
-        delta_day1 = datetime.timedelta(1)
-
-        date_from = date - delta_day1 * days
-        date_to = date + delta_day1 * (days - 1)
-
-        for d in range(-days, days):
-            date1 = date + delta_day1 * d
-            self._mylog.debug('date1=%s', date)
-            sdf = SchedDataFile(date1, self._datadir, debug=self._dbg)
-            self._mylog.debug('sdf=%s', sdf)
-            sched.append({'date': date1, 'sde': sdf.sde})
-
-        top_bottom = self.get_argument('top_bottom', None)
-
-        if self._dbg:
-            for dent in sched:
-                self._mylog.debug('date:%s', dent['date'])
-                for sde in dent['sde']:
-                    self._mylog.debug('\'%s\'', sde)
-
-        #
-        # load ToDo
-        #
-        todo_sdf = SchedDataFile(None, self._datadir, debug=self._dbg)
-
-        #
         # todo_days_value
         #
-        todo_days_value0 = self.get_conf('ToDo_Days')
+        todo_days_value0 = self.get_conf(self.CONF_KEY_TODO_DAYS)
         self._mylog.debug('todo_days_value0=%s', todo_days_value0)
 
         todo_days_value = self.get_argument('todo_days', None)
@@ -132,7 +103,7 @@ class MainHandler(HandlerBase):
 
         if todo_days_value:
             if todo_days_value != todo_days_value0:
-                self.set_conf('ToDo_Days', todo_days_value)
+                self.set_conf(self.CONF_KEY_TODO_DAYS, todo_days_value)
             else:
                 pass
 
@@ -144,6 +115,112 @@ class MainHandler(HandlerBase):
         todo_days_value = int(todo_days_value)
         self._mylog.debug('todo_days_value=%a', todo_days_value)
 
+        #
+        # filter_str
+        #
+        filter_str0 = self.get_conf(self.CONF_KEY_FILTER_STR)
+        filter_str = self.get_argument('filter_str', None)
+
+        if filter_str is not None:
+            if filter_str != filter_str0:
+                self.set_conf(self.CONF_KEY_FILTER_STR, filter_str)
+            else:
+                pass
+
+        elif filter_str0:
+            filter_str = filter_str0
+        else:
+            filter_str = ''
+
+        self._mylog.debug('filter_str=\'%s\'', filter_str)
+        
+        #
+        # search_str
+        #
+        search_str0 = self.get_conf(self.CONF_KEY_SEARCH_STR)
+        search_str = self.get_argument('search_str', None)
+        if search_str is not None:
+            if search_str != search_str0:
+                self.set_conf(self.CONF_KEY_SEARCH_STR, search_str)
+            else:
+                pass
+            
+        elif search_str0:
+            search_str = search_str0
+        else:
+            search_str = ''
+
+        self._mylog.debug('search_str=\'%s\'', search_str)
+
+        #
+        # load schedule data
+        #
+        sched = []
+        delta_day1 = datetime.timedelta(1)
+        date_from = date - delta_day1 * days
+        date_to = date + delta_day1 * (days - 1)
+
+        if search_str:
+            date_from = date - delta_day1 * 365
+            date_to = date + delta_day1 * 365
+
+        date1 = date_from - delta_day1
+        while date1 < date_to:
+            date1 += delta_day1
+            self._mylog.debug('date1=%s', date1)
+            
+            sdf = SchedDataFile(date1, self._datadir, debug=self._dbg)
+#            self._mylog.debug('sdf=%s', sdf)
+
+            out_sde = []
+            for sde in sdf.sde:
+                if filter_str.startswith('!'):
+                    if filter_str[1:] in sde.search_str():
+                        continue
+                else:
+                    if filter_str not in sde.search_str():
+                        continue
+
+                if search_str:
+                    if search_str not in sde.search_str():
+                        continue
+
+                out_sde.append(sde)
+
+            if search_str and not out_sde:
+                continue
+
+            sched.append({'date': date1, 'sde': out_sde})
+
+        top_bottom = self.get_argument('top_bottom', None)
+
+#        if self._dbg:
+#            for dent in sched:
+#                self._mylog.debug('date:%s', dent['date'])
+#                for sde in dent['sde']:
+#                    self._mylog.debug('\'%s\'', sde)
+
+        #
+        # load ToDo
+        #
+        todo_sdf = SchedDataFile(None, self._datadir, debug=self._dbg)
+        todo_sde = []
+        for sde in todo_sdf.sde:
+            if filter_str.startswith('!'):
+                if filter_str[1:] in sde.search_str():
+                    continue
+            else:
+                if filter_str not in sde.search_str():
+                    continue
+
+            if search_str:
+                if search_str not in sde.search_str():
+                    continue
+
+            todo_sde.append(sde)
+        #
+        # render
+        #
         self.render(self.HTML_FILE,
                     title="ytsched",
                     author=__author__,
@@ -154,9 +231,11 @@ class MainHandler(HandlerBase):
                     date_from=date_from,
                     date_to=date_to,
                     sched=sched,
-                    todo=todo_sdf.sde,
+                    todo=todo_sde,
                     todo_days_list=self.TODO_DAYS,
                     todo_days_value=todo_days_value,
+                    filter_str=filter_str,
+                    search_str=search_str,
                     top_bottom=top_bottom,
                     version=self._version)
 

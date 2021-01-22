@@ -5,6 +5,12 @@
     window.addEventListener('load', function() {
         console.log(`window.onload()`);
 
+        const el_search = document.getElementById("search_str");
+        console.log(`search_str=${el_search.value}`);
+        if (el_search.value != "") {
+            return;
+        }
+
         const el = document.getElementById("cur_day");
         scrollToDate(location.pathname, el.value);
     });
@@ -15,6 +21,12 @@
         const bodyH = document.body.clientHeight;
         console.log(`${y}-${bodyH - tail}`);
         
+        const el_search = document.getElementById("search_str");
+        console.log(`search_str=${el_search.value}`);
+        if (el_search.value != "") {
+            return;
+        }
+
         if (y < 70) {
             el = document.getElementById("date_from");
             date = el.value;
@@ -30,29 +42,20 @@
     });
   </script>
                         
-  <input id="top_bottom" name="top_bottom"
-         type="hidden" value="{{ top_bottom }}" />
-  <input id="date_from" name="date_from"
-         type="hidden" value="{{ date_from }}" />
-  <input id="cur_day" name="cur_day"
-         type="hidden" value="{{ date }}" />
-  <input id="date_to" name="date_to"
-         type="hidden" value="{{ date_to}}" />
-
   <!-- menu bar -->
   <div class="container-fluid p-0 fixed-top my-bar">
     <div class="row m-0" style="z-index:100">
 
       <!-- home -->
       <div class="col-2 p-0 text-center">
+        <!--
         <i class="fas fa-circle-notch fa-2x fa-spin"
            onmousedown="scrollToDate(
                         '{{ url_prefix }}', '{{ today }}');" ></i>
-        <!-- 
+        -->
         <i class="fas fa-home fa-2x"
            onmousedown="scrollToDate(
                         '{{ url_prefix }}', '{{ today }}');" ></i>
-        -->
       </div><!-- col -->
       
       <!-- add -->
@@ -68,22 +71,22 @@
         <form id="form_search" name="form_search"
               action="{{ url_prefix }}" method="POST">
 
-          <input id="search" name="search" type="text" size="10"
-                 style="font-size: medium; vertical-align: middle;"/>
-
-          <i class="fas fa-search fa-2x"
+          {% if search_str %}
+            {% set search_spin="fa-spin" %}
+          {% else %}
+            {% set search_spin="" %}
+          {% end %}
+          <input id="search_str" name="search_str" type="text" size="10"
+                 style="font-size: medium; vertical-align: middle;"
+                 value="{{ search_str }}" />
+          <i class="fas fa-search fa-2x {{ search_spin }}"
              style="vertical-align: middle;"
              onmousedown="document.form_search.submit();"></i>
-          <!-- spin
-          <i class="fas fa-search fa-2x fa-spin"
-             style="vertical-align: middle;"
-             onmousedown="document.form_search.submit();"></i>
-          -->
 
         </form>
       </div><!-- col -->
 
-      <!-- menu -->
+      <!-- menu_sw -->
       <div class="col-2 p-0 text-center" style="font-size: x-small;">
         <label for="menu-sw" class="m-0">
           <i class="fas fa-bars fa-3x"></i></label>
@@ -129,20 +132,71 @@
       <div class="col-4 p-0 text-center" style="font-size: small;">
         <form id="form_filter" name="form_filter"
               action="{{ url_prefix }}" method="POST">
-          <input id="filter" name="filter" type="text" size="5"
+          <input id="filter_str" name="filter_str" type="text" size="5"
                  style="vertical-align: middle;"
-                 style="font-size: medium;"/>
+                 value="{{ filter_str }}" />
           <i class="fas fa-filter fa-2x" style="vertical-align: middle;"
              onmousedown="document.form_filter.submit();"></i>
         </form>
       </div><!-- col -->
           
+      <div class="col-12" style="height: 5px;">
+        &nbsp;
+      </div>
+
+      <div class="col-5" style="font-size: small;">
+        Version {{ version }}
+      </div>
+      <div class="col-7 text-right" style="font-size: small">
+        (c) 2020 <strong>{{ author }}</strong>
+      </div>
+    
     </div><!-- row -->        
+
   </div><!-- container -->
 </header>
 <main style="background-color:#FFF;padding-top: 65px;">
   <div class="container-fluid p-0">
     
+    <input id="top_bottom" name="top_bottom"
+           type="hidden" value="{{ top_bottom }}" />
+    <input id="date_from" name="date_from"
+           type="hidden" value="{{ date_from }}" />
+    <input id="cur_day" name="cur_day"
+           type="hidden" value="{{ date }}" />
+    <input id="date_to" name="date_to"
+           type="hidden" value="{{ date_to}}" />
+
+    {% if search_str %}
+
+        {% set date_from2 = str(date_from).replace('-','/') %}
+        {% set date_to2 = str(date_to).replace('-','/') %}
+        {% set date2 = str(date).replace('-', '/') %}
+        {% set delta_from = (date_from - date) / date.resolution %}
+        {% set delta_to = (date_to - date) / date.resolution %}
+
+    <div class="row m-0" style="background-color:#FF0;">
+      <div class="col-2 p-0 text-center">
+        <i class="far fa-arrow-alt-circle-up fa-2x"
+           onmousedown="moveDays('{{ url_prefix }}', {{ delta_from }}, 'auto');"></i>
+      </div>
+      <div class="col-2 p-0 text-center">
+        <i class="far fa-arrow-alt-circle-down fa-2x"
+           onmousedown="moveDays('{{ url_prefix }}', {{ delta_to }}, 'auto');"></i>
+      </div>
+      <div class="col-8 p-0">
+        <strong>
+          {{ date_from2 }}
+          ～
+          <input type="date" value="{{ date }}" />
+          ～
+          {{ date_to2 }}
+        </strong>
+      </div>
+    </div>
+    <hr />
+    {% end %}
+
     {% set sde_count = 0 %}
     {% for sched_ent in sched %}
 
@@ -213,21 +267,21 @@
       <div class="col-11 p-0">
         {% if today_flag and todo_days_value %}
 
-        <!-- ToDo -->
-        {% set todo_flag = True %}
-        {% for sde in todo %}
-        {% if sde.date <= today + delta_day1 * todo_days_value %}
-        {% include sde.html %}
-        {% end %}<!-- if sde.date -->
-        {% end %}<!-- for sde -->
+          <!-- ToDo -->
+          {% set todo_flag = True %}
 
+          {% for sde in todo %}
+            {% if sde.date <= today + delta_day1 * todo_days_value %}
+              {% include sde.html %}
+            {% end %}<!-- if sde.date -->
+          {% end %}<!-- for sde -->
         {% end %}<!-- if today_flag and todo_days_value -->
                           
 
         <!-- Normal Schedule -->
         {% set todo_flag = False %}
         {% for sde in sched_ent['sde'] %}
-        {% include sde.html %}
+          {% include sde.html %}
         {% end %}
         
       </div><!-- col -->

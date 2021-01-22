@@ -26,11 +26,22 @@ def htmlstr2text(intext: str) -> str:
     -------
     outtext: str
     """
+    resub_tbl = {
+        r'&gt;': '>',
+        r'&lt;': '<',
+        r'&amp;': '&',
+        r'&nbsp:': ' ',
+        r'&#160;': ' ',
+        r'\<BR *\/*\>': '\n'
+    }
+
     outtext = intext
     # outtext = html2text.html2text(intext)
-    outtext = outtext.replace('&amp;', '&')
-    outtext = outtext.replace('&nbsp;', ' ')
-    outtext = outtext.replace('&#160;', ' ')
+
+    for k in resub_tbl:
+        # outtext = outtext.replace(k, replace_tbl[k])
+        outtext = re.sub(k, resub_tbl[k], outtext, flags=re.IGNORECASE)
+
     outtext = re.sub(r'<BR */*>', '\n', outtext, flags=re.IGNORECASE)
     return outtext
 
@@ -48,8 +59,10 @@ def text2htmlstr(intext: str) -> str:
         HTML text
     """
     outtext = intext.rstrip('\n')
-    outtext = outtext.replace('&', '&amp;')
-    outtext = outtext.replace(' ', '&nbsp;')
+
+    # outtext = outtext.replace('&', '&amp;')
+    # outtext = outtext.replace(' ', '&nbsp;')
+
     outtext = outtext.replace('\r', '')
     outtext = outtext.replace('\n', '<br />')
     return outtext
@@ -81,9 +94,9 @@ class SchedDataEnt:
         self.debug = debug
         self.__class__._log = get_logger(self.__class__.__name__,
                                          self.debug)
-        self._log.debug('(%s)%s %s-%s [%s] %s @%s:\'%s\'',
-                        id, date, time_start, time_end,
-                        sde_type, title, place, text)
+#        self._log.debug('(%s)%s %s-%s [%s] %s @%s:\'%s\'',
+#                        id, date, time_start, time_end,
+#                        sde_type, title, place, text)
 
         self.id = id
         self.date = date
@@ -143,6 +156,19 @@ class SchedDataEnt:
                           self.type, self.title, self.place,
                           text_htmlstr])
 
+    def search_str(self):
+        """
+        Returns
+        -------
+        search_str: str
+        
+        """
+        search_str = '%s %s %s %s' % (
+            self.type, self.title, self.place,
+            self.text.replace('\n', ' '))
+
+        return search_str
+
     @classmethod
     def new_id(cls):
         id = str(time.time()).replace('.', '-')
@@ -201,7 +227,6 @@ class SchedDataEnt:
         """
         """
         sort_key = '%s %s' % (self.get_date(), self.get_timestr())
-        self._log.debug('sort_key=%s', sort_key)
         return sort_key
 
     def get_date(self):
@@ -210,7 +235,6 @@ class SchedDataEnt:
         -------
         (year, month, day)
         """
-        self._log.debug('')
         return (self.date.year, self.date.month, self.date.day)
 
     def set_date(self, d: datetime.date = None) -> None:
@@ -295,7 +319,7 @@ class SchedDataFile:
         """
         self._dbg = debug
         self._log = get_logger(__class__.__name__, self._dbg)
-        self._log.debug('date=%s, topdir=%s', date, topdir)
+#        self._log.debug('date=%s, topdir=%s', date, topdir)
 
         self.date = date
         self.topdir = topdir
@@ -328,9 +352,6 @@ class SchedDataFile:
                                            date.strftime('%d'))
         else:
             pathname = self.TODO_PATH_FORMAT % (topdir)
-
-        self._log.debug('date=%s, topdir=%s, pathname=%s',
-                        date, topdir, pathname)
 
         return pathname
 
