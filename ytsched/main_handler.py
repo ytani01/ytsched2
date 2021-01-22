@@ -186,11 +186,10 @@ class MainHandler(HandlerBase):
         #
         # get orig_date
         #
+        orig_date = None
         orig_date_str = self.get_argument('orig_date', None)
         if orig_date_str:
             orig_date = datetime.date.fromisoformat(orig_date_str)
-        else:
-            orig_date = datetime.date.today()
 
         self._mylog.debug('orig_date=%s', orig_date)
 

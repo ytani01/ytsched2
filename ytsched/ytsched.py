@@ -321,8 +321,6 @@ class SchedDataFile:
         path: str
 
         """
-        self._log.debug('date=%s, topdir=%s', date, topdir)
-
         if date:
             pathname = self.PATH_FORMAT % (topdir,
                                            date.strftime('%Y'),
@@ -330,6 +328,9 @@ class SchedDataFile:
                                            date.strftime('%d'))
         else:
             pathname = self.TODO_PATH_FORMAT % (topdir)
+
+        self._log.debug('date=%s, topdir=%s, pathname=%s',
+                        date, topdir, pathname)
 
         return pathname
 
@@ -411,6 +412,8 @@ class SchedDataFile:
         if os.path.exists(self.pathname):
             backup_pathname = self.pathname + self.BACKUP_EXT
             shutil.move(self.pathname, backup_pathname)
+
+        os.makedirs(os.path.dirname(self.pathname), exist_ok=True)
 
         with open(self.pathname, mode='w') as f:
             for sde in self.sde:
