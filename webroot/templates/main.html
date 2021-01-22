@@ -15,7 +15,7 @@
         const bodyH = document.body.clientHeight;
         console.log(`${y}-${bodyH - tail}`);
         
-        if (y < 60) {
+        if (y < 70) {
             el = document.getElementById("date_from");
             date = el.value;
             console.log(`date=${date}`);
@@ -54,12 +54,12 @@
           </div><!-- col -->
           
           <div class="col-3 p-0 text-center"
-               onclick="moveDays('{{ url_prefix }}', -7);">
+               onclick="moveDays('{{ url_prefix }}', -7, 'smooth');">
             <i class="fas fa-caret-square-up fa-2x"></i>
           </div><!-- col -->
 
           <div class="col-3 p-0 text-center"
-               onclick="moveDays('{{ url_prefix }}', +7);" >
+               onclick="moveDays('{{ url_prefix }}', +7, 'smooth');" >
             <i class="fas fa-caret-square-down fa-2x"></i>
           </div><!-- col -->
 

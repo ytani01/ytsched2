@@ -41,7 +41,7 @@ const doGet = (path, data) => {
 /**
  *
  */
-const scrollToId = (id, bottom) => {
+const scrollToId = (id, bottom, behavior = "auto") => {
     console.log(`id=${id}`);
 
     const el = document.getElementById(id);
@@ -58,12 +58,12 @@ const scrollToId = (id, bottom) => {
     const el2 = document.getElementById("top_bottom");
     if (el2.value == "bottom") {
         el.scrollIntoView({block: "end", inline: "nearest",
-                           behavior:"auto"});
+                           behavior: behavior});
         scrollBy({left: 0, top: +3, behavior: "auto"});
     } else {
         el.scrollIntoView({block:"start", inline: "nearest",
                            behavior: "auto"});
-        scrollBy({left: 0, top: -65, behavior: "auto"});
+        scrollBy({left: 0, top: -80, behavior: behavior});
 
     }
     
@@ -74,8 +74,8 @@ const scrollToId = (id, bottom) => {
 /**
  *
  */
-const scrollToDate = (path, date) => {
-    if (scrollToId(`date-${date}`)) {
+const scrollToDate = (path, date, behavior = "auto") => {
+    if (scrollToId(`date-${date}`, "top", behavior)) {
         const el = document.getElementById("cur_day");
         el.value = date;
         return true;
@@ -87,12 +87,12 @@ const scrollToDate = (path, date) => {
 /**
  *
  */
-const moveDays = (path, days) => {
+const moveDays = (path, days, behavior = "auto") => {
     const el = document.getElementById("cur_day");
     let d1 = new Date(el.value);
     d1.setDate(d1.getDate() + days);
     console.log(`d1=${d1}`);
 
     d1_str = d1.toISOString().replace(/T.*$/, '');
-    scrollToDate(path, d1_str);
+    scrollToDate(path, d1_str, behavior);
 };
