@@ -9,12 +9,14 @@
 {% end %}
 <header>
   <script>
+    const wdayList = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
     const update_wday = () => {
         const el1 = document.getElementById("date");
         const d1 = new Date(el1.value);
 
         const el2 = document.getElementById("wday");
-        el2.innerHTML = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d1.getDay()]
+        el2.innerHTML = wdayList[d1.getDay()]
     };
 
     const mkInput = (cmd) => {
@@ -32,13 +34,11 @@
     };
 
     const changeDate = (d) => {
-        const el = document.getElementById("date");
-        let d1 = new Date(el.value);
+        const el_date = document.getElementById("date");
+        let d1 = new Date(el_date.value);
         d1.setDate(d1.getDate() + d);
-        console.log(`d1=${d1}`);
-        d1_str = d1.toISOString().replace(/T.*$/, '');
+        el_date.value = d1.toISOString().replace(/T.*$/, '');
 
-        el.value = d1_str;
         update_wday();
     };
   </script>
@@ -46,19 +46,19 @@
   <div class="container-fluid p-0 fixed-top my-bar">
     <div class="row p-0 m-1">
 
-      <div class="col-2 text-center" ontouchstart="history.back();">
+      <div class="col-2 text-center" onmousedown="history.back();">
         <i class="fas fa-reply fa-2x" ></i>
       </div><!-- col -->
       
       <div class="col-1"></div>
 
-      <div class="col-2 text-center" onclick="doSubmit('add');">
+      <div class="col-2 text-center" onmousedown="doSubmit('add');">
         <i class="fas fa-plus-square fa-2x"></i>
       </div><!-- col -->
 
       <div class="col-1"></div>
 
-      <div class="col-2 text-center" onclick="doSubmit('fix');">
+      <div class="col-2 text-center" onmousedown="doSubmit('fix');">
         <i class="fas fa-check-square fa-2x"></i>
       </div><!-- col -->
 
@@ -88,13 +88,13 @@
       <!-- 日付 -->
       <div class="row" style="font-size: large">
         <div class="col-2 text-center"
-             ontouchstart="changeDate(1);">
-          <i class="far fa-arrow-alt-circle-down fa-2x"></i>
+             onmousedown="changeDate(-1);">
+          <i class="far fa-arrow-alt-circle-up fa-2x"></i>
         </div>
 
         <div class="col-2 text-center"
-             ontouchstart="changeDate(-1);">
-          <i class="far fa-arrow-alt-circle-up fa-2x"></i>
+             onmousedown="changeDate(1);">
+          <i class="far fa-arrow-alt-circle-down fa-2x"></i>
         </div>
 
         <div class="col-8 p-0 text-left">

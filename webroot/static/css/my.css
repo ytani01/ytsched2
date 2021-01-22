@@ -3,6 +3,17 @@
     background-color: #48C;
 }
 
+.my-bar-content {
+    position: fixed;
+    top: -100px;
+    width: 100%;
+    /* transition: all 0.5s;*/
+}
+
+#menu-sw:checked ~ .my-bar-content {
+    top: 34px;
+}
+
 .longtext {
      white-space: nowrap;
      overflow: hidden;

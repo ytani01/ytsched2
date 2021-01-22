@@ -39,114 +39,105 @@
   <input id="date_to" name="date_to"
          type="hidden" value="{{ date_to}}" />
 
+  <!-- menu bar -->
   <div class="container-fluid p-0 fixed-top my-bar">
-    <div class="row p-0 m-0">
+    <div class="row m-0" style="z-index:100">
 
-      <div class="col-7 p-0">
-
-        <div class="row p-0 m-0">
-          <!-- home -->
-          <div class="col-3 p-0 text-center">
-            <i class="fas fa-home fa-2x"
-               onclick="scrollToDate(
-                        '{{ url_prefix }}',
-                        '{{ today }}');" ></i>
-          </div><!-- col -->
-          
-          <div class="col-3 p-0 text-center"
-               onclick="moveDays('{{ url_prefix }}', -7, 'smooth');">
-            <i class="fas fa-caret-square-up fa-2x"></i>
-          </div><!-- col -->
-
-          <div class="col-3 p-0 text-center"
-               onclick="moveDays('{{ url_prefix }}', +7, 'smooth');" >
-            <i class="fas fa-caret-square-down fa-2x"></i>
-          </div><!-- col -->
-
-          <div class="col-3 text-center"
-               onclick="doPost(
+      <!-- home -->
+      <div class="col-2 p-0 text-center">
+        <i class="fas fa-circle-notch fa-2x fa-spin"
+           onmousedown="scrollToDate(
+                        '{{ url_prefix }}', '{{ today }}');" ></i>
+        <!-- 
+        <i class="fas fa-home fa-2x"
+           onmousedown="scrollToDate(
+                        '{{ url_prefix }}', '{{ today }}');" ></i>
+        -->
+      </div><!-- col -->
+      
+      <!-- add -->
+      <div class="col-2 p-0 text-center"
+           onmousedown="doPost(
                         '{{ url_prefix + 'edit/' }}',
                         {date: '{{ date }}', sde_id: ''} );">
-            <i class="fas fa-plus-square fa-2x"></i>
-          </div><!-- col -->
-
-        </div><!-- row -->
-
-        <div class="row p-0 m-0" style="font-size: x-small;">
-          <div class="col-6 p-0 text-left">
-            <input id="date" name="date"
-                   type="date" value="{{ date }}"
-                   style="width: 119px"
-                   onchange="doPost(
-                             '{{ url_prefix }}', {date: this.value});"/>
-          </div><!-- col -->
-
-          <div class="col-6 p-0 text-center">
-            <form id="todo_days_form" name="todo_days_form"
-                  action="{{ url_prefix }}" method="POST">
-            ToDo
-            <select id="todo_days" name="todo_days"
-                    onchange="document.todo_days_form.submit();">
-              {% for opt in todo_days_list %}
-                {% if todo_days_list[opt] == todo_days_value %}
-                  <option value="{{ todo_days_list[opt] }}" selected>
-                    {{ opt }}
-                  </option>
-                {% else %}
-                  <option value="{{ todo_days_list[opt] }}">
-                    {{ opt }}
-                  </option>
-                {% end %}
-              {% end %}
-            </select>
-            </form>
-          </div><!-- col -->
-        </div><!-- row -->
-
+        <i class="fas fa-plus-square fa-2x"></i>
       </div><!-- col -->
 
-      <div class="col-5 p-0 text-right">
-        
-        <div class="container-fluid p-0">
-          
-          <form id="form_filter" name="form_filter"
-                  action="{{ url_prefix }}" method="POST">
-              
-            <div class="row p-0 m-0 align-middle">
+      <!-- search -->
+      <div class="col-6 p-0 text-center" style="font-size: medium;">
+        <form id="form_search" name="form_search"
+              action="{{ url_prefix }}" method="POST">
 
-              <div class="col-4 p-0 text-center"
-                   onclick="document.form_filter.submit();">
-                <i class="fas fa-filter fa-lg"></i>
-              </div><!-- col -->
-              
-              <div class="col-8 p-0 text-center" style="font-size: small">
-                <input id="filter" name="filter" type="text" size="9" />
-                
-              </div><!-- col -->
-            </div><!-- row -->
-          </form>
-          
-          <form id="form_search" name="form_search"
-                action="{{ url_prefix }}" method="POST">
-            
-            <div class="row p-0 m-0 align-middle">
-              
-              <div class="col-4 p-0 text-center"
-                   onclick="document.form_search.submit();">
-                <i class="fas fa-search fa-lg"></i>
-              </div><!-- col -->
-              
-              <div class="col-8 p-0 text-center" style="font-size: small">
-                <input id="search" name="search" type="text" size="9" />
+          <input id="search" name="search" type="text" size="10"
+                 style="font-size: medium; vertical-align: middle;"/>
 
-              </div><!-- col -->
-              
-            </div><!-- row -->
-          </form>
-            
-        </div><!-- col -->
-      </div><!-- container -->
+          <i class="fas fa-search fa-2x"
+             style="vertical-align: middle;"
+             onmousedown="document.form_search.submit();"></i>
+          <!-- spin
+          <i class="fas fa-search fa-2x fa-spin"
+             style="vertical-align: middle;"
+             onmousedown="document.form_search.submit();"></i>
+          -->
+
+        </form>
+      </div><!-- col -->
+
+      <!-- menu -->
+      <div class="col-2 p-0 text-center" style="font-size: x-small;">
+        <label for="menu-sw" class="m-0">
+          <i class="fas fa-bars fa-3x"></i></label>
+      </div><!-- col -->
+
     </div><!-- row -->
+    <input id="menu-sw" type="checkbox" style="display:none;">
+    <div id="menu-content" class="row m-0 my-bar my-bar-content"
+         style="z-index:80">
+
+      <!-- date -->
+      <div class="col-5 p-0 text-center">
+        <input id="date" name="date"
+               type="date" value="{{ date }}"
+               onchange="doPost('{{ url_prefix }}',{date:this.value});"/>
+      </div><!-- col -->
+        
+      <!-- ToDo days -->
+      <div class="col-3 p-0 text-center">
+        <form id="todo_days_form" name="todo_days_form"
+              action="{{ url_prefix }}" method="POST">
+          <i class="fas fa-list-alt fa-lg"
+             style="vertical-align: middle;"></i>
+          <select id="todo_days" name="todo_days"
+                  style="vertical-align: middle;"
+                  onchange="document.todo_days_form.submit();">
+            {% for opt in todo_days_list %}
+            {% if todo_days_list[opt] == todo_days_value %}
+            <option value="{{ todo_days_list[opt] }}" selected>
+              {{ opt }}
+            </option>
+            {% else %}
+            <option value="{{ todo_days_list[opt] }}">
+              {{ opt }}
+            </option>
+            {% end %}
+            {% end %}
+          </select>
+        </form>
+      </div><!-- col -->
+
+      <!-- filter -->
+      <div class="col-4 p-0 text-center" style="font-size: small;">
+        <form id="form_filter" name="form_filter"
+              action="{{ url_prefix }}" method="POST">
+          <input id="filter" name="filter" type="text" size="5"
+                 style="vertical-align: middle;"
+                 style="font-size: medium;"/>
+          <i class="fas fa-filter fa-2x" style="vertical-align: middle;"
+             onmousedown="document.form_filter.submit();"></i>
+        </form>
+      </div><!-- col -->
+          
+    </div><!-- row -->        
   </div><!-- container -->
 </header>
 <main style="background-color:#FFF;padding-top: 65px;">
@@ -187,7 +178,7 @@
       {% set obj = {'date': str(sched_date) } %}
       <div class="col-1 p-0 text-center"
            style="background-color:{{ bg_color }};"
-           onclick="doPost({{ url }}, {{ obj }});">
+           onmousedown="doPost({{ url }}, {{ obj }});">
 
         <div class="row p-0 m-0"
              style="font-size: xx-small; font-weight: unset;">
