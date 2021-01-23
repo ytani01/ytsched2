@@ -299,9 +299,9 @@ fi
 #
 # install my python packages
 #
-if [ $FAST_MODE -lt 1 ]; then
-    install_python_pkg_from_git $CUILIB_PKG $CUILIB_DIR $CUILIB_GIT
-fi
+#if [ $FAST_MODE -lt 1 ]; then
+#    install_python_pkg_from_git $CUILIB_PKG $CUILIB_DIR $CUILIB_GIT
+#fi
 
 #
 # install my package
