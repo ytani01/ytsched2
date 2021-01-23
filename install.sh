@@ -178,9 +178,6 @@ clean() {
 # main
 #
 cd_echo $MYDIR
-MY_VERSION=`python setup.py --version`
-echo "MY_VERSION=$MY_VERSION"
-echo
 
 while getopts fuch OPT; do
     case $OPT in
@@ -227,6 +224,14 @@ if [ -z $VIRTUAL_ENV ]; then
     . ./bin/activate
 fi
 cd_echo $VIRTUAL_ENV
+
+#
+# version
+#
+cd_echo $MYDIR
+MY_VERSION=`python setup.py --version`
+echo "MY_VERSION=$MY_VERSION"
+echo
 
 #
 # make $WRAPPER_SCRIPT
