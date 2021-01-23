@@ -19,7 +19,8 @@ class MainHandler(HandlerBase):
     """
     HTML_FILE = 'main.html'
 
-    DEF_DAYS = 60
+    DEF_DAYS = 45
+    SEARCH_MODE_DAYS = 365
 
     TODO_DAYS = {'off': 0,
                  '1W': 7,
@@ -70,6 +71,13 @@ class MainHandler(HandlerBase):
         #
         # set Date
         #
+        cur_day = datetime.date.today()
+        cur_day_str = self.get_argument('cur_day', None)
+        self._mylog.debug('cur_day_str=%s', cur_day_str)
+        if cur_day_str:
+            cur_day = datetime.date.fromisoformat(cur_day_str)
+        self._mylog.debug('cur_day=%s', cur_day)
+        
         if todo_flag:
             date = datetime.date.today()
 
@@ -88,7 +96,7 @@ class MainHandler(HandlerBase):
                 date = datetime.date(int(year), int(month), int(day))
 
         if not date:
-            date = datetime.date.today()
+            date = cur_day
 
         self._mylog.debug('date=%s', date)
 
@@ -153,6 +161,25 @@ class MainHandler(HandlerBase):
         self._mylog.debug('search_str=\'%s\'', search_str)
 
         #
+        # load ToDo
+        #
+        todo_sdf = SchedDataFile(None, self._datadir, debug=self._dbg)
+        todo_sde = []
+        for sde in todo_sdf.sde:
+            if filter_str.startswith('!'):
+                if filter_str[1:] in sde.search_str():
+                    continue
+            else:
+                if filter_str not in sde.search_str():
+                    continue
+
+            if search_str:
+                if search_str not in sde.search_str():
+                    continue
+
+            todo_sde.append(sde)
+
+        #
         # load schedule data
         #
         sched = []
@@ -161,8 +188,8 @@ class MainHandler(HandlerBase):
         date_to = date + delta_day1 * (days - 1)
 
         if search_str:
-            date_from = date - delta_day1 * 365
-            date_to = date + delta_day1 * 365
+            date_from = date - delta_day1 * self.SEARCH_MODE_DAYS
+            date_to = date + delta_day1 * self.SEARCH_MODE_DAYS
 
         date1 = date_from - delta_day1
         while date1 < date_to:
@@ -187,10 +214,19 @@ class MainHandler(HandlerBase):
 
                 out_sde.append(sde)
 
+            # ToDo
+            for sde in todo_sde:
+                if sde.date == date1 and date1 != datetime.date.today():
+                    out_sde.append(sde)
+
             if search_str and not out_sde:
                 continue
 
-            sched.append({'date': date1, 'sde': out_sde})
+            sched.append({
+                'date': date1,
+                'is_holiday': sdf.is_holiday,
+                'sde': out_sde
+            })
 
         top_bottom = self.get_argument('top_bottom', None)
 
@@ -200,24 +236,6 @@ class MainHandler(HandlerBase):
 #                for sde in dent['sde']:
 #                    self._mylog.debug('\'%s\'', sde)
 
-        #
-        # load ToDo
-        #
-        todo_sdf = SchedDataFile(None, self._datadir, debug=self._dbg)
-        todo_sde = []
-        for sde in todo_sdf.sde:
-            if filter_str.startswith('!'):
-                if filter_str[1:] in sde.search_str():
-                    continue
-            else:
-                if filter_str not in sde.search_str():
-                    continue
-
-            if search_str:
-                if search_str not in sde.search_str():
-                    continue
-
-            todo_sde.append(sde)
         #
         # render
         #
@@ -306,7 +324,6 @@ class MainHandler(HandlerBase):
         #
         sde_type = self.get_argument('sde_type', '')
         if SchedDataEnt.type_is_todo(sde_type):
-            orig_date = None
             todo_flag = True
 
         #

@@ -38,11 +38,14 @@ def htmlstr2text(intext: str) -> str:
     outtext = intext
     # outtext = html2text.html2text(intext)
 
+    outtext = outtext.replace('&nbsp;', ' ')
+    outtext = outtext.replace('（', '(')
+    outtext = outtext.replace('）', ')')
+
     for k in resub_tbl:
         # outtext = outtext.replace(k, replace_tbl[k])
         outtext = re.sub(k, resub_tbl[k], outtext, flags=re.IGNORECASE)
 
-    outtext = re.sub(r'<BR */*>', '\n', outtext, flags=re.IGNORECASE)
     return outtext
 
 
@@ -63,6 +66,7 @@ def text2htmlstr(intext: str) -> str:
     # outtext = outtext.replace('&', '&amp;')
     # outtext = outtext.replace(' ', '&nbsp;')
 
+    outtext = outtext.replace('\t', ' ')
     outtext = outtext.replace('\r', '')
     outtext = outtext.replace('\n', '<br />')
     return outtext
@@ -78,8 +82,16 @@ class SchedDataEnt:
     TYPE_PREFIX_TODO = '□'
     TYPE_HOLYDAY = ['休日', '祝日']
 
-    TITLE_PREFIX_IMPORTANT = ['★', '☆']
-    TITLE_PREFIX_CANCELED = ['(キャンセル', '(欠', '(中止', '(休']
+    TITLE_PREFIX_IMPORTANT = ['!', '！', '★', '☆']
+    TITLE_PREFIX_CANCELED = [
+        '(キャンセル',
+        '(欠',
+        '(中止',
+        '(休',
+        '(無効',
+        '(不要',
+        '×'
+    ]
 
     _log = get_logger(__name__, False)
 
@@ -192,19 +204,23 @@ class SchedDataEnt:
     def is_todo(self):
         """
         """
-        self._log.debug('')
+        # self._log.debug('')
         if self.type:
             return self.type.startswith(self.TYPE_PREFIX_TODO)
 
         return False
 
     def is_holiday(self):
-        self._log.debug('')
+        """
+        """
+        # self._log.debug('')
         if self.type == '':
             return False
         return self.type in self.TYPE_HOLYDAY
 
     def is_important(self):
+        """
+        """
         if self.title == '':
             return False
         for start_str in self.TITLE_PREFIX_IMPORTANT:
@@ -214,6 +230,8 @@ class SchedDataEnt:
         return False
 
     def is_canceled(self):
+        """        
+        """        
         if self.title == '':
             return False
 
@@ -330,6 +348,7 @@ class SchedDataFile:
         self.filename = pl.pop()
         self.dirname  = '/'.join(pl)
 
+        self.is_holiday = False
         self.sde = self.load()
 
     def date2path(self,
@@ -362,12 +381,15 @@ class SchedDataFile:
         Notes
         -----
         初期化時に自動的に実行される
-        '''
-        self._log.debug('')
 
+        休日・祝日が含まれる場合は、``is_holiday``をTrueにする
+        '''
+        # self._log.debug('')
+
+        self.is_holiday = False
         ok = False
         for e in self.ENCODE:
-            self._log.debug('e=%s', e)
+            # self._log.debug('e=%s', e)
             try:
                 with open(self.pathname, encoding=e) as f:
                     lines = f.readlines()
@@ -414,6 +436,11 @@ class SchedDataFile:
 
             sde = SchedDataEnt(d[0], date2, time_start2, time_end2,
                                d[3], d[4], d[5], d[6], debug=self._dbg)
+            if not self.is_holiday:
+                self.is_holiday = sde.is_holiday()
+                if self.is_holiday:
+                    self._log.debug('is_holiday=%s', self.is_holiday)
+
             out.append(sde)
 
         out2 = sorted(out, key=lambda x: x.get_sortkey())
@@ -436,10 +463,11 @@ class SchedDataFile:
 
         os.makedirs(os.path.dirname(self.pathname), exist_ok=True)
 
-        with open(self.pathname, mode='w') as f:
-            for sde in self.sde:
-                line = sde.mk_dataline()
-                f.write(line + '\n')
+        if self.sde:
+            with open(self.pathname, mode='w') as f:
+                for sde in self.sde:
+                    line = sde.mk_dataline()
+                    f.write(line + '\n')
 
     def add_sde(self, sde: SchedDataEnt) -> None:
         """

@@ -3,43 +3,47 @@
 <header>
   <script>
     window.addEventListener('load', function() {
-        console.log(`window.onload()`);
-
         const el_search = document.getElementById("search_str");
-        console.log(`search_str=${el_search.value}`);
+        console.log(`onload(): search_str="${el_search.value}"`);
         if (el_search.value != "") {
             return;
         }
 
         const el = document.getElementById("cur_day");
-        scrollToDate(location.pathname, el.value);
+        scrollToDate(location.pathname, el.value, "auto");
     });
-    
+
+    sc_flag = false;
     window.addEventListener('scroll', function() {
+        if (sc_flag) {
+            return;
+        }
+        const el_search = document.getElementById("search_str");
+        //console.log(`onscroll:search_str="${el_search.value}"`);
+        if (el_search.value != "") {
+            return;
+        }
+
         const y = window.pageYOffset;
         const tail = window.pageYOffset + window.innerHeight;
         const bodyH = document.body.clientHeight;
         console.log(`${y}-${bodyH - tail}`);
         
-        const el_search = document.getElementById("search_str");
-        console.log(`search_str=${el_search.value}`);
-        if (el_search.value != "") {
-            return;
-        }
-
         if (y < 70) {
+            sc_flag = true;
             el = document.getElementById("date_from");
             date = el.value;
             console.log(`date=${date}`);
             doPost('/ytsched/', {date: date, top_bottom: "top"});
         }
-        if (bodyH - tail < 25) {
+        if (bodyH - tail < 90) {
+            sc_flag = true;
             el = document.getElementById("date_to");
             date = el.value;
             console.log(`date=${date}`);
             doPost('/ytsched/', {date: date, top_bottom: "bottom"});
         }
-    });
+    }, {passive: true});
   </script>
                         
   <!-- menu bar -->
@@ -55,7 +59,7 @@
         -->
         <i class="fas fa-home fa-2x"
            onmousedown="scrollToDate(
-                        '{{ url_prefix }}', '{{ today }}');" ></i>
+                        '{{ url_prefix }}', '{{ today }}', 'auto');" ></i>
       </div><!-- col -->
       
       <!-- add -->
@@ -83,6 +87,8 @@
              style="vertical-align: middle;"
              onmousedown="document.form_search.submit();"></i>
 
+          <input id="cur_day" name="cur_day"
+                 type="hidden" value="{{ date }}" />
         </form>
       </div><!-- col -->
 
@@ -137,6 +143,8 @@
                  value="{{ filter_str }}" />
           <i class="fas fa-filter fa-2x" style="vertical-align: middle;"
              onmousedown="document.form_filter.submit();"></i>
+          <input name="cur_day"
+                 type="hidden" value="{{ date }}" />
         </form>
       </div><!-- col -->
           
@@ -162,7 +170,7 @@
            type="hidden" value="{{ top_bottom }}" />
     <input id="date_from" name="date_from"
            type="hidden" value="{{ date_from }}" />
-    <input id="cur_day" name="cur_day"
+    <input name="cur_day"
            type="hidden" value="{{ date }}" />
     <input id="date_to" name="date_to"
            type="hidden" value="{{ date_to}}" />
@@ -175,29 +183,47 @@
         {% set delta_from = (date_from - date) / date.resolution %}
         {% set delta_to = (date_to - date) / date.resolution %}
 
-    <div class="row m-0" style="background-color:#FF0;">
-      <div class="col-2 p-0 text-center">
-        <i class="far fa-arrow-alt-circle-up fa-2x"
-           onmousedown="moveDays('{{ url_prefix }}', {{ delta_from }}, 'auto');"></i>
+    <div class="row m-0" style="background-color:#EEE;">
+      <div class="col-1">
       </div>
-      <div class="col-2 p-0 text-center">
-        <i class="far fa-arrow-alt-circle-down fa-2x"
-           onmousedown="moveDays('{{ url_prefix }}', {{ delta_to }}, 'auto');"></i>
+      <div class="col-2 p-0 text-right">
+        <div class="container-fluid p-0" style="opacity: 0.8;">
+          <div class="row m-0"
+               onmousedown="doPostDate('{{ url_prefix }}', '{{ date }}', -365);" >
+            <div class="col p-0 text-center">
+              <i class="fas fa-arrow-alt-circle-up fa-2x"></i>
+            </div>
+          </div>
+          <div class="row" style="font-size: xx-small">
+            <div class="col p-0 text-center">
+             &nbsp;
+            </div>
+          </div>
+          <div class="row"
+               onmousedown="doPostDate('{{ url_prefix }}', '{{ date }}', +365);">
+            <div class="col p-0 text-center">
+              <i class="fas fa-arrow-alt-circle-down fa-2x"></i>
+            </div><!-- col -->
+          </div><!-- row -->
+        </div><!-- container -->
+      </div><!-- col -->
+      <div class="col-1">
       </div>
-      <div class="col-8 p-0">
-        <strong>
-          {{ date_from2 }}
-          ～
-          <input type="date" value="{{ date }}" />
-          ～
-          {{ date_to2 }}
-        </strong>
+      <div class="col-8 p-0 text-center">
+        <input type="date" value="{{ date_from }}"
+               onchange="doPostDate('{{ url_prefix }}', this.value, 365);" />
+        <br />
+        <i class="fas fa-arrows-alt-v"></i>
+        <br />
+        <input type="date" value="{{ date_to }}"
+               onchange="doPostDate('{{ url_prefix }}', this.value, -365);" />             
       </div>
     </div>
-    <hr />
     {% end %}
 
     {% set sde_count = 0 %}
+    {% set year=0 %}
+
     {% for sched_ent in sched %}
 
     {% set sched_date = sched_ent['date'] %}
@@ -214,18 +240,44 @@
     {% else %}
       {% set border = 'border: 1px solid #888 !important;' %}
     {% end %}
+
+    {% if search_str %}
+      {% if int(sched_date.year) != int(year) %}
+        {% set year=sched_date.year %}
+        <strong>{{ year }}</strong>
+      {% end %}
+    {% end %}
     <div id="date-{{ sched_date }}"
          class="row p-0 m-0 border rounded"
-         style="background-color:#EEE;{{ border }}" >
+         style="background-color:#EEE;{{ border }}">
 
       <!-- 日付 -->
       {% set weekday = sched_date.weekday() %}
+      {% set bg_color = '#EFF' %}
+      {% if weekday == 0 %}
+        {% set bg_color = '#EFFFFF' %}
+      {% end %}
+      {% if weekday == 1 %}
+        {% set bg_color = '#E4F8FE' %}
+      {% end %}
+      {% if weekday == 2 %}
+        {% set bg_color = '#E0EFFD' %}
+      {% end %}
+      {% if weekday == 3 %}
+        {% set bg_color = '#D4EBFC' %}
+      {% end %}
+      {% if weekday == 4 %}
+        {% set bg_color = '#D0E0FB' %}
+      {% end %}
       {% if weekday == 5 %}
-        {% set bg_color = '#CDF' %}
-      {% elif weekday == 6 %}
-        {% set bg_color = '#FCC' %}
-      {% else %}
-        {% set bg_color = '#EFF' %}
+        {% set bg_color = '#C0D4FA' %}
+      {% end %}
+      {% if weekday == 6 %}
+        {% set bg_color = '#FFCCCC' %}
+      {% end %}
+
+      {% if sched_ent['is_holiday'] %}
+        {% set bg_color = '#F88' %}
       {% end %}
 
       {% set url = url_prefix %}
@@ -265,28 +317,29 @@
 
       <!-- スケジュール -->
       <div class="col-11 p-0">
+        <!-- Normal Schedule -->
+        {% for sde in sched_ent['sde'] %}
+          {% include sde.html %}
+        {% end %}
+        
         {% if today_flag and todo_days_value %}
-
           <!-- ToDo -->
-          {% set todo_flag = True %}
-
           {% for sde in todo %}
             {% if sde.date <= today + delta_day1 * todo_days_value %}
               {% include sde.html %}
             {% end %}<!-- if sde.date -->
           {% end %}<!-- for sde -->
         {% end %}<!-- if today_flag and todo_days_value -->
-                          
-
-        <!-- Normal Schedule -->
-        {% set todo_flag = False %}
-        {% for sde in sched_ent['sde'] %}
-          {% include sde.html %}
-        {% end %}
-        
+         <div class="text-center" style="opacity: .4;"
+           onmousedown="doPost(
+                        '{{ url_prefix + 'edit/' }}',
+                        {date: '{{ sched_date }}', sde_id: ''} );">
+           <i class="fas fa-plus-square"></i>
+         </div>                              
       </div><!-- col -->
     </div><!-- row -->
-    {% end %}
+
+    {% end %}<!-- for sched_ent -->
 
   </div><!-- container -->
 </main>
