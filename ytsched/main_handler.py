@@ -34,7 +34,7 @@ class MainHandler(HandlerBase):
 
     COOKIE_TODO_DAYS = "todo_days"
 
-    def get(self, date=None, days=DEF_DAYS):
+    def get(self, date=None):
         """
         GET method and rendering
 
@@ -184,8 +184,8 @@ class MainHandler(HandlerBase):
         #
         sched = []
         delta_day1 = datetime.timedelta(1)
-        date_from = date - delta_day1 * days
-        date_to = date + delta_day1 * (days - 1)
+        date_from = date - delta_day1 * self._days
+        date_to = date + delta_day1 * (self._days - 1)
 
         if search_str:
             date_from = date - delta_day1 * self.SEARCH_MODE_DAYS
@@ -229,6 +229,7 @@ class MainHandler(HandlerBase):
             })
 
         top_bottom = self.get_argument('top_bottom', None)
+        self._mylog.debug('top_bottom=%s', top_bottom)
 
 #        if self._dbg:
 #            for dent in sched:

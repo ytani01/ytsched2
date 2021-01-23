@@ -6,6 +6,8 @@
  *
  */
 const doPost = (path, data) => {
+    console.log(`doPost()`);
+
     const form = document.createElement("form");
     form.setAttribute("action", path);
     form.setAttribute("method", "POST");
@@ -50,18 +52,60 @@ const doGet = (path, data) => {
     window.location.href=url;
 };
 
+sc_flag = false;
+
+scroll_handler = (event) => {
+    console.log(`event=${event}, sc_flag=${sc_flag}`);
+
+    if ( ! sc_flag ) {
+        return;
+    }
+
+    const el_search = document.getElementById("search_str");
+    //console.log(`onscroll:search_str="${el_search.value}"`);
+    if (el_search.value != "") {
+        return;
+    }
+
+    const y = window.pageYOffset;
+    const tail = window.pageYOffset + window.innerHeight;
+    const bodyH = document.body.clientHeight;
+    console.log(`${y}-${bodyH - tail}`);
+    
+    if (y < 70) {
+        sc_flag = false;
+        el = document.getElementById("date_from");
+        date = el.value;
+        console.log(`date=${date}`);
+        doPost('/ytsched/', {date: date, top_bottom: "top"});
+    }
+    if (bodyH - tail < 90) {
+        sc_flag = false;
+        el = document.getElementById("date_to");
+        date = el.value;
+        console.log(`date=${date}`);
+        doPost('/ytsched/', {date: date, top_bottom: "bottom"});
+    }
+};
+
 /**
  *
  */
-const scrollToId = (id, bottom, behavior = "auto") => {
-    //console.log(`id=${id}`);
+const scrollToId = (id, behavior = "auto") => {
+    sc_flag = false;
+    
+    console.log(`id=${id}`);
     const el = document.getElementById(id);
     if (el == null) {
+        console.log(`scrollToID:el=${el}`);
         return false;
     }
 
     const tail = el.offsetTop + window.innerHeight;
     if (tail > document.body.clientHeight) {
+        console.log(`scrollToId:${tail} > ${document.body.clientHeight}`);
+
+        return true;
         return false;
     }
 
@@ -76,8 +120,9 @@ const scrollToId = (id, bottom, behavior = "auto") => {
         scrollBy({left: 0, top: -70, behavior: behavior});
 
     }
-    
-    //el.scrollIntoView(true);
+
+    sc_flag = true;
+
     return true;
 };
 
@@ -85,11 +130,18 @@ const scrollToId = (id, bottom, behavior = "auto") => {
  *
  */
 const scrollToDate = (path, date, behavior = "auto") => {
-    if (scrollToId(`date-${date}`, "top", behavior)) {
+    sc_flag = false;
+    
+    console.log(`date=${date}`);
+    if (scrollToId(`date-${date}`, behavior)) {
         const el = document.getElementById("cur_day");
         el.value = date;
+
+        sc_flag = true;
+    
         return true;
     }
+
     doPost(path, {date: date});
     return false;
 };

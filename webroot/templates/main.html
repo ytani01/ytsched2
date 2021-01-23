@@ -9,41 +9,13 @@
             return;
         }
 
-        const el = document.getElementById("cur_day");
+        window.addEventListener('scroll', scroll_handler,
+                                {passive: true});
+
+        const el = document.getElementById("date");
         scrollToDate(location.pathname, el.value, "auto");
     });
 
-    sc_flag = false;
-    window.addEventListener('scroll', function() {
-        if (sc_flag) {
-            return;
-        }
-        const el_search = document.getElementById("search_str");
-        //console.log(`onscroll:search_str="${el_search.value}"`);
-        if (el_search.value != "") {
-            return;
-        }
-
-        const y = window.pageYOffset;
-        const tail = window.pageYOffset + window.innerHeight;
-        const bodyH = document.body.clientHeight;
-        console.log(`${y}-${bodyH - tail}`);
-        
-        if (y < 70) {
-            sc_flag = true;
-            el = document.getElementById("date_from");
-            date = el.value;
-            console.log(`date=${date}`);
-            doPost('/ytsched/', {date: date, top_bottom: "top"});
-        }
-        if (bodyH - tail < 90) {
-            sc_flag = true;
-            el = document.getElementById("date_to");
-            date = el.value;
-            console.log(`date=${date}`);
-            doPost('/ytsched/', {date: date, top_bottom: "bottom"});
-        }
-    }, {passive: true});
   </script>
                         
   <!-- menu bar -->
@@ -62,16 +34,8 @@
                         '{{ url_prefix }}', '{{ today }}', 'auto');" ></i>
       </div><!-- col -->
       
-      <!-- add -->
-      <div class="col-2 p-0 text-center"
-           onmousedown="doPost(
-                        '{{ url_prefix + 'edit/' }}',
-                        {date: '{{ date }}', sde_id: ''} );">
-        <i class="fas fa-plus-square fa-2x"></i>
-      </div><!-- col -->
-
       <!-- search -->
-      <div class="col-6 p-0 text-center" style="font-size: medium;">
+      <div class="col-8 p-0 text-center" style="font-size: medium;">
         <form id="form_search" name="form_search"
               action="{{ url_prefix }}" method="POST">
 
@@ -80,12 +44,17 @@
           {% else %}
             {% set search_spin="" %}
           {% end %}
-          <input id="search_str" name="search_str" type="text" size="10"
-                 style="font-size: medium; vertical-align: middle;"
-                 value="{{ search_str }}" />
           <i class="fas fa-search fa-2x {{ search_spin }}"
              style="vertical-align: middle;"
              onmousedown="document.form_search.submit();"></i>
+
+          <input id="search_str" name="search_str" type="text" size="10"
+                 style="font-size: medium; vertical-align: middle;"
+                 value="{{ search_str }}" />
+
+          <i class="fas fa-backspace fa-2x"
+             style="vertical-align: middle;"
+             onmousedown="document.getElementById('search_str').value='';"></i>
 
           <input id="cur_day" name="cur_day"
                  type="hidden" value="{{ date }}" />

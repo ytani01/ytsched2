@@ -173,7 +173,7 @@ class SchedDataEnt:
         Returns
         -------
         search_str: str
-        
+
         """
         search_str = '%s %s %s %s' % (
             self.type, self.title, self.place,
@@ -230,8 +230,8 @@ class SchedDataEnt:
         return False
 
     def is_canceled(self):
-        """        
-        """        
+        """
+        """
         if self.title == '':
             return False
 

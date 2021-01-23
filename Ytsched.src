@@ -9,7 +9,6 @@ MY_VERSION="%%% MY_VERSION %%%"
 VENVDIR="%%% VENVDIR %%%"
 DATADIR="%%% DATADIR %%%"
 WEBROOT="%%% WEBROOT %%%"
-DATADIR="%%% DATADIR %%%"
 
 #
 # main

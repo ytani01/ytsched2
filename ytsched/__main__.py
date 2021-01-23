@@ -83,15 +83,19 @@ def data(year, month, day, datadir, debug):
 Web server""")
 @click.option('--port', '-p', 'port', type=int,
               default=WebServer.DEF_PORT,
-              help='port number')
+              help='port number, default=%s' % (
+                  WebServer.DEF_PORT))
 @click.option('--webroot', '-r', 'webroot', type=click.Path(exists=True),
               default=WebServer.DEF_WEBROOT,
-              help='Web root directory')
+              help='Web root directory, default=\'%s\'' % (
+                  WebServer.DEF_WEBROOT))
 @click.option('--datadir', '-w', 'datadir', type=click.Path(),
               default=WebServer.DEF_DATADIR,
-              help='data directory')
+              help='data directory, default=\'%s\'' % (
+                  WebServer.DEF_DATADIR))
 @click.option('--days', 'days', type=int, default=MainHandler.DEF_DAYS,
-              help='+/- days')
+              help='+/- days, default=%s' % (
+                  MainHandler.DEF_DAYS))
 @click.option('--size_limit', '-l', 'size_limit', type=int,
               default=100*1024*1024,
               help='upload size limit, default=%s' % (
@@ -101,7 +105,7 @@ Web server""")
 @click.option('--debug', '-d', 'debug', is_flag=True, default=False,
               help='debug flag')
 def webapp(port, webroot, datadir, days, size_limit, version, debug):
-    """ cmd1  """
+    """ webapp  """
     log = get_logger(__name__, debug)
 
     app = WebServer(port, webroot, datadir, days, size_limit, version,
