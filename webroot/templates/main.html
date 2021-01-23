@@ -289,7 +289,7 @@
         <div class="row p-0 m-0"
              style="font-size: xx-small; font-weight: unset;">
           <div class="col p-0 m-0 text-left">
-            &nbsp;{{ sched_ent['date'].month }} /
+            {{ '%02d' % sched_ent['date'].month }} /
           </div>
         </div>
 
@@ -304,7 +304,7 @@
              style="font-size: {{ font_size }};
                     font-weight: {{ font_weight }};">
           <div class="col p-0 text-center">
-            {{ sched_date.day }}
+            {{ '%02d' % sched_date.day }}
           </div>
         </div>
         <div class="row p-0 m-0"

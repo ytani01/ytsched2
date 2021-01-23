@@ -59,8 +59,12 @@ class HandlerBase(tornado.web.RequestHandler):
         self._mylog.debug('')
 
         conf = {}
-        with open(self._conf_file) as f:
-            lines = f.readlines()
+
+        try:
+            with open(self._conf_file) as f:
+                lines = f.readlines()
+        except FileNotFoundError:
+            return conf
 
         for line in lines:
             if line:

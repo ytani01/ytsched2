@@ -25,7 +25,7 @@
   {% set title_font_style="font-size: medium; font-weight: bold" %}
 {% else %}
   {% set important_flag = False %}
-  {% if sde.title.startswith('(') %}
+  {% if not sde.title or sde.title.startswith('(')  %}
     {% set title_font_style="font-size: small; font-weight: normal" %}
   {% else %}
     {% set title_font_style="font-size: medium; font-weight: normal" %}
