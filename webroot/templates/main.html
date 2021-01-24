@@ -265,29 +265,45 @@
            style="background-color:{{ bg_color }};"
            onmousedown="doPost({{ url }}, {{ obj }});">
 
+        {% if today_flag %}
+          {% set font_size = 'x-large' %}
+          {% set font_weight = 'bold' %}
+        {% else %}
+          {% set font_size = 'large' %}
+          {% set font_weight = 'unset' %}
+        {% end %}
+
+        {% if sched_date.weekday() == 0 or sched_date == date %}
         <div class="row p-0 m-0"
-             style="font-size: xx-small; font-weight: unset;">
+             style="font-size:x-small;
+                    font-weight:{{ font_weight }};
+                    line-height: 12px">
+          <div class="col p-0 text-left">
+            {{ sched_date.year }}
+          </div>
+        </div>
+        {% end %}
+        <div class="row p-0 m-0"
+             style="font-size:x-small;
+                    font-weight:{{ font_weight }};
+                    line-height: 12px">
           <div class="col p-0 m-0 text-left">
             {{ '%02d' % sched_ent['date'].month }} /
           </div>
         </div>
 
-        {% if today_flag %}
-          {% set font_size = 'large' %}
-          {% set font_weight = 'bold' %}
-        {% else %}
-          {% set font_size = 'medium' %}
-          {% set font_weight = 'unset' %}
-        {% end %}
         <div class="row p-0 m-0"
              style="font-size: {{ font_size }};
-                    font-weight: {{ font_weight }};">
+                    font-weight: {{ font_weight }};
+                    line-height: 24px">
           <div class="col p-0 text-center">
             {{ '%02d' % sched_date.day }}
           </div>
         </div>
         <div class="row p-0 m-0"
-             style="font-size: x-small; font-weight: unset;">
+             style="font-size:x-small;
+                    font-weight:{{ font_weight }};
+                    line-height: 12px">
           <div class="col p-0 text-right">
             ({{ sched_date.strftime('%a') }})
           </div>

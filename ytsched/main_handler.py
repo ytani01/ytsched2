@@ -222,8 +222,10 @@ class MainHandler(HandlerBase):
 
             # ToDo
             for sde in todo_sde:
-                if sde.date == date1 and date1 != datetime.date.today():
+                if sde.date == date1:
                     out_sde.append(sde)
+                    if sde.date == datetime.date.today():
+                        todo_sde.remove(sde)
 
             if search_str and not out_sde:
                 continue

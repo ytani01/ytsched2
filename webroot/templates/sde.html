@@ -1,9 +1,9 @@
+<!--
 {% set sde_count = sde_count + 1 %}
+{% set url = url_prefix + 'edit/' %}
 
-{% set todo_flag = False %}
 {% set bg_color = '#FFF' %}
 {% if sde.is_todo() %}
-  {% set todo_flag = True %}
   {% set bg_color = '#FFE' %}
   {% if sde.date < today %}
     {% set bg_color = '#EEB' %}
@@ -12,102 +12,96 @@
   {% end %}
 {% end %}
 
-{% set url = url_prefix + 'edit/' %}
-
-{% if sde.is_canceled() %}
-  {% set cancel_flag = True %}
-{% else %}
-  {% set cancel_flag = False %}
+{% set time_start = '' %}
+{% if sde.time_start %}
+  {% set time_start = sde.time_start.strftime('%H:%M') %}
 {% end %}
 
+{% set time_end = '' %}
+{% if sde.time_end %}
+  {% set time_end = '-' + sde.time_end.strftime('%H:%M') %}
+{% end %}
+
+{% set sde_type = '' %}
+{% if sde.type %}
+  {% if sde.is_todo() %}
+    {% if len(sde.type) > 1 %}
+      {% set sde_type = '[' + sde.type[1:] + ']' %}
+    {% end %}
+  {% else %}
+    {% set sde_type = '[' + sde.type + ']' %}
+  {% end %}
+{% end %}
+
+{% set sde_title = '(no title)' %}
+{% if sde.title %}
+  {% set sde_title = sde.title %}
+{% end %}
+
+{% set place = '' %}
+{% if sde.place %}
+  {% set place = '@' + sde.place %}
+{% end %}
+
+{% set detail = sde.text.rstrip('\n') %}
+
 {% if sde.is_important() %}
-  {% set important_flag = True %}
   {% set title_font_style="font-size: medium; font-weight: bold" %}
 {% else %}
-  {% set important_flag = False %}
-  {% if not sde.title or sde.title.startswith('(')  %}
+  {% if sde_title.startswith('(')  %}
     {% set title_font_style="font-size: small; font-weight: normal" %}
   {% else %}
     {% set title_font_style="font-size: medium; font-weight: normal" %}
   {% end %}
 {% end %}
+
+-->
 <input id="sde_id" name="sde_id"
        type="hidden" value="{{ sde.id }}" />
 
+{% if sde.is_canceled() %}
+<del>
+{% end %}
 <div class="container-fluid p-0 border"
      style="background-color:{{ bg_color }};">
-  {% if cancel_flag %}
-  <del>
-  {% end %}
-    {% set detail = sde.text.rstrip('\n') %}
     <div class="row m-0">
-        {% if todo_flag %}
+      {% if not sde.is_todo() %}
+      <div class="col-1 p-0 text-left"
+           style="font-size:xx-small; font-weight:bold; line-height: 12px">
+        {{ time_start }}<br/>{{ time_end }}
+      </div>
+      {% else %}
       <div class="col-1 p-0 text-center">
-        <i class="far fa-square" style="vertical-aline: center;"></i>
+        <i class="far fa-square fa-xs" style="vertical-aline: top;"></i>
       </div>
-        {% else %}
-      <div class="col-1 p-0 text-left" style="font-size: xx-small;">
-        {% if sde.time_start or sde.time_end %}
-          {% if sde.time_start %}
-            {{ sde.time_start.strftime('%H:%M') }}
-          {% end %}
-        <br/>
-        -
-          {% if sde.time_end %}
-            {{ sde.time_end.strftime('%H:%M') }}
-          {% end %}
-        {% end %}
-      </div>
-        {% end %}
+      {% end %}<!-- if not todo -->
       <div class="col-11 p-0"
            onclick="doPost('{{ url }}',
                     { date:'{{ sched_date }}',
-                      sde_id: '{{sde.id }}',
-                      todo_flag: {{ str(todo_flag).lower() }} } );">
-          {% if todo_flag %}
-                   <div class="container-fluid p-0"
-                        style="font-size: xx-small; display: inline-block; width: 30px; vertical-align: middle;">
-                     <div class="row m-0">
-                       <div class="col p-0">
-                         {{ str(sde.date)[0:4] }}
-                       </div>
-                     </div>
-                     <div class="row m-0">
-                       <div class="col p-0">
-                         {{ str(sde.date)[5:].replace('-','/') }}
-                       </div>
-                     </div>
-                   </div>
-            {% if sde.time_start or sde.time_end %}
-              {% if sde.time_start %}
-                {{ sde.time_start.strftime('%H:%M') }}
-              {% end %}
-              ～
-              {% if sde.time_end %}
-                {{ sde.time_end.strftime('%H:%M') }}
-              {% end %}
-            {% end %}
-          {% end %}
+                    sde_id: '{{sde.id }}',
+                    todo_flag: {{ str(sde.is_todo()).lower() }} } );">
+        {% if sde.is_todo() %}
+
+          {% if sde.date != sched_date %}
+          {% set sde_date = str(sde.date).replace('-', '/') %}
+        <span style="font-size:xx-small; font-weight:bold; display:inline-flex; vertical-align:top; line-height:12px">
+          {{ sde_date[0:4] }}<br />{{ sde_date[5:] }}
+        </span>
+          {% end %}<!-- sde.date != sched_date -->
+
+        <span style="font-size:xx-small; font-weight:bold; display:inline-flex; vertical-align:top; line-height:12px">
+          {{ time_start }}<br />{{ time_end }}
+        </span>
+        {% end %}<!-- if todo -->
+
         <span style="font-size: small;">
-          {% if sde.type %}
-            {% if todo_flag %}
-              {% if len(sde.type) > 1 %}
-                [ {{ sde.type[1:] }} ]
-              {% end %}
-            {% else %}
-              [ {{ sde.type }} ]
-            {% end %}
-          {% end %}
-          <span style="{{ title_font_style }}">
-          {% if not sde.title %}
-            (no title)
-          {% else %}
-            {{ sde.title }}
-          {% end %}
-          </span>
-          {% if sde.place %}
-            <span class="longtext">@{{ sde.place }}</span>
-          {% end %}
+          {{ sde_type }}
+        </span>
+        <span style="{{ title_font_style }}">
+          {{ sde_title }}
+        </span>
+        <span style="font-size: small">
+          {{ place }}
         </span>
       </div><!-- col -->
     </div><!-- row -->
@@ -118,7 +112,7 @@
            style="font-size: small;">{{ detail }}</div><!-- col -->
     </div><!-- row -->
     {% end %}
-  {% if cancel_flag %}
-  </del>
-  {% end %}
 </div><!-- container -->
+{% if sde.is_canceled() %}
+</del>
+{% end %}
