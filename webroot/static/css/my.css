@@ -11,7 +11,7 @@
 }
 
 #menu-sw:checked ~ .my-bar-content {
-    top: 34px;
+    top: 28px;
 }
 
 .longtext {

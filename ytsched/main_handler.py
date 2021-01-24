@@ -161,6 +161,12 @@ class MainHandler(HandlerBase):
         self._mylog.debug('search_str=\'%s\'', search_str)
 
         #
+        # top_bottom
+        #
+        top_bottom = self.get_argument('top_bottom', None)
+        self._mylog.debug('top_bottom=%s', top_bottom)
+
+        #
         # load ToDo
         #
         todo_sdf = SchedDataFile(None, self._datadir, debug=self._dbg)
@@ -227,15 +233,6 @@ class MainHandler(HandlerBase):
                 'is_holiday': sdf.is_holiday,
                 'sde': out_sde
             })
-
-        top_bottom = self.get_argument('top_bottom', None)
-        self._mylog.debug('top_bottom=%s', top_bottom)
-
-#        if self._dbg:
-#            for dent in sched:
-#                self._mylog.debug('date:%s', dent['date'])
-#                for sde in dent['sde']:
-#                    self._mylog.debug('\'%s\'', sde)
 
         #
         # render
