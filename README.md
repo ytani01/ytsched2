@@ -17,5 +17,8 @@
   - 無限にスクロール
   - 検索やフィルター機能の充実
 
-## Appendix
+## memo
 
+### Javascript scroll
+
+![](docs/javascript-scroll.svg)
