@@ -5,13 +5,21 @@
     window.addEventListener('load', function() {
         const el_search = document.getElementById("search_str");
         console.log(`onload(): search_str="${el_search.value}"`);
-        if (el_search.value == "") {
-            window.addEventListener('scroll', scroll_handler,
-                                    {passive: true});
+
+        const body_h = document.body.clientHeight;
+        const win_h = document.documentElement.clientHeight;
+
+        if ( body_h < win_h ) {
+            return;
         }
 
         const el = document.getElementById("date");
         scrollToDate(location.pathname, el.value, "auto");
+        
+        if (el_search.value == "") {
+            window.addEventListener('scroll', scroll_handler,
+                                    {passive: true});
+        }
     });
 
   </script>
@@ -29,7 +37,7 @@
         -->
         <i class="fas fa-home fa-lg" style="vertical-align: middle;"
            onmousedown="scrollToDate(
-                        '{{ url_prefix }}', '{{ today }}', 'auto');" ></i>
+                        '{{ url_prefix }}', '{{ today }}');" ></i>
       </div><!-- col -->
 
       <!-- search -->

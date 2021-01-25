@@ -54,7 +54,7 @@ const doGet = (path, data) => {
 
 sc_flag = false;
 
-scroll_handler = (event) => {
+const scroll_handler = (event) => {
     console.log(`event=${event}, sc_flag=${sc_flag}`);
 
     if ( ! sc_flag ) {
@@ -67,19 +67,19 @@ scroll_handler = (event) => {
         return;
     }
 
-    const y = window.pageYOffset;
-    const tail = window.pageYOffset + window.innerHeight;
-    const bodyH = document.body.clientHeight;
-    console.log(`${y}-${bodyH - tail}`);
+    const d_top = window.pageYOffset;
+    const d_bottom = document.body.clientHeight - d_top
+          - document.documentElement.clientHeight;
+    console.log(`${d_top}-${d_bottom}`);
     
-    if (y < 70) {
+    if (d_top < 70) {
         sc_flag = false;
         el = document.getElementById("date_from");
         date = el.value;
         console.log(`date=${date}`);
         doPost('/ytsched/', {date: date, top_bottom: "top"});
     }
-    if (bodyH - tail < 90) {
+    if (d_bottom < 90) {
         sc_flag = false;
         el = document.getElementById("date_to");
         date = el.value;
@@ -91,16 +91,24 @@ scroll_handler = (event) => {
 /**
  *
  */
-const scrollToId = (id, behavior = "auto") => {
+const scrollToId = (id, top_bottom = "top", behavior = "smooth") => {
     sc_flag = false;
+    console.log(`id=${id}`);
     
+    const body_h = document.body.clientHeight;
+    const win_h = document.documentElement.clientHeight;
+
+    if (body_h <= win_h) {
+        console.log(`body_h=${body_h} < win_h=${win_h}`);
+        return true;
+    }
+
+    const el = document.getElementById(id);
     const el_search = document.getElementById('search_str');
     const search_str = el_search.value;
 
-    console.log(`id=${id}`);
-    const el = document.getElementById(id);
     if (el == null) {
-        console.log(`scrollToID:el=${el}`);
+        console.log(`scrollToId:scrollToID:el=${el}`);
 
         if (search_str) {
             return true;
@@ -108,29 +116,15 @@ const scrollToId = (id, behavior = "auto") => {
         return false;
     }
 
-    if (document.documentElement.clientHeight >
-        document.body.clientHeight) {
-        return true;
-    }
+    const top_id = el.offsetTop;
+    const bottom_id = el.offsetTop + el.offsetHeight;
 
-    const tail = el.offsetTop + window.innerHeight;
-    if (tail > document.body.clientHeight) {
-        console.log(`scrollToId:${tail} > ${document.body.clientHeight}`);
-
-        return true;
-        return false;
-    }
-
-    const el2 = document.getElementById("top_bottom");
-    if (el2.value == "bottom") {
-        el.scrollIntoView({block: "end", inline: "nearest",
-                           behavior: "auto"});
-        scrollBy({left: 0, top: +3, behavior: behavior});
+    if (top_bottom == "bottom") {
+        scrollTo({left: 0, top: bottom_id - win_h + 3,
+                  behavior: behavior});
     } else {
-        el.scrollIntoView({block:"start", inline: "nearest",
-                           behavior: "auto"});
-        scrollBy({left: 0, top: -70, behavior: behavior});
-
+        scrollTo({left: 0, top: top_id - 70,
+                  behavior: behavior});
     }
 
     sc_flag = true;
@@ -141,14 +135,15 @@ const scrollToId = (id, behavior = "auto") => {
 /**
  *
  */
-const scrollToDate = (path, date, behavior = "auto") => {
+const scrollToDate = (path, date, behavior = "smooth") => {
     sc_flag = false;
     
-    console.log(`date=${date}`);
-    if (scrollToId(`date-${date}`, behavior)) {
-        const el = document.getElementById("cur_day");
-        el.value = date;
+    console.log(`scrollToDate:date=${date}`);
+    const el_top_bottom = document.getElementById("top_bottom");
+    const top_bottom = el_top_bottom.value;
+    el_top_bottom.value = "top";
 
+    if (scrollToId(`date-${date}`, top_bottom, behavior)) {
         sc_flag = true;
     
         return true;
@@ -161,7 +156,7 @@ const scrollToDate = (path, date, behavior = "auto") => {
 /**
  *
  */
-const moveDays = (path, days, behavior = "auto") => {
+const moveDays = (path, days, behavior = "smooth") => {
     const el = document.getElementById("cur_day");
     let d1 = new Date(el.value);
     d1.setDate(d1.getDate() + days);
