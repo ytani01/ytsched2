@@ -101,6 +101,11 @@ const scrollToId = (id, behavior = "auto") => {
         return false;
     }
 
+    if (document.documentElement.clientHeight >
+        document.body.clientHeight) {
+        return true;
+    }
+
     const tail = el.offsetTop + window.innerHeight;
     if (tail > document.body.clientHeight) {
         console.log(`scrollToId:${tail} > ${document.body.clientHeight}`);
