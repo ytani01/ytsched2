@@ -30,6 +30,7 @@ help() {
     |   |       +- js/
     |   |       +- images/
     |   |       :
+    |   +- env/ .. VENVDIR
     |   |
     |   +- upload/
     |   +- data/ .. DATADIR
@@ -38,7 +39,7 @@ help() {
     |   :   +- 2021/
     |   :   :
     |
-    +- env1/ .. python3 Virtualenv(venv) 【ユーザが作成する】
+    +- env1/ .. python3 Virtualenv(venv) for build 【ユーザが作成する】
         |
         +- ytsched2/ .. MYDIR
         |   |
@@ -73,6 +74,9 @@ mkdir -pv $BINDIR
 
 WORKDIR="$HOME/$MY_PKG"
 echo "WORKDIR=$WORKDIR"
+
+VENVDIR="$WORKDIR/env"
+echo "VENVDIR=$VENVDIR"
 
 WEBROOT="$WORKDIR/webroot"
 echo "WEBROOT=$WEBROOT"
@@ -130,7 +134,6 @@ usage() {
     echo
     echo "  Usage: $MYNAME [-u] [-h]"
     echo
-    echo "    -f  fastmode"
     echo "    -u  uninstall"
     echo "    -c  clean"
     echo "    -h  show this usage"
@@ -140,15 +143,12 @@ usage() {
 uninstall() {
     cd_echo $MYDIR
 
-    echo "### uninstall my python package"
-    echo
-    pip uninstall -y $MY_PKG
-    echo
-
-    echo "### remove installed files"
-    echo
-    rm -f `cat $INSTALLED_FILE`
-    echo
+    if [ -f $INSTALLED_FILE ]; then
+        echo "### remove installed files"
+        echo
+        rm -fv `cat $INSTALLED_FILE`
+        echo
+    fi
 
     echo "### remove build/"
     echo
@@ -158,8 +158,15 @@ uninstall() {
     echo "### $WORKDIR"
     echo
     if [ -d $WORKDIR ]; then
-        # rm -rfv $WORKDIR
-        echo "WORKDIR=$WORKDIR: exists"
+        rm -rfv $WEBROOT
+        echo
+        
+        if [ -d $DATADIR ]; then
+            echo "DATADIR=$DATADIR: exists .. Important !!"
+        fi
+        if [ -d $LOGDIR ]; then
+            echo "LOGDIR=$LOGDIR: exists"
+        fi
     fi
     echo
     
@@ -181,7 +188,6 @@ cd_echo $MYDIR
 
 while getopts fuch OPT; do
     case $OPT in
-        f) FAST_MODE=1;echo "FAST_MODE=$FAST_MODE";;
         u) uninstall; exit 0;;
         c) clean; exit 0;;
         h) help; echo "#####"; usage; exit 0;;
@@ -204,26 +210,70 @@ if [ -f $PKGS_TXT ]; then
 fi
 
 #
+# work dirs
+#
+for d in $WORKDIR $WEBROOT $LOGDIR; do
+    echo "### $d"
+    echo
+    if [ ! -d $d ]; then
+        mkdir -pv $d
+        echo
+    fi
+done
+
+if [ -d $DATADIR ]; then
+    BACKDIR="$DATADIR.bak"
+
+    if [ -d $BACKDIR ]; then
+        echo "$BACKDIR exists: move/copy/remove by yourself"
+        echo
+        exit 1
+    fi
+    echo "### backup $DATADIR to $BACKDIR"
+    cp -rfv $DATADIR $BACKDIR
+fi
+
+#
 # venv
 #
-if [ -z $VIRTUAL_ENV ]; then
-    while [ ! -f ./bin/activate ]; do
-        cd ..
-        if [ `pwd` = "/" ]; then
-            echo
-            echo "ERROR: Please create and activate Python3 Virtualenv(venv) and run again"
-            echo
-            echo "\$ cd ~"
-            echo "\$ python -m venv env1"
-            echo "\$ . ~/env1/bin/activate"
-            echo
-            exit 1
-        fi
-    done
-    echo "### activate venv"
-    . ./bin/activate
+cd_echo $WORKDIR
+
+SUBDIR=`basename $VENVDIR`
+
+if [ ! -f $VENVDIR/bin/activate ]; then
+    rm -rfv $SUBDIR
 fi
-cd_echo $VIRTUAL_ENV
+if [ ! -d $VENVDIR ]; then
+    python3 -m venv `basename $VENVDIR`
+fi
+. $VENVDIR/bin/activate
+echo "VIRTUAL_ENV=$VIRTUAL_ENV"
+echo
+
+#
+# update pip, setuptools, and wheel
+#
+echo "### insall/update pip etc. .."
+echo
+pip install -U pip setuptools wheel
+hash -r
+echo
+pip -V
+echo
+
+#
+# install my python packages
+#
+#install_python_pkg_from_git $CUILIB_PKG $CUILIB_DIR $CUILIB_GIT
+
+#
+# install my package
+#
+cd_echo $MYDIR
+echo "### install my python package"
+echo
+pip install .
+echo
 
 #
 # version
@@ -271,51 +321,13 @@ echo $BINDIR/$WRAPPER_SCRIPT >> $INSTALLED_FILE
 echo
 
 #
-# work dir
+# install webroot
 #
-for d in $WORKDIR $WEBROOT $LOGDIR; do
-    echo "### $d"
-    echo
-    if [ ! -d $d ]; then
-        mkdir -pv $d
-        echo
-    fi
-done
-
 if [ ! -z $WEBROOT ]; then
     cd_echo $MYDIR/webroot
     cp -rfv * $WEBROOT
     echo
 fi
-
-#
-# update pip, setuptools, and wheel
-#
-if [ $FAST_MODE -lt 1 ]; then
-    echo "### insall/update pip etc. .."
-    echo
-    pip install -U pip setuptools wheel
-    hash -r
-    echo
-    pip -V
-    echo
-fi
-
-#
-# install my python packages
-#
-#if [ $FAST_MODE -lt 1 ]; then
-#    install_python_pkg_from_git $CUILIB_PKG $CUILIB_DIR $CUILIB_GIT
-#fi
-
-#
-# install my package
-#
-cd_echo $MYDIR
-echo "### install my python package"
-echo
-pip install .
-echo
 
 #
 # display usage
