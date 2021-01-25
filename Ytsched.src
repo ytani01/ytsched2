@@ -5,7 +5,6 @@
 
 MY_PKG="%%% MY_PKG %%%"
 
-MY_VERSION="%%% MY_VERSION %%%"
 VENVDIR="%%% VENVDIR %%%"
 DATADIR="%%% DATADIR %%%"
 WEBROOT="%%% WEBROOT %%%"
@@ -31,7 +30,6 @@ SUBCMD=$1
 shift
 if [ x$SUBCMD = xwebapp ]; then
     exec python -m $MY_PKG $SUBCMD \
-         --version $MY_VERSION \
          --datadir $DATADIR --webroot $WEBROOT $*
 fi
 

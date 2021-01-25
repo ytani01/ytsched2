@@ -12,6 +12,7 @@ import os
 import tornado.ioloop
 import tornado.httpserver
 import tornado.web
+from . import __version__
 from .main_handler import MainHandler
 from .edit_handler import EditHandler
 from .my_logger import get_logger
@@ -35,7 +36,6 @@ class WebServer:
                  datadir: str = DEF_DATADIR,
                  days: int = MainHandler.DEF_DAYS,
                  size_limit: int = DEF_SIZE_LIMIT,
-                 version: str = '(cur)',
                  debug: bool = False):
         """ Constructor
 
@@ -51,22 +51,19 @@ class WebServer:
 
         size_limit: int
             max upload size
-        version: str
-            version string
         """
         self._dbg = debug
         self._log = get_logger(self.__class__.__name__, self._dbg)
         self._log.info('port=%s, webroot=%s, datadir=%s, days=%s',
                        port, webroot, datadir, days)
         self._log.info('size_limit=%s', size_limit)
-        self._log.info('version=%s', version)
 
         self._port = port
         self._webroot = os.path.expanduser(webroot)
         self._datadir = os.path.expanduser(datadir)
         self._days = days
         self._size_limit = size_limit
-        self._version = version
+        self._version = __version__
 
         try:
             os.makedirs(self._datadir, exist_ok=True)
