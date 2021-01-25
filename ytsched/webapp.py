@@ -9,6 +9,7 @@ __author__ = 'Yoichi Tanibayashi'
 __date__ = '2021/01'
 
 import os
+import sys
 import tornado.ioloop
 import tornado.httpserver
 import tornado.web
@@ -36,6 +37,7 @@ class WebServer:
                  datadir: str = DEF_DATADIR,
                  days: int = MainHandler.DEF_DAYS,
                  size_limit: int = DEF_SIZE_LIMIT,
+                 version: bool = False,
                  debug: bool = False):
         """ Constructor
 
@@ -51,12 +53,14 @@ class WebServer:
 
         size_limit: int
             max upload size
+
+        version: bool
         """
         self._dbg = debug
         self._log = get_logger(self.__class__.__name__, self._dbg)
-        self._log.info('port=%s, webroot=%s, datadir=%s, days=%s',
-                       port, webroot, datadir, days)
-        self._log.info('size_limit=%s', size_limit)
+        self._log.debug('port=%s, webroot=%s, datadir=%s, days=%s',
+                        port, webroot, datadir, days)
+        self._log.debug('size_limit=%s', size_limit)
 
         self._port = port
         self._webroot = os.path.expanduser(webroot)
@@ -64,6 +68,10 @@ class WebServer:
         self._days = days
         self._size_limit = size_limit
         self._version = __version__
+
+        if version:
+            print(__version__)
+            sys.exit(0)
 
         try:
             os.makedirs(self._datadir, exist_ok=True)

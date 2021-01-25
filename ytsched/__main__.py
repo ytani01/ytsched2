@@ -100,13 +100,15 @@ Web server""")
               default=100*1024*1024,
               help='upload size limit, default=%s' % (
                   WebServer.DEF_SIZE_LIMIT))
+@click.option('--version', '-v', 'version', is_flag=True, default=False,
+              help='print version')
 @click.option('--debug', '-d', 'debug', is_flag=True, default=False,
               help='debug flag')
-def webapp(port, webroot, datadir, days, size_limit, debug):
+def webapp(port, webroot, datadir, days, size_limit, version, debug):
     """ webapp  """
     log = get_logger(__name__, debug)
 
-    app = WebServer(port, webroot, datadir, days, size_limit,
+    app = WebServer(port, webroot, datadir, days, size_limit, version,
                     debug=debug)
     try:
         app.main()
