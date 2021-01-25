@@ -5,12 +5,10 @@
     window.addEventListener('load', function() {
         const el_search = document.getElementById("search_str");
         console.log(`onload(): search_str="${el_search.value}"`);
-        if (el_search.value != "") {
-          return;
+        if (el_search.value == "") {
+            window.addEventListener('scroll', scroll_handler,
+                                    {passive: true});
         }
-
-        window.addEventListener('scroll', scroll_handler,
-                                {passive: true});
 
         const el = document.getElementById("date");
         scrollToDate(location.pathname, el.value, "auto");

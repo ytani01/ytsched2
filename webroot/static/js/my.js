@@ -94,10 +94,17 @@ scroll_handler = (event) => {
 const scrollToId = (id, behavior = "auto") => {
     sc_flag = false;
     
+    const el_search = document.getElementById('search_str');
+    const search_str = el_search.value;
+
     console.log(`id=${id}`);
     const el = document.getElementById(id);
     if (el == null) {
         console.log(`scrollToID:el=${el}`);
+
+        if (search_str) {
+            return true;
+        }
         return false;
     }
 
