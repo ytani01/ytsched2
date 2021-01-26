@@ -2,14 +2,37 @@
 {% block content %}
 <header>
   <script>
+    let clickCount = 0;
+
+    const homeButtonHdr = (event) => {
+        if( !clickCount ) { // single click
+	    ++clickCount;
+	    setTimeout( function() {clickCount = 0;}, 350 );
+            console.log("single click");
+
+            scrollToDate('{{ url_prefix }}', '{{ today }}');
+
+        } else { // double click
+	    event.preventDefault() ;
+	    clickCount = 0;
+	    console.log( "double click" ) ;
+
+            doPost('{{ url_prefix }}', {date: '{{ today }}'});
+        }
+    };
+
     window.addEventListener('load', function() {
         const el_search = document.getElementById("search_str");
         console.log(`onload(): search_str="${el_search.value}"`);
+
+        const el_home_button = document.getElementById("home_button");
+        el_home_button.addEventListener("mousedown", homeButtonHdr);
 
         const body_h = document.body.clientHeight;
         const win_h = document.documentElement.clientHeight;
 
         if ( body_h < win_h ) {
+            console.log(`body_h=${body_h} < win_h=${win_h}`);
             return;
         }
 
@@ -17,27 +40,18 @@
         scrollToDate(location.pathname, el.value, "auto");
         
         if (el_search.value == "") {
-            window.addEventListener('scroll', scroll_handler,
-                                    {passive: true});
+            window.addEventListener('scroll', scrollHdr, {passive:true});
         }
     });
-
   </script>
                         
   <!-- menu bar -->
   <div class="container-fluid p-0 fixed-top my-bar">
-    <div class="row m-0" style="z-index:100">
+    <div class="row m-0 mt-2 mb-2">
 
       <!-- home -->
-      <div class="col-1 p-0 text-center">
-        <!--
-        <i class="fas fa-circle-notch fa-2x fa-spin"
-           onmousedown="scrollToDate(
-                        '{{ url_prefix }}', '{{ today }}');" ></i>
-        -->
-        <i class="fas fa-home fa-lg" style="vertical-align: middle;"
-           onmousedown="scrollToDate(
-                        '{{ url_prefix }}', '{{ today }}');" ></i>
+      <div id="home_button" class="col-1 p-0 text-center">
+        <i class="fas fa-home fa-lg" style="vertical-align: middle;"></i>
       </div><!-- col -->
 
       <!-- search -->
@@ -54,13 +68,13 @@
              style="vertical-align: middle;"
              onmousedown="document.form_search.submit();"></i>
 
-          <input id="search_str" name="search_str" type="text" size="10"
+          <input id="search_str" name="search_str"
+                 type="text" size="10"
                  style="font-size: small; vertical-align: middle;"
                  value="{{ search_str }}" />
-
           <i class="fas fa-backspace fa-lg"
              style="vertical-align: middle;"
-             onmousedown="document.getElementById('search_str').value='';"></i>
+             onmousedown="search_str.value='';"></i>
 
           <input id="cur_day" name="cur_day"
                  type="hidden" value="{{ date }}" />
@@ -92,7 +106,8 @@
       <div class="col-5 p-0 text-center">
         <input id="date" name="date"
                type="date" value="{{ date }}"
-               onchange="doPost('{{ url_prefix }}',{date:this.value});"/>
+               onchange="doPost('{{ url_prefix }}',
+                         {date:this.value});"/>
       </div><!-- col -->
         
       <!-- ToDo days -->
@@ -126,7 +141,8 @@
           <input id="filter_str" name="filter_str" type="text" size="5"
                  style="vertical-align: middle;"
                  value="{{ filter_str }}" />
-          <i class="fas fa-filter fa-2x" style="vertical-align: middle;"
+          <i class="fas fa-filter fa-2x"
+             style="vertical-align: middle;"
              onmousedown="document.form_filter.submit();"></i>
           <input name="cur_day"
                  type="hidden" value="{{ date }}" />
@@ -161,7 +177,6 @@
            type="hidden" value="{{ date_to}}" />
 
     {% if search_str %}
-
         {% set date_from2 = str(date_from).replace('-','/') %}
         {% set date_to2 = str(date_to).replace('-','/') %}
         {% set date2 = str(date).replace('-', '/') %}
@@ -174,7 +189,8 @@
       <div class="col-2 p-0 text-right">
         <div class="container-fluid p-0" style="opacity: 0.8;">
           <div class="row m-0"
-               onmousedown="doPostDate('{{ url_prefix }}', '{{ date }}', -365);" >
+               onmousedown="doPostDate('{{ url_prefix }}',
+                            '{{ date }}', -365);" >
             <div class="col p-0 text-center">
               <i class="fas fa-arrow-alt-circle-up fa-2x"></i>
             </div>
@@ -185,7 +201,8 @@
             </div>
           </div>
           <div class="row"
-               onmousedown="doPostDate('{{ url_prefix }}', '{{ date }}', +365);">
+               onmousedown="doPostDate('{{ url_prefix }}',
+                            '{{ date }}', +365);">
             <div class="col p-0 text-center">
               <i class="fas fa-arrow-alt-circle-down fa-2x"></i>
             </div><!-- col -->
@@ -196,12 +213,14 @@
       </div>
       <div class="col-8 p-0 text-center">
         <input type="date" value="{{ date_from }}"
-               onchange="doPostDate('{{ url_prefix }}', this.value, 365);" />
+               onchange="doPostDate('{{ url_prefix }}',
+                         this.value, 365);" />
         <br />
         <i class="fas fa-arrows-alt-v"></i>
         <br />
         <input type="date" value="{{ date_to }}"
-               onchange="doPostDate('{{ url_prefix }}', this.value, -365);" />             
+               onchange="doPostDate('{{ url_prefix }}',
+                         this.value, -365);" />
       </div>
     </div>
     {% end %}

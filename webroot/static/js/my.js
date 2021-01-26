@@ -52,12 +52,11 @@ const doGet = (path, data) => {
     window.location.href=url;
 };
 
-sc_flag = false;
+let scrollFlag = false;
+const scrollHdr = (event) => {
+    console.log(`event=${event}, scrollFlag=${scrollFlag}`);
 
-const scroll_handler = (event) => {
-    console.log(`event=${event}, sc_flag=${sc_flag}`);
-
-    if ( ! sc_flag ) {
+    if ( ! scrollFlag ) {
         return;
     }
 
@@ -73,14 +72,14 @@ const scroll_handler = (event) => {
     console.log(`${d_top}-${d_bottom}`);
     
     if (d_top < 70) {
-        sc_flag = false;
+        scrollFlag = false;
         el = document.getElementById("date_from");
         date = el.value;
         console.log(`date=${date}`);
         doPost('/ytsched/', {date: date, top_bottom: "top"});
     }
     if (d_bottom < 90) {
-        sc_flag = false;
+        scrollFlag = false;
         el = document.getElementById("date_to");
         date = el.value;
         console.log(`date=${date}`);
@@ -92,7 +91,7 @@ const scroll_handler = (event) => {
  *
  */
 const scrollToId = (id, top_bottom = "top", behavior = "smooth") => {
-    sc_flag = false;
+    scrollFlag = false;
     console.log(`id=${id}`);
     
     const body_h = document.body.clientHeight;
@@ -127,7 +126,7 @@ const scrollToId = (id, top_bottom = "top", behavior = "smooth") => {
                   behavior: behavior});
     }
 
-    sc_flag = true;
+    scrollFlag = true;
 
     return true;
 };
@@ -136,7 +135,7 @@ const scrollToId = (id, top_bottom = "top", behavior = "smooth") => {
  *
  */
 const scrollToDate = (path, date, behavior = "smooth") => {
-    sc_flag = false;
+    scrollFlag = false;
     
     console.log(`scrollToDate:date=${date}`);
     const el_top_bottom = document.getElementById("top_bottom");
@@ -144,7 +143,7 @@ const scrollToDate = (path, date, behavior = "smooth") => {
     el_top_bottom.value = "top";
 
     if (scrollToId(`date-${date}`, top_bottom, behavior)) {
-        sc_flag = true;
+        scrollFlag = true;
     
         return true;
     }
