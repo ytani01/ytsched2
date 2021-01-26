@@ -180,7 +180,7 @@ class MainHandler(HandlerBase):
                     continue
 
             if search_str:
-                if search_str not in sde.search_str():
+                if search_str.lower() not in sde.search_str():
                     continue
 
             todo_sde.append(sde)

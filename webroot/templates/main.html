@@ -50,12 +50,22 @@
     <div class="row m-0 mt-2 mb-2">
 
       <!-- home -->
-      <div id="home_button" class="col-1 p-0 text-center">
+      <div id="home_button" class="col-2 p-0 text-center">
         <i class="fas fa-home fa-lg" style="vertical-align: middle;"></i>
       </div><!-- col -->
 
+      <div id="back_button" class="col-1 p-0 text-center"
+           onclick="moveToMonday(-1, '{{ url_prefix }}');">
+        <i class="fas fa-chevron-left"></i>
+      </div><!-- col -->
+
+      <div id="forward_button" class="col-1 p-0 text-center"
+           onclick="moveToMonday(1, '{{ url_prefix }}');">
+        <i class="fas fa-chevron-right"></i>
+      </div><!-- col -->
+
       <!-- search -->
-      <div class="col-10 p-0 text-center" style="font-size: medium;">
+      <div class="col-6 p-0 text-center" style="font-size: medium;">
         <form id="form_search" name="form_search"
               action="{{ url_prefix }}" method="POST">
 
@@ -82,25 +92,18 @@
       </div><!-- col -->
 
       <!-- menu_sw -->
-      <div class="col-1 p-0 text-center">
+      <div class="col-2 p-0 text-center">
         <label for="menu-sw" class="m-0">
           <i class="fas fa-bars fa-lg"
              style="vertical-align: middle;"></i>
         </label>
       </div><!-- col -->
-
-      <div class="col-12" style="height: 3px;">
-        &nbsp;
-      </div>
     </div><!-- row -->
 
     <input id="menu-sw" type="checkbox" style="display:none;">
-    <div id="menu-content" class="row m-0 my-bar my-bar-content"
-         style="z-index:80">
 
-      <div class="col-12" style="height: 10px;">
-        &nbsp;
-      </div>
+    <div id="menu-content"
+         class="row pt-3 m-0 my-bar my-bar-content">
 
       <!-- date -->
       <div class="col-5 p-0 text-center">
@@ -138,21 +141,17 @@
       <div class="col-4 p-0 text-center" style="font-size: small;">
         <form id="form_filter" name="form_filter"
               action="{{ url_prefix }}" method="POST">
-          <input id="filter_str" name="filter_str" type="text" size="5"
-                 style="vertical-align: middle;"
-                 value="{{ filter_str }}" />
           <i class="fas fa-filter fa-2x"
              style="vertical-align: middle;"
              onmousedown="document.form_filter.submit();"></i>
+          <input id="filter_str" name="filter_str" type="text" size="5"
+                 style="vertical-align: middle;"
+                 value="{{ filter_str }}" />
           <input name="cur_day"
                  type="hidden" value="{{ date }}" />
         </form>
       </div><!-- col -->
           
-      <div class="col-12" style="height: 5px;">
-        &nbsp;
-      </div>
-
       <div class="col-5" style="font-size: small;">
         Version {{ version }}
       </div>

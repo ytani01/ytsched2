@@ -54,9 +54,8 @@ const doGet = (path, data) => {
 
 let scrollFlag = false;
 const scrollHdr = (event) => {
-    console.log(`event=${event}, scrollFlag=${scrollFlag}`);
-
     if ( ! scrollFlag ) {
+        console.log(`scrollHdr:event=${event}, scrollFlag=${scrollFlag}`);
         return;
     }
 
@@ -69,7 +68,7 @@ const scrollHdr = (event) => {
     const d_top = window.pageYOffset;
     const d_bottom = document.body.clientHeight - d_top
           - document.documentElement.clientHeight;
-    console.log(`${d_top}-${d_bottom}`);
+    console.log(`scrollHdr:${d_top}-${d_bottom}`);
     
     if (d_top < 70) {
         scrollFlag = false;
@@ -78,7 +77,7 @@ const scrollHdr = (event) => {
         console.log(`date=${date}`);
         doPost('/ytsched/', {date: date, top_bottom: "top"});
     }
-    if (d_bottom < 90) {
+    if (d_bottom < 80) {
         scrollFlag = false;
         el = document.getElementById("date_to");
         date = el.value;
@@ -92,7 +91,7 @@ const scrollHdr = (event) => {
  */
 const scrollToId = (id, top_bottom = "top", behavior = "smooth") => {
     scrollFlag = false;
-    console.log(`id=${id}`);
+    console.log(`scrollToId:id=${id}`);
     
     const body_h = document.body.clientHeight;
     const win_h = document.documentElement.clientHeight;
@@ -127,7 +126,6 @@ const scrollToId = (id, top_bottom = "top", behavior = "smooth") => {
     }
 
     scrollFlag = true;
-
     return true;
 };
 
@@ -136,31 +134,86 @@ const scrollToId = (id, top_bottom = "top", behavior = "smooth") => {
  */
 const scrollToDate = (path, date, behavior = "smooth") => {
     scrollFlag = false;
-    
     console.log(`scrollToDate:date=${date}`);
+    
+    const el_cur_day = document.getElementById("cur_day");
     const el_top_bottom = document.getElementById("top_bottom");
     const top_bottom = el_top_bottom.value;
     el_top_bottom.value = "top";
 
     if (scrollToId(`date-${date}`, top_bottom, behavior)) {
+        el_cur_day.value = date;
         scrollFlag = true;
-    
         return true;
     }
 
+    console.log(`path=${path}`);
     doPost(path, {date: date});
     return false;
+};
+
+/*
+ *
+ */
+const moveDays = (path, days, behavior="smooth") => {
+    const el = document.getElementById("cur_day");
+    let d1 = new Date(el.value);
+    d1.setDate(d1.getDate() + days);
+    console.log(`moveDays:d1=${d1}`);
+
+    d1_str = d1.toISOString().replace(/T.*$/, '');
+    el.value = d1_str;
+    scrollToDate(path, d1_str, behavior);
 };
 
 /**
  *
  */
-const moveDays = (path, days, behavior = "smooth") => {
-    const el = document.getElementById("cur_day");
-    let d1 = new Date(el.value);
-    d1.setDate(d1.getDate() + days);
-    console.log(`d1=${d1}`);
+const moveToMonday = (direction=1, path, behavior="smooth") => {
+    const el_cur_day = document.getElementById("cur_day");
+    let cur_day = new Date(el_cur_day.value);
+    console.log(`moveToMonday:path=${path}`);
+    console.log(`moveToMonday:cur_day=${cur_day}`);
 
+    const wday = cur_day.getDay();
+
+    let d_day;
+    let d_day2;
+    if ( direction > 0 ) {
+        d_day = (1 - wday + 7) % 7;
+        if (d_day == 0) {
+            d_day = 7;
+        }
+        d_day2 = d_day + 21;
+    } else {
+        d_day = (1 - wday);
+        if (d_day == 0) {
+            d_day = -7;
+        }
+        if (d_day > 0) {
+            d_day -= 7;
+        }
+        d_day2 = d_day - 21;
+    }
+
+    let d1 = new Date(el_cur_day.value);
+    console.log(`d1=${d1}`);
+    d1.setDate(d1.getDate() + d_day);
+    console.log(`d1=${d1}`);
     d1_str = d1.toISOString().replace(/T.*$/, '');
-    scrollToDate(path, d1_str, behavior);
+    console.log(`moveToMonday:d1_str=${d1_str}`);
+
+    let d2 = new Date(el_cur_day.value);
+    d2.setDate(d2.getDate() + d_day2);
+    d2_str = d2.toISOString().replace(/T.*$/, '');
+    console.log(`moveToMonday:d2_str=${d2_str}`);
+
+    el_d2 = document.getElementById(`date-${d2_str}`);
+    if ( ! el_d2 ) {
+        doPost(path, {date: d1_str});
+    }
+
+    el_cur_day.value = d1_str;
+    scrollFlag = false;
+    scrollToId(`date-${d1_str}`);
 };

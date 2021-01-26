@@ -179,7 +179,7 @@ class SchedDataEnt:
             self.type, self.title, self.place,
             self.text.replace('\n', ' '))
 
-        return search_str
+        return search_str.lower()
 
     @classmethod
     def new_id(cls):
