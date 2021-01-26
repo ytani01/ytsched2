@@ -396,7 +396,8 @@ class SchedDataFile:
                     ok = True
                     break
             except FileNotFoundError:
-                self._log.debug('%s: not found', self.pathname)
+                self._log.debug('%s: not found .. ignored',
+                                self.pathname)
                 return []
             except UnicodeDecodeError:
                 self._log.debug('%s: decode error .. try next ..', e)
