@@ -142,7 +142,11 @@ const scrollHdr = (event) => {
     //el_rel_days.innerHTML = `${rel_days}`;
     yyyy_str = top_date_str.substr(0,4);
     mm_dd_str = top_date_str.substr(5,5).replace('-','/');
-    el_rel_days.innerHTML = `${yyyy_str}<br />${mm_dd_str}<br />[ ${parseInt(rel_days/7)}w ]`;
+    sign_str = '';
+    if (rel_days >= 0) {
+        sign_str = '+';
+    }
+    el_rel_days.innerHTML = `${yyyy_str}<br />[${sign_str}${parseInt(rel_days/7)}w]`;
 
     if ( ! scrollFlag ) {
         console.log(`scrollHdr:event=${event}, scrollFlag=${scrollFlag}`);
