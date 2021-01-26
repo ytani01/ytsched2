@@ -132,8 +132,9 @@ install_python_pkg_from_git() {
 
 usage() {
     echo
-    echo "  Usage: $MYNAME [-u] [-h]"
+    echo "  Usage: $MYNAME [-f] [-u] [-h]"
     echo
+    echo "    -f  fast mode"
     echo "    -u  uninstall"
     echo "    -c  clean"
     echo "    -h  show this usage"
@@ -188,6 +189,7 @@ cd_echo $MYDIR
 
 while getopts fuch OPT; do
     case $OPT in
+	f) FAST_MODE=1;;
         u) uninstall; exit 0;;
         c) clean; exit 0;;
         h) help; echo "#####"; usage; exit 0;;
@@ -224,7 +226,7 @@ done
 if [ -d $DATADIR ]; then
     BACKDIR="$DATADIR.bak"
 
-    if [ -d $BACKDIR ]; then
+    if [ $FAST_MODE -eq 0 -a -d $BACKDIR ]; then
         echo "$BACKDIR exists: move/copy/remove by yourself"
         echo
         exit 1
