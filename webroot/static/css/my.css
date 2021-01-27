@@ -5,13 +5,13 @@
 
 .my-bar-content {
     position: fixed;
-    top: -100px;
+    bottom: -50px;
     width: 100%;
-    /* transition: all 0.5s;*/
+    transition: all 0.05s;
 }
 
 #menu-sw:checked ~ .my-bar-content {
-    top: 33px;
+    bottom: 42px;
 }
 
 .longtext {

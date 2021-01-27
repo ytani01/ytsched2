@@ -143,6 +143,7 @@ const scrollHdr = (event) => {
     yyyy_str = top_date_str.substr(0,4);
     mm_dd_str = top_date_str.substr(5,5).replace('-','/');
     sign_str = '';
+
     if (rel_days >= 0) {
         sign_str = '+';
     }
@@ -164,7 +165,7 @@ const scrollHdr = (event) => {
           - document.documentElement.clientHeight;
     console.log(`scrollHdr:${d_top}-${d_bottom}`);
     
-    if (d_top < 70) {
+    if (d_top < 50) {
         scrollFlag = false;
         el = document.getElementById("date_from");
         date = el.value;
@@ -212,10 +213,10 @@ const scrollToId = (id, top_bottom = "top", behavior = "smooth") => {
     const bottom_of_el = el.offsetTop + el.offsetHeight;
 
     if (top_bottom == "bottom") {
-        scrollTo({left: 0, top: bottom_of_el - win_h + 3,
+        scrollTo({left: 0, top: bottom_of_el - win_h + 50,
                   behavior: behavior});
     } else {
-        scrollTo({left: 0, top: top_of_el - 75,
+       scrollTo({left: 0, top: top_of_el - 20,
                   behavior: behavior});
     }
 
@@ -313,4 +314,23 @@ const moveToMonday = (direction=1, path, behavior="smooth") => {
     el_cur_day.value = d1_str;
     scrollFlag = false;
     scrollToId(`date-${d1_str}`);
+};
+
+/**
+ * TBD
+ */
+const editStr = (el0) => {
+    console.log(`el0=${el0}`);
+    let value = el0.innerHTML;
+    console.log(`value=${value}`);
+    const el_input = document.createElement("input");
+    el_input.type="text";
+    el_input.value = value;
+    console.log(`el_input=${el_input.type}`);
+
+    el0.replaceChildren(el_input);
+    el0.onclick="";
+    el0.onchange= () => {
+        console.log(`value=${el_input.value}`);
+    };
 };

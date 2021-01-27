@@ -84,12 +84,20 @@
 
           {% if sde.date != sched_date %}
           {% set sde_date = str(sde.date).replace('-', '/') %}
-        <span style="font-size:xx-small; font-weight:bold; display:inline-flex; vertical-align:top; line-height:12px">
+        <span style="font-size:xx-small;
+                     font-weight:bold;
+                     display:inline-flex;
+                     vertical-align:top;
+                     line-height:12px">
           {{ sde_date[0:4] }}<br />{{ sde_date[5:] }}
         </span>
           {% end %}<!-- sde.date != sched_date -->
 
-        <span style="font-size:xx-small; font-weight:bold; display:inline-flex; vertical-align:top; line-height:12px">
+        <span style="font-size:xx-small;
+                     font-weight:bold;
+                     display:inline-flex;
+                     vertical-align:top;
+                     line-height:12px">
           {{ time_start }}<br />{{ time_end }}
         </span>
         {% end %}<!-- if todo -->

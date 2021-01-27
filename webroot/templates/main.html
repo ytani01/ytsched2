@@ -30,7 +30,7 @@
 
         const body_h = document.body.clientHeight;
         const win_h = document.documentElement.clientHeight;
-
+    
         if ( body_h < win_h ) {
             console.log(`body_h=${body_h} < win_h=${win_h}`);
             return;
@@ -40,136 +40,14 @@
         scrollToDate(location.pathname, el.value, "auto");
         
         if (el_search.value == "") {
+            console.log('AAA');
             window.addEventListener('scroll', scrollHdr, {passive:true});
         }
     });
   </script>
                         
-  <!-- menu bar -->
-  <div class="container-fluid p-0 fixed-top my-bar">
-    <div class="row m-0 mt-2 mb-2">
-
-      <!-- home -->
-      <div id="home_button" class="col-2 p-0 text-center">
-        <span id="rel_days"
-              style="display: inline-flex;
-                     font-size: x-small;
-                     font-weight: bold;
-                     line-height: 11px;
-                     vertical-align: middle;"> </span>
-        <i class="fas fa-home fa-lg" style="vertical-align: middle;"></i>
-      </div><!-- col -->
-
-      <div id="back_button" class="col-1 p-0 text-center"
-           onclick="moveToMonday(-1, '{{ url_prefix }}');">
-        <i class="fas fa-chevron-left"></i>
-      </div><!-- col -->
-
-      <div id="forward_button" class="col-1 p-0 text-center"
-           onclick="moveToMonday(1, '{{ url_prefix }}');">
-        <i class="fas fa-chevron-right"></i>
-      </div><!-- col -->
-
-      <!-- search -->
-      <div class="col-6 p-0 text-center" style="font-size: medium;">
-        <form id="form_search" name="form_search"
-              action="{{ url_prefix }}" method="POST">
-
-          {% if search_str %}
-            {% set search_spin="fa-spin" %}
-          {% else %}
-            {% set search_spin="" %}
-          {% end %}
-          <i class="fas fa-search fa-lg {{ search_spin }}"
-             style="vertical-align: middle;"
-             onmousedown="document.form_search.submit();"></i>
-
-          <input id="search_str" name="search_str"
-                 type="text" size="10"
-                 style="font-size: small; vertical-align: middle;"
-                 value="{{ search_str }}" />
-          <i class="fas fa-backspace fa-lg"
-             style="vertical-align: middle;"
-             onmousedown="search_str.value='';"></i>
-
-          <input id="cur_day" name="cur_day"
-                 type="hidden" value="{{ date }}" />
-        </form>
-      </div><!-- col -->
-
-      <!-- menu_sw -->
-      <div class="col-2 p-0 text-center">
-        <label for="menu-sw" class="m-0">
-          <i class="fas fa-bars fa-lg"
-             style="vertical-align: middle;"></i>
-        </label>
-      </div><!-- col -->
-    </div><!-- row -->
-
-    <input id="menu-sw" type="checkbox" style="display:none;">
-
-    <div id="menu-content"
-         class="row pt-3 m-0 my-bar my-bar-content">
-
-      <!-- date -->
-      <div class="col-5 p-0 text-center">
-        <input id="date" name="date"
-               type="date" value="{{ date }}"
-               onchange="doPost('{{ url_prefix }}',
-                         {date:this.value});"/>
-      </div><!-- col -->
-        
-      <!-- ToDo days -->
-      <div class="col-3 p-0 text-center">
-        <form id="todo_days_form" name="todo_days_form"
-              action="{{ url_prefix }}" method="POST">
-          <i class="fas fa-list-alt fa-lg"
-             style="vertical-align: middle;"></i>
-          <select id="todo_days" name="todo_days"
-                  style="vertical-align: middle;"
-                  onchange="document.todo_days_form.submit();">
-            {% for opt in todo_days_list %}
-            {% if todo_days_list[opt] == todo_days_value %}
-            <option value="{{ todo_days_list[opt] }}" selected>
-              {{ opt }}
-            </option>
-            {% else %}
-            <option value="{{ todo_days_list[opt] }}">
-              {{ opt }}
-            </option>
-            {% end %}
-            {% end %}
-          </select>
-        </form>
-      </div><!-- col -->
-
-      <!-- filter -->
-      <div class="col-4 p-0 text-center" style="font-size: small;">
-        <form id="form_filter" name="form_filter"
-              action="{{ url_prefix }}" method="POST">
-          <i class="fas fa-filter fa-2x"
-             style="vertical-align: middle;"
-             onmousedown="document.form_filter.submit();"></i>
-          <input id="filter_str" name="filter_str" type="text" size="5"
-                 style="vertical-align: middle;"
-                 value="{{ filter_str }}" />
-          <input name="cur_day"
-                 type="hidden" value="{{ date }}" />
-        </form>
-      </div><!-- col -->
-          
-      <div class="col-5" style="font-size: small;">
-        Version {{ version }}
-      </div>
-      <div class="col-7 text-right" style="font-size: small">
-        (c) 2020 <strong>{{ author }}</strong>
-      </div>
-    
-    </div><!-- row -->        
-
-  </div><!-- container -->
 </header>
-<main style="background-color:#FFF;padding-top: 65px;">
+<main style="background-color:#FFF;">
   <div class="container-fluid p-0">
     
     <input id="top_bottom" name="top_bottom"
@@ -368,4 +246,142 @@
 
   </div><!-- container -->
 </main>
+<footer>
+  <!-- menu bar -->
+  <div class="container-fluid p-2 fixed-bottom my-bar"
+       style="z-index:2;">
+    <div class="row m-0">
+
+      <!-- menu_sw -->
+      <div class="col-2 p-0 text-left">
+        <label for="menu-sw" class="m-0">
+          &nbsp;
+        </label>
+        <label for="menu-sw" class="m-0">
+          <i class="fas fa-bars fa-lg"
+             style="vertical-align: middle;"></i>
+        </label>
+        <label for="menu-sw" class="m-0">
+          &nbsp;
+        </label>
+      </div><!-- col -->
+
+      <!-- back -->
+      <div id="back_button" class="col-1 p-0 text-center"
+           onclick="moveToMonday(-1, '{{ url_prefix }}');">
+        <i class="fas fa-chevron-left"></i>
+      </div><!-- col -->
+
+      <!-- forward -->
+      <div id="forward_button" class="col-1 p-0 text-center"
+           onclick="moveToMonday(1, '{{ url_prefix }}');">
+        <i class="fas fa-chevron-right"></i>
+      </div><!-- col -->
+
+      <!-- home -->
+      <div id="home_button" class="col-3 p-0 text-center">
+        <span id="rel_days"
+              style="display: inline-flex;
+                     font-size: x-small;
+                     font-weight: bold;
+                     line-height: 11px;
+                     vertical-align: middle;"> </span>
+        <i class="fas fa-home fa-lg" style="vertical-align: middle;"></i>
+      </div><!-- col -->
+
+      <!-- search -->
+      <div class="col-5 p-0 text-right" style="font-size: medium;">
+        <form id="form_search" name="form_search"
+              action="{{ url_prefix }}" method="POST">
+
+          {% if search_str %}
+            {% set search_spin="fa-spin" %}
+          {% else %}
+            {% set search_spin="" %}
+          {% end %}
+          <i class="fas fa-search fa-lg {{ search_spin }}"
+             style="vertical-align: middle;"
+             onmousedown="document.form_search.submit();"></i>
+          <input id="search_str" name="search_str"
+                 type="text" size="9"
+                 style="font-size: small; vertical-align: middle;"
+                 value="{{ search_str }}" />
+          <i class="fas fa-backspace fa-lg"
+             style="vertical-align: middle;"
+             onmousedown="search_str.value='';"></i>
+
+          <input id="cur_day" name="cur_day"
+                 type="hidden" value="{{ date }}" />
+        </form>
+      </div><!-- col -->
+
+    </div><!-- row -->
+  </div><!-- container -->
+
+  <input id="menu-sw" type="checkbox" style="display:none;">
+
+  <div class="container-fluid p-0 fixed-bottom my-bar my-bar-content"
+       style="z-index: 1;">
+
+    <div id="menu-content" class="row m-1">
+
+      <div class="col-5" style="font-size: small;">
+        Version {{ version }}
+      </div>
+      <div class="col-7 text-right" style="font-size: small">
+        (c) 2020 <strong>{{ author }}</strong>
+      </div>
+      
+    </div><!-- row -->
+    <div id="menu-content" class="row m-1">
+
+      <!-- date -->
+      <div class="col-5 p-0 text-center">
+        <input id="date" name="date"
+               type="date" value="{{ date }}"
+               onchange="doPost('{{ url_prefix }}',
+                         {date:this.value});"/>
+      </div><!-- col -->
+      
+      <!-- ToDo days -->
+      <div class="col-3 p-0 text-center">
+        <form id="todo_days_form" name="todo_days_form"
+              action="{{ url_prefix }}" method="POST">
+          <i class="fas fa-list-alt fa-lg"
+             style="vertical-align: middle;"></i>
+          <select id="todo_days" name="todo_days"
+                  style="vertical-align: middle;"
+                  onchange="document.todo_days_form.submit();">
+            {% for opt in todo_days_list %}
+            {% if todo_days_list[opt] == todo_days_value %}
+            <option value="{{ todo_days_list[opt] }}" selected>
+              {{ opt }}
+            </option>
+            {% else %}
+            <option value="{{ todo_days_list[opt] }}">
+              {{ opt }}
+            </option>
+            {% end %}
+            {% end %}
+          </select>
+        </form>
+      </div><!-- col -->
+
+      <!-- filter -->
+      <div class="col-4 p-0 text-center" style="font-size: small;">
+        <form id="form_filter" name="form_filter"
+              action="{{ url_prefix }}" method="POST">
+          <i class="fas fa-filter fa-2x"
+             style="vertical-align: middle;"
+             onmousedown="document.form_filter.submit();"></i>
+          <input id="filter_str" name="filter_str" type="text" size="5"
+                 style="vertical-align: middle;"
+                 value="{{ filter_str }}" />
+          <input name="cur_day"
+                 type="hidden" value="{{ date }}" />
+        </form>
+      </div><!-- col -->
+    </div><!-- row -->        
+  </div><!-- container -->
+</footer>
 {% end %}
