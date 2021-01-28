@@ -29,7 +29,7 @@ def htmlstr2text(intext: str) -> str:
     resub_tbl = {
         r'&gt;': '>',
         r'&lt;': '<',
-        r'&amp;': '&',
+#        r'&amp;': '&',
         r'&nbsp:': ' ',
         r'&#160;': ' ',
         r'\<BR *\/*\>': '\n'
@@ -63,8 +63,10 @@ def text2htmlstr(intext: str) -> str:
     """
     outtext = intext.rstrip('\n')
 
-    # outtext = outtext.replace('&', '&amp;')
-    # outtext = outtext.replace(' ', '&nbsp;')
+#    outtext = outtext.replace('&', '&amp;')
+#    outtext = outtext.replace('>', '&gt;')
+#    outtext = outtext.replace('<', '&lt;')
+#    outtext = outtext.replace(' ', '&nbsp;')
 
     outtext = outtext.replace('\t', ' ')
     outtext = outtext.replace('\r', '')
@@ -99,16 +101,16 @@ class SchedDataEnt:
                  date: datetime.date = datetime.date.today(),
                  time_start: datetime.time = '',
                  time_end: datetime.time = '',
-                 sde_type='', title=TITLE_NULL, place='', text='',
+                 sde_type='', title=TITLE_NULL, place='', detail='',
                  debug=False):
         """ Constructor
         """
         self.debug = debug
         self.__class__._log = get_logger(self.__class__.__name__,
                                          self.debug)
-#        self._log.debug('(%s)%s %s-%s [%s] %s @%s:\'%s\'',
-#                        id, date, time_start, time_end,
-#                        sde_type, title, place, text)
+        self._log.debug('(%s)%s %s-%s [%s] %s @%s:\'%s\'',
+                        id, date, time_start, time_end,
+                        sde_type, title, place, detail)
 
         self.id = id
         self.date = date
@@ -117,7 +119,7 @@ class SchedDataEnt:
         self.type = sde_type
         self.title = title
         self.place = place
-        self.text = htmlstr2text(text)
+        self.detail = htmlstr2text(detail)
 
         if not self.title:
             self.title = self.TITLE_NULL
@@ -143,7 +145,7 @@ class SchedDataEnt:
         out_str += '[%s]' % (htmlstr2text(self.type))
         out_str += '%s' % (htmlstr2text(self.title))
         out_str += '@%s: ' % (htmlstr2text(self.place))
-        out_str += htmlstr2text(self.text)
+        out_str += htmlstr2text(self.detail)
 
         return out_str
 
@@ -162,7 +164,7 @@ class SchedDataEnt:
             time_end_str = self.time_end.strftime('%H:%M')
 
         time_str = time_start_str + '-' + time_end_str
-        text_htmlstr = text2htmlstr(self.text)
+        text_htmlstr = text2htmlstr(self.detail)
 
         return '\t'.join([self.id, date_str, time_str,
                           self.type, self.title, self.place,
@@ -177,7 +179,7 @@ class SchedDataEnt:
         """
         search_str = '%s %s %s %s' % (
             self.type, self.title, self.place,
-            self.text.replace('\n', ' '))
+            self.detail.replace('\n', ' '))
 
         return search_str.lower()
 
@@ -406,9 +408,11 @@ class SchedDataFile:
             self._log.warning('%s: invalid encoding', self.pathname)
             return []
 
+        # self._log.debug('lines=%s', lines)
         out = []
         for l in lines:
             d = [htmlstr2text(d1) for d1 in l.split('\t')]
+            # self._log.debug('d=%s', d)
 
             date1 = d[1].split('/')
             date2 = datetime.date(int(date1[0]),

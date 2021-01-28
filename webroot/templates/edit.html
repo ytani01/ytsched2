@@ -11,7 +11,7 @@
   <script>
     const wdayList = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-    const mkInput = (cmd) => {
+    const mkInput = cmd => {
         const input = document.createElement("input");
         input.setAttribute("type", "hidden");
         input.setAttribute("name", "cmd");
@@ -19,13 +19,13 @@
         return input;
     };
 
-    const doSubmit = (cmd) => {
+    const doSubmit = cmd => {
         form = document.forms["input_form"];
         form.appendChild(mkInput(cmd));
         form.submit();
     };
 
-    const update_wday = (el_date) => {
+    const update_wday = el_date => {
         if ( el_date === undefined ) {
             el_date = document.getElementById("date");
         }
@@ -57,6 +57,32 @@
 
         setDate(d1, el_date);
     };
+
+    const changeDetailHeight = () => {
+      const el_detail = document.getElementById("detail");
+      const detail_y = el_detail.parentElement.offsetTop;
+
+      const el_id = document.getElementById("div_id");
+      const id_h = el_id.offsetHeight;
+
+      const win_h = document.documentElement.clientHeight
+
+      const detail_h = win_h - detail_y - id_h - 7;
+
+      el_detail.style.height = `${detail_h}px`;
+    }
+
+    window.addEventListener('load', function() {
+      changeDetailHeight();
+    });
+    /*
+    window.addEventListener('resize', function() {
+      changeDetailHeight();
+    });
+    */
+    window.addEventListener('rotationchange', function() {
+      changeDetailHeight();
+    });
   </script>
   
   <div class="container-fluid p-0 fixed-top my-bar">
@@ -97,22 +123,21 @@
 
     <div class="container-fluid"
          style="background-color: #EEE;">
-      <div class="row">
-        &nbsp;
-      </div>
-
       <!-- 日付 -->
-      <div class="row" style="font-size: large">
-        <div class="col-5 text-center">
-          <i class="far fa-arrow-alt-circle-up fa-2x"
+      <div class="row p-1" style="font-size: large">
+        <div class="col-4 text-center">
+          <i class="far fa-arrow-alt-circle-up fa-lg"
+             style="vertical-align: middle;"
              onmousedown="changeDate(-1);"></i>
-          <i class="far fa-dot-circle fa-2x"
+          <i class="far fa-dot-circle fa-lg"
+             style="vertical-align: middle;"
              onmousedown="setDate();"></i>
-          <i class="far fa-arrow-alt-circle-down fa-2x"
+          <i class="far fa-arrow-alt-circle-down fa-lg"
+             style="vertical-align: middle;"
              onmousedown="changeDate(1);"></i>
         </div>
 
-        <div class="col-7 p-0 text-left">
+        <div class="col-8 p-1 text-left">
           <input id="date" name="date"
                  type="date" value="{{ sde.date }}"
                  onchange="update_wday();" />
@@ -121,12 +146,8 @@
         </div><!-- col -->
       </div><!-- row -->
 
-      <div class="row">
-        &nbsp;
-      </div>
-
       <!-- 時刻 -->
-      <div class="row" style="font-size: x-large">
+      <div class="row p-1" style="font-size: large">
         <div class="col">
           <input id="time_start" name="time_start" style="width: 100px;"
                  type="time" value="{{ sde.time_start }}" />
@@ -135,10 +156,6 @@
                  type="time" value="{{ sde.time_end }}" />
         </div><!-- col -->
       </div><!-- row -->
-
-      <div class="row">
-        &nbsp;
-      </div>
 
       <!-- Type -->
       <div class="row" style="font-size: x-large;">
@@ -169,18 +186,17 @@
       </div><!-- row -->
 
       <!-- 詳細 -->
-      <div class="row" style="font-size: large;">
-        <div class="col">
-          <textarea id="text" name="text" style="width: 100%;"
-                    rows="8">
-            {{ sde.text }}</textarea>
+      <div id="div_detail" class="row p-0" style="font-size: large;">
+        <div class="col p-0">
+          <textarea id="detail" name="detail" style="width: 100%;">
+            {{ sde.detail }}</textarea>
         </div><!-- col -->
       </div><!-- row -->
 
       <!-- ID -->
-      <div class="row" style="font-size: x-small">
-        <div class="col">
-          <input id="sde_id" name="sde_id"
+      <div id="div_id" class="row text-right" style="font-size: x-small">
+        <div class="col p-0">
+          <input id="sde_id" name="sde_id" size="15"
                  type="text" value="{{ sde.id }}" readonly>
         </div><!-- col -->
       </div><!-- row -->

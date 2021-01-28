@@ -203,10 +203,11 @@ class MainHandler(HandlerBase):
             self._mylog.debug('date1=%s', date1)
             
             sdf = SchedDataFile(date1, self._datadir, debug=self._dbg)
-#            self._mylog.debug('sdf=%s', sdf)
+            # self._mylog.debug('sdf=%s', sdf)
 
             out_sde = []
             for sde in sdf.sde:
+                self._mylog.debug('sde=%s', sde)
                 if filter_str.startswith('!'):
                     if filter_str[1:] in sde.search_str():
                         continue
@@ -334,10 +335,10 @@ class MainHandler(HandlerBase):
         self._mylog.debug('[%s]%s@%s', sde_type, title, place)
 
         #
-        # text
+        # detail
         #
-        text = self.get_argument('text', '')
-        self._mylog.debug('test:\'%s\'', text)
+        detail = self.get_argument('detail', '')
+        self._mylog.debug('detail:\'%s\'', detail)
 
         #
         # sde_id
@@ -350,7 +351,7 @@ class MainHandler(HandlerBase):
         #
         if cmd == 'add':
             self.cmd_add(None, date, time_start, time_end,
-                         sde_type, title, place, text)
+                         sde_type, title, place, detail)
 
         if cmd == 'del':
             self.cmd_del(sde_id, orig_date)
@@ -359,12 +360,12 @@ class MainHandler(HandlerBase):
             self._mylog.debug('EXEC [%s]', cmd)
             self.cmd_del(sde_id, orig_date)
             self.cmd_add(sde_id, date, time_start, time_end,
-                         sde_type, title, place, text)
+                         sde_type, title, place, detail)
 
         return todo_flag
 
     def cmd_add(self, sde_id, date, time_start, time_end,
-                sde_type, title, place, text):
+                sde_type, title, place, detail):
         """
         Parameters
         ----------
@@ -373,7 +374,7 @@ class MainHandler(HandlerBase):
         self._mylog.debug('sde_id=%s, date=%s', sde_id, date)
 
         new_sde = SchedDataEnt(sde_id, date, time_start, time_end,
-                               sde_type, title, place, text,
+                               sde_type, title, place, detail,
                                debug=self._dbg)
         if new_sde.is_todo():
             sdf = SchedDataFile(None, topdir=self._datadir,

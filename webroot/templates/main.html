@@ -40,7 +40,6 @@
         scrollToDate(location.pathname, el.value, "auto");
         
         if (el_search.value == "") {
-            console.log('AAA');
             window.addEventListener('scroll', scrollHdr, {passive:true});
         }
     });
@@ -115,7 +114,7 @@
 
     {% set sched_date = sched_ent['date'] %}
 
-    <!-- {{ date }} -->
+    <!-- {{ sched_date }} -->
     {% if sched_date == today %}
       {% set today_flag = True %}
     {% else %}
@@ -374,7 +373,7 @@
           <i class="fas fa-filter fa-2x"
              style="vertical-align: middle;"
              onmousedown="document.form_filter.submit();"></i>
-          <input id="filter_str" name="filter_str" type="text" size="5"
+          <input id="filter_str" name="filter_str" type="text" size="7"
                  style="vertical-align: middle;"
                  value="{{ filter_str }}" />
           <input name="cur_day"

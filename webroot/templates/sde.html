@@ -43,7 +43,8 @@
   {% set place = '@' + sde.place %}
 {% end %}
 
-{% set detail = sde.text.rstrip('\n') %}
+{% set detail = sde.detail.rstrip('\n') %}
+AAA {{ detail }}
 
 {% if sde.is_important() %}
   {% set title_font_style="font-size: medium; font-weight: bold" %}

@@ -56,14 +56,14 @@ const getTopDateString = () => {
     const win_top = window.pageYOffset;
 
     let el_date = document.getElementById(`date-${el_date_from.value}`);
-    console.log(`getTopDate: el_date.id=${el_date.id}`);
+    // console.log(`getTopDate: el_date.id=${el_date.id}`);
     while ( el_date.offsetTop < win_top ) {
         d1 = new Date(el_date.id.replace('date-',''));
         d1 = shiftDays(d1, 1);
-        console.log(`d1=${d1}`);
+        // console.log(`d1=${d1}`);
         d1_str = getJSTDateString(d1);
         el_date = document.getElementById(`date-${d1_str}`);
-        console.log(`getTopDate: el_date.id=${el_date.id}`);
+        // console.log(`getTopDate: el_date.id=${el_date.id}`);
     }
     return el_date.id.replace('date-', '');
 };
@@ -137,7 +137,7 @@ let scrollFlag = false;
 const scrollHdr = (event) => {
     const top_date_str = getTopDateString();
     const rel_days = getRelativeDate();
-    console.log(`rel_days=${rel_days}`);
+    // console.log(`rel_days=${rel_days}`);
     const el_rel_days = document.getElementById("rel_days");
     //el_rel_days.innerHTML = `${rel_days}`;
     yyyy_str = top_date_str.substr(0,4);
@@ -163,7 +163,12 @@ const scrollHdr = (event) => {
     const d_top = window.pageYOffset;
     const d_bottom = document.body.clientHeight - d_top
           - document.documentElement.clientHeight;
-    console.log(`scrollHdr:${d_top}-${d_bottom}`);
+    if ( d_top < 200 ) {
+        console.log(`scrollHdr:d_top=${d_top}`);
+    }
+    if ( d_bottom < 200 ) {
+        console.log(`scrollHdr:d_bottom=${d_bottom}`);
+    }
     
     if (d_top < 50) {
         scrollFlag = false;
@@ -213,7 +218,7 @@ const scrollToId = (id, top_bottom = "top", behavior = "smooth") => {
     const bottom_of_el = el.offsetTop + el.offsetHeight;
 
     if (top_bottom == "bottom") {
-        scrollTo({left: 0, top: bottom_of_el - win_h + 50,
+        scrollTo({left: 0, top: bottom_of_el - win_h - 5,
                   behavior: behavior});
     } else {
        scrollTo({left: 0, top: top_of_el - 20,
