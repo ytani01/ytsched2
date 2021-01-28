@@ -128,6 +128,9 @@ class MainHandler(HandlerBase):
         #
         top_bottom = self.get_argument('top_bottom', None)
         self._mylog.debug('top_bottom=%s', top_bottom)
+        if not top_bottom:
+            top_bottom = "top"
+            self._mylog.debug('[fix]top_bottom=%s', top_bottom)
 
         #
         # filter_str

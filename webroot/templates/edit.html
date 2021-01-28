@@ -20,7 +20,7 @@
     };
 
     const doSubmit = cmd => {
-        form = document.forms["input_form"];
+        const form = document.forms["input_form"];
         form.appendChild(mkInput(cmd));
         form.submit();
     };
@@ -120,6 +120,9 @@
 
     <input id="orig_date" name="orig_date"
            type="hidden" value="{{ orig_date }}" />
+
+    <input id="top_bottom" name="top_bottom"
+           type="hidden" value="top" />
 
     <div class="container-fluid"
          style="background-color: #EEE;">
