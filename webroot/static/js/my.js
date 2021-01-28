@@ -60,10 +60,8 @@ const getTopDateString = () => {
     while ( el_date.offsetTop < win_top ) {
         d1 = new Date(el_date.id.replace('date-',''));
         d1 = shiftDays(d1, 1);
-        // console.log(`d1=${d1}`);
         d1_str = getJSTDateString(d1);
         el_date = document.getElementById(`date-${d1_str}`);
-        // console.log(`getTopDate: el_date.id=${el_date.id}`);
     }
     return el_date.id.replace('date-', '');
 };
@@ -160,15 +158,11 @@ const scrollHdr = (event) => {
         return;
     }
 
+    const win_h = document.documentElement.clientHeight;
+    const body_h = document.body.clientHeight;
     const d_top = window.pageYOffset;
-    const d_bottom = document.body.clientHeight - d_top
-          - document.documentElement.clientHeight;
-    if ( d_top < 200 ) {
-        console.log(`scrollHdr:d_top=${d_top}`);
-    }
-    if ( d_bottom < 200 ) {
-        console.log(`scrollHdr:d_bottom=${d_bottom}`);
-    }
+    const d_bottom = body_h - d_top - win_h;
+    console.log(`scrollHdr:d_top=${d_top}, d_bottom=${d_bottom}`);
     
     if (d_top < 50) {
         scrollFlag = false;
@@ -184,6 +178,17 @@ const scrollHdr = (event) => {
         console.log(`date=${date}`);
         doPost('/ytsched/', {date: date, top_bottom: "bottom"});
     }
+};
+
+/**
+ *
+ */
+let scrollHdrTimer = 0;
+const scrollHdr0 = (event) => {
+    if (scrollHdrTimer > 0) {
+        clearTimeout(scrollHdrTimer);
+    }
+    scrollHdrTimer = setTimeout(scrollHdr, 100);
 };
 
 /**
@@ -216,12 +221,20 @@ const scrollToId = (id, top_bottom = "top", behavior = "smooth") => {
 
     const top_of_el = el.offsetTop;
     const bottom_of_el = el.offsetTop + el.offsetHeight;
+    const el_menu_bar = document.getElementById("menu_bar");
+    const menu_bar_h = el_menu_bar.offsetHeight;
 
-    if (top_bottom == "bottom") {
-        scrollTo({left: 0, top: bottom_of_el - win_h - 5,
+    console.log(`scrollToId:top_bottom=${top_bottom}`);
+
+    const scroll_offset = 30;
+    if (top_bottom == "top") {
+        scrollTo({left: 0,
+                  top: top_of_el - scroll_offset,
                   behavior: behavior});
-    } else {
-       scrollTo({left: 0, top: top_of_el - 20,
+    }
+    if (top_bottom == "bottom") {
+        scrollTo({left: 0,
+                  top: bottom_of_el - win_h + menu_bar_h + scroll_offset,
                   behavior: behavior});
     }
 
@@ -232,14 +245,11 @@ const scrollToId = (id, top_bottom = "top", behavior = "smooth") => {
 /**
  *
  */
-const scrollToDate = (path, date, behavior = "smooth") => {
+const scrollToDate = (path, date, top_bottom="top", behavior="smooth") => {
     scrollFlag = false;
-    console.log(`scrollToDate:date=${date}`);
+    console.log(`scrollToDate:date=${date}, top_bottom=${top_bottom}`);
     
     const el_cur_day = document.getElementById("cur_day");
-    const el_top_bottom = document.getElementById("top_bottom");
-    const top_bottom = el_top_bottom.value;
-    el_top_bottom.value = "top"; // set default to el_top_bottom
 
     if (scrollToId(`date-${date}`, top_bottom, behavior)) {
         el_cur_day.value = date;
@@ -248,13 +258,12 @@ const scrollToDate = (path, date, behavior = "smooth") => {
     }
 
     console.log(`path=${path}`);
-    doPost(path, {date: date});
+    doPost(path, {date: date, top_bottom: top_bottom});
     return false;
 };
 
 /*
  *
- */
 const moveDays = (path, days, behavior="smooth") => {
     const el = document.getElementById("cur_day");
     let d1 = new Date(el.value);
@@ -264,8 +273,9 @@ const moveDays = (path, days, behavior="smooth") => {
     d1_str = getJSTDateString(d1);
     console.log(`moveDays:d1_str=${d1_str}`);
     el.value = d1_str;
-    scrollToDate(path, d1_str, behavior);
+    scrollToDate(path, d1_str, "top", behavior);
 };
+ */
 
 /**
  * [Important!]
@@ -312,7 +322,7 @@ const moveToMonday = (direction=1, path, behavior="smooth") => {
 
     el_d2 = document.getElementById(`date-${d2_str}`);
     if ( ! el_d2 ) {
-        doPost(path, {date: d1_str});
+        doPost(path, {date: d1_str, top_bottom: "top"});
         return;
     }
 

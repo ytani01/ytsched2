@@ -9,42 +9,51 @@
 	    ++clickCount;
 	    setTimeout( function() {clickCount = 0;}, 350 );
             console.log("single click");
-
-            scrollToDate('{{ url_prefix }}', '{{ today }}');
-
+            
+            scrollToDate('{{ url_prefix }}', '{{ today }}', 'top');
+            
         } else { // double click
 	    event.preventDefault() ;
 	    clickCount = 0;
 	    console.log( "double click" ) ;
-
-            doPost('{{ url_prefix }}', {date: '{{ today }}'});
+            
+            doPost('{{ url_prefix }}', {date: '{{ today }}', top_bottom: 'top'} );
         }
     };
 
-    window.addEventListener('load', function() {
+    const onloadHdr = (event) => {
+        const el_menu_bar = document.getElementById("menu_bar");
+        document.body.style.paddingBottom = `${el_menu_bar.offsetHeight}px`;
+        console.log(`onload(): menu_bar height=${document.body.style.paddingBottom}`);
+
         const el_search = document.getElementById("search_str");
         console.log(`onload(): search_str="${el_search.value}"`);
-
+        
         const el_home_button = document.getElementById("home_button");
         el_home_button.addEventListener("mousedown", homeButtonHdr);
-
+        
         const body_h = document.body.clientHeight;
         const win_h = document.documentElement.clientHeight;
-    
+      
         if ( body_h < win_h ) {
             console.log(`body_h=${body_h} < win_h=${win_h}`);
             return;
         }
-
-        const el = document.getElementById("date");
-        scrollToDate(location.pathname, el.value, "auto");
-        
+      
+        const el_top_bottom = document.getElementById("top_bottom");
+        const el_date = document.getElementById("date");
+        scrollToDate(location.pathname,
+                     el_date.value,
+                     el_top_bottom.value,
+                     "auto");
+      
         if (el_search.value == "") {
-            window.addEventListener('scroll', scrollHdr, {passive:true});
+            window.addEventListener('scroll', scrollHdr0, {passive:true});
         }
-    });
+    };
+
+    window.addEventListener('load', onloadHdr);
   </script>
-                        
 </header>
 <main style="background-color:#FFF;">
   <div class="container-fluid p-0">
@@ -247,7 +256,7 @@
 </main>
 <footer>
   <!-- menu bar -->
-  <div class="container-fluid p-2 fixed-bottom my-bar"
+  <div id="menu_bar" class="container-fluid p-2 fixed-bottom my-bar"
        style="z-index:2;">
     <div class="row m-0">
 
