@@ -20,7 +20,7 @@ class MainHandler(HandlerBase):
     HTML_FILE = 'main.html'
 
     DEF_DAYS = 45
-    SEARCH_MODE_DAYS = 365
+    SEARCH_MODE_DAYS = 180
 
     TODO_DAYS = {'off': 0,
                  '1W': 7,
@@ -124,6 +124,12 @@ class MainHandler(HandlerBase):
         self._mylog.debug('todo_days_value=%a', todo_days_value)
 
         #
+        # top_bottom
+        #
+        top_bottom = self.get_argument('top_bottom', None)
+        self._mylog.debug('top_bottom=%s', top_bottom)
+
+        #
         # filter_str
         #
         filter_str0 = self.get_conf(self.CONF_KEY_FILTER_STR)
@@ -161,12 +167,6 @@ class MainHandler(HandlerBase):
         self._mylog.debug('search_str=\'%s\'', search_str)
 
         #
-        # top_bottom
-        #
-        top_bottom = self.get_argument('top_bottom', None)
-        self._mylog.debug('top_bottom=%s', top_bottom)
-
-        #
         # load ToDo
         #
         todo_sdf = SchedDataFile(None, self._datadir, debug=self._dbg)
@@ -195,7 +195,8 @@ class MainHandler(HandlerBase):
 
         if search_str:
             date_from = date - delta_day1 * self.SEARCH_MODE_DAYS
-            date_to = date + delta_day1 * self.SEARCH_MODE_DAYS
+            # date_to = date + delta_day1 * self.SEARCH_MODE_DAYS
+            date_to = date
 
         date1 = date_from - delta_day1
         while date1 < date_to:

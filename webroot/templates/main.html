@@ -72,7 +72,7 @@
         <div class="container-fluid p-0" style="opacity: 0.8;">
           <div class="row m-0"
                onmousedown="doPostDate('{{ url_prefix }}',
-                            '{{ date }}', -365);" >
+                            '{{ date }}', {{ str(date_from - date_to)[:-14] }});" >
             <div class="col p-0 text-center">
               <i class="fas fa-arrow-alt-circle-up fa-2x"></i>
             </div>
@@ -84,7 +84,7 @@
           </div>
           <div class="row"
                onmousedown="doPostDate('{{ url_prefix }}',
-                            '{{ date }}', +365);">
+                            '{{ date }}', {{ str(date_to - date_from)[:-14] }});">
             <div class="col p-0 text-center">
               <i class="fas fa-arrow-alt-circle-down fa-2x"></i>
             </div><!-- col -->
@@ -96,13 +96,13 @@
       <div class="col-8 p-0 text-center">
         <input type="date" value="{{ date_from }}"
                onchange="doPostDate('{{ url_prefix }}',
-                         this.value, 365);" />
+                         this.value, {{ str(date_to - date_from)[:-14] }});"/>
         <br />
         <i class="fas fa-arrows-alt-v"></i>
         <br />
         <input type="date" value="{{ date_to }}"
                onchange="doPostDate('{{ url_prefix }}',
-                         this.value, -365);" />
+                         this.value, 0);" />
       </div>
     </div>
     {% end %}
