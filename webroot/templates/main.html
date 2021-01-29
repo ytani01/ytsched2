@@ -10,6 +10,12 @@
 	    setTimeout( function() {clickCount = 0;}, 350 );
             console.log("single click");
             
+            const search_str = '{{ search_str }}';
+            if ( search_str ) {
+                console.log(`search_str=${search_str}`);
+                doPost('{{ url_prefix }}', {date: '{{ today }}'} );
+            }
+
             scrollToDate('{{ url_prefix }}', '{{ today }}', 'top');
             
         } else { // double click
@@ -113,7 +119,7 @@
                onchange="doPostDate('{{ url_prefix }}',
                          this.value, {{ str(date_to - date_from)[:-14] }});"/>
         <br />
-        <i class="fas fa-arrows-alt-v"></i>
+        <i class="fas fa-long-arrow-alt-up"></i>
         最大
         <select id="search_n_in" name="search_n_in"
                 style="vertical-align; middle;"

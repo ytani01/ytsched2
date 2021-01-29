@@ -29,7 +29,7 @@ const shiftDays = (d, days) => {
 };
 
 /**
- * "YYYY-mm-ddTHH:MM:SS.SSSZ"
+ * get JST string: "YYYY-mm-ddTHH:MM:SS.SSSZ"
  *
  * `toLocaleDateString`が機能しない環境があるので、
  * あえて、面倒な変換を行う(!?)
@@ -45,7 +45,7 @@ const getJSTString = (d) => {
 };
 
 /**
- * "YYYY-mm-dd"
+ * get JST date string: "YYYY-mm-dd"
  *
  * @param {Date} d
  *
