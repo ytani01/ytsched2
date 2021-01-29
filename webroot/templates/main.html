@@ -16,8 +16,7 @@
 	    event.preventDefault() ;
 	    clickCount = 0;
 	    console.log( "double click" ) ;
-            
-            doPost('{{ url_prefix }}', {date: '{{ today }}', top_bottom: 'top'} );
+            doPost('{{ url_prefix }}', {date: '{{ today }}', sde_align: 'top'} );
         }
     };
 
@@ -40,16 +39,21 @@
             return;
         }
       
-        const el_top_bottom = document.getElementById("top_bottom");
+        const el_sde_align = document.getElementById("sde_align");
         const el_date = document.getElementById("date");
         scrollToDate(location.pathname,
                      el_date.value,
-                     el_top_bottom.value,
+                     el_sde_align.value,
                      "auto");
       
         if (el_search.value == "") {
             window.addEventListener('scroll', scrollHdr0, {passive:true});
         }
+    };
+
+    const changeSearchN = (val) => {
+        console.log(`changeSearchN: val=${val}`);
+        doPost({{ url_prefix }}, {date: cur_day.value, search_n: val} );
     };
 
     window.addEventListener('load', onloadHdr);
@@ -58,14 +62,16 @@
 <main style="background-color:#FFF;">
   <div class="container-fluid p-0">
     
-    <input id="top_bottom" name="top_bottom"
-           type="hidden" value="{{ top_bottom }}" />
+    <input id="sde_align" name="sde_align"
+           type="hidden" value="{{ sde_align }}" />
     <input id="date_from" name="date_from"
            type="hidden" value="{{ date_from }}" />
     <input name="cur_day"
            type="hidden" value="{{ date }}" />
     <input id="date_to" name="date_to"
            type="hidden" value="{{ date_to}}" />
+    <input id="search_n" name="search_n"
+           type="hidden" value="{{ search_n }}" />
 
     {% if search_str %}
         {% set date_from2 = str(date_from).replace('-','/') %}
@@ -108,6 +114,18 @@
                          this.value, {{ str(date_to - date_from)[:-14] }});"/>
         <br />
         <i class="fas fa-arrows-alt-v"></i>
+        最大
+        <select id="search_n_in" name="search_n_in"
+                style="vertical-align; middle;"
+                onchange="changeSearchN(this.value);">
+          {% for v in [1, 3, 5, 10, 20] %}
+            {% if v == search_n %}
+          <option value="{{ v }}" selected>{{ v }}件</option>
+            {% else %}
+          <option value="{{ v }}">{{ v }}件</option>
+            {% end %}
+          {% end %}
+        </select>
         <br />
         <input type="date" value="{{ date_to }}"
                onchange="doPostDate('{{ url_prefix }}',

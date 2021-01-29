@@ -8,6 +8,7 @@ MainHandler
 __author__ = 'Yoichi Tanibayashi'
 __date__ = '2021/01'
 
+import re
 import datetime
 from .handler import HandlerBase
 from .ytsched import SchedDataFile, SchedDataEnt
@@ -20,7 +21,8 @@ class MainHandler(HandlerBase):
     HTML_FILE = 'main.html'
 
     DEF_DAYS = 45
-    SEARCH_MODE_DAYS = 180
+    SEARCH_MODE_DAYS = 365 * 3
+    DEF_SEARCH_N = 5
 
     TODO_DAYS = {'off': 0,
                  '1W': 7,
@@ -124,13 +126,13 @@ class MainHandler(HandlerBase):
         self._mylog.debug('todo_days_value=%a', todo_days_value)
 
         #
-        # top_bottom
+        # sde_align
         #
-        top_bottom = self.get_argument('top_bottom', None)
-        self._mylog.debug('top_bottom=%s', top_bottom)
-        if not top_bottom:
-            top_bottom = "top"
-            self._mylog.debug('[fix]top_bottom=%s', top_bottom)
+        sde_align = self.get_argument('sde_align', None)
+        self._mylog.debug('sde_align=%s', sde_align)
+        if not sde_align:
+            sde_align = "top"
+            self._mylog.debug('[fix]sde_align=%s', sde_align)
 
         #
         # filter_str
@@ -170,6 +172,25 @@ class MainHandler(HandlerBase):
         self._mylog.debug('search_str=\'%s\'', search_str)
 
         #
+        # search_n
+        #
+        search_n_str0 = self.get_conf(self.CONF_KEY_SEARCH_N)
+        search_n_str = self.get_argument('search_n', None)
+        if search_n_str is not None:
+            if search_n_str != search_n_str0:
+                self.set_conf(self.CONF_KEY_SEARCH_N, search_n_str)
+            else:
+                pass
+
+        elif search_n_str0:
+            search_n_str = search_n_str0
+        else:
+            search_n_str = str(self.DEF_SEARCH_N)
+
+        search_n = int(search_n_str)
+        self._mylog.debug('search_n=%s', search_n)
+
+        #
         # load ToDo
         #
         todo_sdf = SchedDataFile(None, self._datadir, debug=self._dbg)
@@ -198,13 +219,17 @@ class MainHandler(HandlerBase):
 
         if search_str:
             date_from = date - delta_day1 * self.SEARCH_MODE_DAYS
-            # date_to = date + delta_day1 * self.SEARCH_MODE_DAYS
             date_to = date
 
-        date1 = date_from - delta_day1
-        while date1 < date_to:
-            date1 += delta_day1
-            self._mylog.debug('date1=%s', date1)
+        search_count = 0
+        date1 = date_to + delta_day1
+        while date1 > date_from:
+            if search_str and search_count >= search_n:
+                date_from = date1
+                break
+            
+            date1 -= delta_day1
+            # self._mylog.debug('date1=%s', date1)
             
             sdf = SchedDataFile(date1, self._datadir, debug=self._dbg)
             # self._mylog.debug('sdf=%s', sdf)
@@ -220,13 +245,19 @@ class MainHandler(HandlerBase):
                         continue
 
                 if search_str:
-                    if search_str not in sde.search_str():
+                    if not re.search(search_str, sde.search_str()):
                         continue
 
                 out_sde.append(sde)
+                search_count += 1
 
             # ToDo
             for sde in todo_sde:
+                self._mylog.debug('sde=%s', sde)
+                if search_str:
+                    if not re.search(search_str, sde.search_str()):
+                        continue
+
                 if sde.date == date1:
                     out_sde.append(sde)
                     if sde.date == datetime.date.today():
@@ -240,6 +271,8 @@ class MainHandler(HandlerBase):
                 'is_holiday': sdf.is_holiday,
                 'sde': out_sde
             })
+
+        sched = sched[::-1]
 
         #
         # render
@@ -259,7 +292,8 @@ class MainHandler(HandlerBase):
                     todo_days_value=todo_days_value,
                     filter_str=filter_str,
                     search_str=search_str,
-                    top_bottom=top_bottom,
+                    search_n=search_n,
+                    sde_align=sde_align,
                     version=self._version)
 
     def post(self):

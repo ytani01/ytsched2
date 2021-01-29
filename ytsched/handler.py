@@ -19,6 +19,7 @@ class HandlerBase(tornado.web.RequestHandler):
     CONF_KEY_TODO_DAYS = 'ToDo_Days'
     CONF_KEY_FILTER_STR = 'FilterStr'
     CONF_KEY_SEARCH_STR = 'SearchStr'
+    CONF_KEY_SEARCH_N = 'SearchN'
 
     def __init__(self, app, req):
         """ Constructor """

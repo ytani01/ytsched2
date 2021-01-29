@@ -57,6 +57,12 @@ class EditHandler(HandlerBase):
             date = datetime.date.today()
 
         #
+        # search_str
+        #
+        search_str = self.get_argument('search_str', None)
+        self._mylog.debug('search_str=%s', search_str)
+
+        #
         # sde_id
         #
         if not sde_id:
@@ -97,9 +103,12 @@ class EditHandler(HandlerBase):
                     date=date,
                     sde=sde,
                     todo_flag=todo_flag,
+                    search_str=search_str,
                     version=self._version)
 
     def post(self):
         """
         """
+        self._mylog.debug('request.body_arguments=%s',
+                          self.request.body_arguments)
         self.get()

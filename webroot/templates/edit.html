@@ -11,7 +11,7 @@
   <script>
     const wdayList = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-    const mkInput = cmd => {
+    const mkInput = (cmd) => {
         const input = document.createElement("input");
         input.setAttribute("type", "hidden");
         input.setAttribute("name", "cmd");
@@ -19,13 +19,13 @@
         return input;
     };
 
-    const doSubmit = cmd => {
+    const doSubmit = (cmd) => {
         const form = document.forms["input_form"];
         form.appendChild(mkInput(cmd));
         form.submit();
     };
 
-    const update_wday = el_date => {
+    const update_wday = (el_date) => {
         if ( el_date === undefined ) {
             el_date = document.getElementById("date");
         }
@@ -35,7 +35,7 @@
         el_wday.innerHTML = wdayList[d1.getDay()];
     };
 
-    const setDate = (date_value, el_date) => {
+    const setElDate = (date_value, el_date) => {
         let d1 = new Date(); // today
         if ( date_value ) {
             d1 = new Date(date_value);
@@ -48,14 +48,14 @@
         update_wday(el_date);
     };
 
-    const changeDate = (d, el_date) => {
+    const changeElDate = (d, el_date) => {
         if ( el_date === undefined ) {
             el_date = document.getElementById("date");
         }
         let d1 = new Date(el_date.value);
         d1.setDate(d1.getDate() + d);
 
-        setDate(d1, el_date);
+        setElDate(d1, el_date);
     };
 
     const changeDetailHeight = () => {
@@ -66,11 +66,10 @@
       const id_h = el_id.offsetHeight;
 
       const win_h = document.documentElement.clientHeight
-
       const detail_h = win_h - detail_y - id_h - 7;
 
       el_detail.style.height = `${detail_h}px`;
-    }
+    };
 
     window.addEventListener('load', function() {
       changeDetailHeight();
@@ -121,8 +120,13 @@
     <input id="orig_date" name="orig_date"
            type="hidden" value="{{ orig_date }}" />
 
-    <input id="top_bottom" name="top_bottom"
+    {% if search_str %}
+    <input id="sde_align" name="sde_align"
+           type="hidden" value="bottom" />
+    {% else %}
+    <input id="sde_align" name="sde_align"
            type="hidden" value="top" />
+    {% end %}
 
     <div class="container-fluid"
          style="background-color: #EEE;">
@@ -131,13 +135,13 @@
         <div class="col-4 text-center">
           <i class="far fa-arrow-alt-circle-up fa-lg"
              style="vertical-align: middle;"
-             onmousedown="changeDate(-1);"></i>
+             onmousedown="changeElDate(-1);"></i>
           <i class="far fa-dot-circle fa-lg"
              style="vertical-align: middle;"
-             onmousedown="setDate();"></i>
+             onmousedown="setElDate();"></i>
           <i class="far fa-arrow-alt-circle-down fa-lg"
              style="vertical-align: middle;"
-             onmousedown="changeDate(1);"></i>
+             onmousedown="changeElDate(1);"></i>
         </div>
 
         <div class="col-8 p-1 text-left">

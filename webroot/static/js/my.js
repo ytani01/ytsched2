@@ -3,6 +3,8 @@
  */
 
 /**
+ * 日数計算
+ *
  * @param {Date} d_from
  * @param {Date} d_to
  *
@@ -14,6 +16,8 @@ const calcDays = (d_from, d_to) => {
 };
 
 /**
+ * 日付をずらす
+ *
  * @param {Date} d
  * @param {number} days
  *
@@ -25,6 +29,8 @@ const shiftDays = (d, days) => {
 };
 
 /**
+ * "YYYY-mm-ddTHH:MM:SS.SSSZ"
+ *
  * `toLocaleDateString`が機能しない環境があるので、
  * あえて、面倒な変換を行う(!?)
  *
@@ -39,6 +45,8 @@ const getJSTString = (d) => {
 };
 
 /**
+ * "YYYY-mm-dd"
+ *
  * @param {Date} d
  *
  * @return {String} jst_date_str
@@ -49,6 +57,7 @@ const getJSTDateString = (d) => {
 
 /**
  *
+ * @return {String} date_str: "date-YYYY-MM-DD"
  */
 const getTopDateString = () => {
     const el_date_from = document.getElementById("date_from");
@@ -69,7 +78,7 @@ const getTopDateString = () => {
 /**
  * @return {number} days
  */
-const getRelativeDate = () => {
+const getDaysFromToday = () => {
     const top_date_str = getTopDateString();
     const d_top_date = new Date(top_date_str);
     const d_today = new Date(getJSTDateString(new Date()));
@@ -104,12 +113,17 @@ const doPost = (path, data) => {
 /**
  *
  */
-const doPostDate = (path, date, days = 0) => {
+const doPostDate = (path, date, days = 0, sde_align = undefined) => {
+    console.log(`doPostDate: sde_align=${sde_align}`);
     let d1 = new Date(date);
-    d1.setDate(d1.getDate() + days);
+    d1 = shiftDays(d1, days);
     d1_str = getJSTDateString(d1);
     console.log(`date=${date}, d1_str=${d1_str}`);
 
+    data_obj = {date: d1_str};
+    if ( sde_align ) {
+        data_obj["sde_align"] = sde_align;
+    }
     doPost(path, {date: d1_str});
 };
 
@@ -134,7 +148,7 @@ let scrollFlag = false;
  */
 const scrollHdr = (event) => {
     const top_date_str = getTopDateString();
-    const rel_days = getRelativeDate();
+    const rel_days = getDaysFromToday();
     // console.log(`rel_days=${rel_days}`);
     const el_rel_days = document.getElementById("rel_days");
     //el_rel_days.innerHTML = `${rel_days}`;
@@ -142,10 +156,11 @@ const scrollHdr = (event) => {
     mm_dd_str = top_date_str.substr(5,5).replace('-','/');
     sign_str = '';
 
-    if (rel_days >= 0) {
+    const rel_weeks = parseInt(rel_days / 7);
+    if (rel_weeks >= 0) {
         sign_str = '+';
     }
-    el_rel_days.innerHTML = `${yyyy_str}<br />[${sign_str}${parseInt(rel_days/7)}w]`;
+    el_rel_days.innerHTML = `${yyyy_str}<br />[${sign_str}${rel_weeks}w]`;
 
     if ( ! scrollFlag ) {
         console.log(`scrollHdr:event=${event}, scrollFlag=${scrollFlag}`);
@@ -169,14 +184,14 @@ const scrollHdr = (event) => {
         el = document.getElementById("date_from");
         date = el.value;
         console.log(`date=${date}`);
-        doPost('/ytsched/', {date: date, top_bottom: "top"});
+        doPost('/ytsched/', {date: date, sde_align: "top"});
     }
     if (d_bottom < 80) {
         scrollFlag = false;
         el = document.getElementById("date_to");
         date = el.value;
         console.log(`date=${date}`);
-        doPost('/ytsched/', {date: date, top_bottom: "bottom"});
+        doPost('/ytsched/', {date: date, sde_align: "bottom"});
     }
 };
 
@@ -194,7 +209,7 @@ const scrollHdr0 = (event) => {
 /**
  *
  */
-const scrollToId = (id, top_bottom = "top", behavior = "smooth") => {
+const scrollToId = (id, sde_align = "top", behavior = "smooth") => {
     scrollFlag = false;
     console.log(`scrollToId:id=${id}`);
     
@@ -224,15 +239,15 @@ const scrollToId = (id, top_bottom = "top", behavior = "smooth") => {
     const el_menu_bar = document.getElementById("menu_bar");
     const menu_bar_h = el_menu_bar.offsetHeight;
 
-    console.log(`scrollToId:top_bottom=${top_bottom}`);
+    console.log(`scrollToId:sde_align=${sde_align}`);
 
     const scroll_offset = 30;
-    if (top_bottom == "top") {
+    if (sde_align == "top") {
         scrollTo({left: 0,
                   top: top_of_el - scroll_offset,
                   behavior: behavior});
     }
-    if (top_bottom == "bottom") {
+    if (sde_align == "bottom") {
         scrollTo({left: 0,
                   top: bottom_of_el - win_h + menu_bar_h + scroll_offset,
                   behavior: behavior});
@@ -245,20 +260,20 @@ const scrollToId = (id, top_bottom = "top", behavior = "smooth") => {
 /**
  *
  */
-const scrollToDate = (path, date, top_bottom="top", behavior="smooth") => {
+const scrollToDate = (path, date, sde_align="top", behavior="smooth") => {
     scrollFlag = false;
-    console.log(`scrollToDate:date=${date}, top_bottom=${top_bottom}`);
+    console.log(`scrollToDate:date=${date}, sde_align=${sde_align}`);
     
     const el_cur_day = document.getElementById("cur_day");
 
-    if (scrollToId(`date-${date}`, top_bottom, behavior)) {
+    if (scrollToId(`date-${date}`, sde_align, behavior)) {
         el_cur_day.value = date;
         scrollFlag = true;
         return true;
     }
 
     console.log(`path=${path}`);
-    doPost(path, {date: date, top_bottom: top_bottom});
+    doPost(path, {date: date, sde_align: sde_align});
     return false;
 };
 
@@ -322,7 +337,7 @@ const moveToMonday = (direction=1, path, behavior="smooth") => {
 
     el_d2 = document.getElementById(`date-${d2_str}`);
     if ( ! el_d2 ) {
-        doPost(path, {date: d1_str, top_bottom: "top"});
+        doPost(path, {date: d1_str, sde_align: "top"});
         return;
     }
 
