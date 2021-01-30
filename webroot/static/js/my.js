@@ -210,7 +210,7 @@ const scrollHdr0 = (event) => {
     const osd_h = elOSD.offsetHeight;
     const osd_w = elOSD.offsetWidth;
     // const osd_x = win_w / 2 - osd_w / 2;
-    const osd_x = win_w - osd_w;
+    const osd_x = win_w - osd_w - 10;
     const osd_y = win_top + win_h / 2 - osd_h / 2;
     console.log(`osd_x,y=${osd_x},${osd_y}`);
 
@@ -281,7 +281,7 @@ const scrollToId = (id, sde_align = "top", behavior = "smooth") => {
     const scroll_offset = 30;
     if (sde_align == "top") {
         scrollTo({left: 0,
-                  top: top_of_el - scroll_offset - 35,
+                  top: top_of_el - scroll_offset,
                   behavior: behavior});
     }
     if (sde_align == "bottom") {

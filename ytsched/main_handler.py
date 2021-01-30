@@ -60,15 +60,15 @@ class MainHandler(HandlerBase):
             self.redirect(self._url_prefix)
             return
 
-        todo_flag = False
-
         #
         # exec command (add/fix/del)
         #
         cmd = self.get_argument('cmd', None)
 
         if cmd in ['add', 'fix', 'del']:
-            todo_flag = self.exec_update(cmd)
+            date = self.exec_update(cmd)
+
+        self._mylog.debug('date=%s', date)
 
         #
         # set Date
@@ -80,9 +80,6 @@ class MainHandler(HandlerBase):
             cur_day = datetime.date.fromisoformat(cur_day_str)
         self._mylog.debug('cur_day=%s', cur_day)
         
-        if todo_flag:
-            date = datetime.date.today()
-
         if not date:
             date_str = self.get_argument('date', None)
             self._mylog.debug('date_str=%s', date_str)
@@ -304,7 +301,7 @@ class MainHandler(HandlerBase):
 
         self.get()
 
-    def exec_update(self, cmd: str) -> bool:
+    def exec_update(self, cmd: str) -> datetime.date:
         """
         Parameters
         ----------
@@ -312,12 +309,10 @@ class MainHandler(HandlerBase):
 
         Returns
         -------
-        todo_flag: bool
+        date: datetime.date
 
         """
         self._mylog.debug('')
-
-        todo_flag = False
 
         #
         # get orig_date
@@ -362,8 +357,8 @@ class MainHandler(HandlerBase):
         # get sde_type
         #
         sde_type = self.get_argument('sde_type', '')
-        if SchedDataEnt.type_is_todo(sde_type):
-            todo_flag = True
+#        if SchedDataEnt.type_is_todo(sde_type):
+#            date = datetime.date.today()
 
         #
         # title & place
@@ -379,6 +374,23 @@ class MainHandler(HandlerBase):
         self._mylog.debug('detail:\'%s\'', detail)
 
         #
+        # deadlines
+        #
+        deadline_date = self.get_argument('deadline_date', None)
+        deadline_time_start = self.get_argument('deadline_time_start',
+                                                None)
+        deadline_time_end = self.get_argument('deadline_time_end', None)
+
+        if deadline_date and not SchedDataEnt.type_is_todo(sde_type):
+            date = datetime.date.today()
+            time_start, time_end = None, None
+            detail = '〆%s %s-%s\n%s' % (
+                deadline_date.replace('-', '/'),
+                deadline_time_start, deadline_time_end,
+                detail)
+            self._mylog.debug('[fix] date=%s', date)
+            self._mylog.debug('[fix] detail=%s', detail)
+        #
         # sde_id
         #
         sde_id = self.get_argument('sde_id')
@@ -393,14 +405,16 @@ class MainHandler(HandlerBase):
 
         if cmd == 'del':
             self.cmd_del(sde_id, orig_date)
+            date = orig_date
 
         if cmd == 'fix':
             self._mylog.debug('EXEC [%s]', cmd)
             self.cmd_del(sde_id, orig_date)
             self.cmd_add(sde_id, date, time_start, time_end,
-                         sde_type, title, place, detail)
+                                sde_type, title, place, detail)
 
-        return todo_flag
+        self._mylog.debug('date=%s', date)
+        return date
 
     def cmd_add(self, sde_id, date, time_start, time_end,
                 sde_type, title, place, detail):
@@ -408,6 +422,10 @@ class MainHandler(HandlerBase):
         Parameters
         ----------
 
+        Returns
+        -------
+        date: datetime.date
+        
         """
         self._mylog.debug('sde_id=%s, date=%s', sde_id, date)
 
