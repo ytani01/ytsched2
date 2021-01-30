@@ -244,7 +244,7 @@ const scrollToId = (id, sde_align = "top", behavior = "smooth") => {
     const scroll_offset = 30;
     if (sde_align == "top") {
         scrollTo({left: 0,
-                  top: top_of_el - scroll_offset,
+                  top: top_of_el - scroll_offset - 35,
                   behavior: behavior});
     }
     if (sde_align == "bottom") {
