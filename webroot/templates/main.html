@@ -7,22 +7,30 @@
     const homeButtonHdr = (event) => {
         if( !clickCount ) { // single click
 	    ++clickCount;
-	    setTimeout( function() {clickCount = 0;}, 350 );
+	    setTimeout(function() {clickCount = 0;}, 350 );
             console.log("single click");
             
-            const search_str = '{{ search_str }}';
-            if ( search_str ) {
-                console.log(`search_str=${search_str}`);
-                doPost('{{ url_prefix }}', {date: '{{ today }}'} );
+            const search_str0 = '{{ search_str }}';
+            console.log(`search_str0=${search_str0}`);
+            if ( search_str0 ) {
+              const el_search = document.getElementById("search_str");
+              const search_str = el_search.value;
+              console.log(`search_str=${search_str}`);
+              doPost('{{ url_prefix }}',
+                     {
+                       date: '{{ today }}',
+                       search_str: search_str
+                     } );
             }
-
             scrollToDate('{{ url_prefix }}', '{{ today }}', 'top');
-            
+
         } else { // double click
-	    event.preventDefault() ;
+            event.preventDefault() ;
 	    clickCount = 0;
 	    console.log( "double click" ) ;
-            doPost('{{ url_prefix }}', {date: '{{ today }}', sde_align: 'top'} );
+          
+            doPost('{{ url_prefix }}',
+                   {date: '{{ today }}', sde_align: 'top'} );
         }
     };
 
