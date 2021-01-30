@@ -1,4 +1,4 @@
-![](docs/sample1.png)
+![](docs/sample0.png)
 
 # YT Scheduler
 
