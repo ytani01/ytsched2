@@ -2,6 +2,8 @@
  *   (c) 2021 Yoichi Tanibayashi
  */
 
+let elOSD;
+
 /**
  * 日数計算
  *
@@ -147,11 +149,11 @@ let scrollFlag = false;
  *
  */
 const scrollHdr = (event) => {
+    elOSD.style.display = "none";
+
     const top_date_str = getTopDateString();
     const rel_days = getDaysFromToday();
-    // console.log(`rel_days=${rel_days}`);
     const el_rel_days = document.getElementById("rel_days");
-    //el_rel_days.innerHTML = `${rel_days}`;
     yyyy_str = top_date_str.substr(0,4);
     mm_dd_str = top_date_str.substr(5,5).replace('-','/');
     sign_str = '';
@@ -160,7 +162,8 @@ const scrollHdr = (event) => {
     if (rel_weeks >= 0) {
         sign_str = '+';
     }
-    el_rel_days.innerHTML = `${yyyy_str}<br />[${sign_str}${rel_weeks}w]`;
+    el_rel_days.innerHTML
+        = `${yyyy_str}<br />[${sign_str}${rel_weeks}w]`;
 
     if ( ! scrollFlag ) {
         console.log(`scrollHdr:event=${event}, scrollFlag=${scrollFlag}`);
@@ -200,6 +203,40 @@ const scrollHdr = (event) => {
  */
 let scrollHdrTimer = 0;
 const scrollHdr0 = (event) => {
+    const win_top = window.pageYOffset;
+    const win_h = document.documentElement.clientHeight;
+    const win_w = document.documentElement.clientWidth;
+
+    const osd_h = elOSD.offsetHeight;
+    const osd_w = elOSD.offsetWidth;
+    // const osd_x = win_w / 2 - osd_w / 2;
+    const osd_x = win_w - osd_w;
+    const osd_y = win_top + win_h / 2 - osd_h / 2;
+    console.log(`osd_x,y=${osd_x},${osd_y}`);
+
+    const top_date_str = getTopDateString();
+    yyyy_str = top_date_str.substr(0,4);
+    mm_dd_str = top_date_str.substr(5,5).replace('-','/');
+
+    const rel_days = getDaysFromToday();
+    sign_str = '';
+    if (rel_days > 0) {
+        sign_str = '+';
+    }
+    w_sign_str = '';
+    if (rel_days >= 7) {
+        w_sign_str = '+';
+    }
+    const rel_weeks = parseInt(rel_days / 7);
+    elOSD.innerHTML =
+        `${yyyy_str}/${mm_dd_str}<br />` +
+        `${sign_str}${rel_days} days<br />` +
+        `(${w_sign_str}${rel_weeks} weeks)`;
+
+    elOSD.style.left = `${osd_x}px`;
+    elOSD.style.top = `${osd_y}px`;
+    elOSD.style.display = "block";
+
     if (scrollHdrTimer > 0) {
         clearTimeout(scrollHdrTimer);
     }

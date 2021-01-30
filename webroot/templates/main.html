@@ -35,6 +35,8 @@
     };
 
     const onloadHdr = (event) => {
+      elOSD = document.getElementById("osd");
+
       const el_home_button = document.getElementById("home_button");
       el_home_button.addEventListener("mousedown", homeButtonHdr);
       
@@ -84,6 +86,18 @@
            type="hidden" value="{{ date_to}}" />
     <input id="search_n" name="search_n"
            type="hidden" value="{{ search_n }}" />
+
+    <div id="osd"
+         style="position: absolute;
+                z-index: 10;
+                text-align: center;
+                font-size: x-large;
+                text-color: black;
+                background-color: yellow;
+                opacity: 0.6;
+                display: none;">
+      OSD
+    </div>
 
     {% if search_str %}
         {% set date_from2 = str(date_from).replace('-','/') %}
@@ -225,7 +239,6 @@
           {% set font_weight = 'unset' %}
         {% end %}
 
-        {% if sched_date.weekday() == 0 or sched_date == date %}
         <div class="row p-0 m-0"
              style="font-size:x-small;
                     font-weight:{{ font_weight }};
@@ -234,7 +247,6 @@
             {{ sched_date.year }}
           </div>
         </div>
-        {% end %}
         <div class="row p-0 m-0"
              style="font-size:x-small;
                     font-weight:{{ font_weight }};
@@ -258,6 +270,22 @@
                     line-height: 12px">
           <div class="col p-0 text-right">
             ({{ sched_date.strftime('%a') }})
+          </div>
+        </div>
+        {% set days = (sched_date - today).days %}
+        {% from monthdelta import monthmod %}
+        {% set months = monthmod(today, sched_date) %}
+        <div class="row p-0 m-0"
+             style="font-size:x-small;
+                    font-weight:{{ font_weight }};
+                    line-height: 12px">
+          <div class="col p-0 text-left">
+            {{ '%+d' % days }}
+            <!-- 
+            {{ months[0].months }}
+            {{ months[0].months // 12 }}
+            {{ months[0].months % 12 }}
+            -->
           </div>
         </div>
       </div><!-- col -->
@@ -330,7 +358,8 @@
                      font-weight: bold;
                      line-height: 11px;
                      vertical-align: middle;"> </span>
-        <i class="fas fa-home fa-lg" style="vertical-align: middle;"></i>
+        <i class="fas fa-home fa-lg"
+           style="vertical-align: middle;"></i>
       </div><!-- col -->
 
       <!-- search -->
