@@ -21,7 +21,8 @@ class MainHandler(HandlerBase):
     HTML_FILE = 'main.html'
 
     DEF_DAYS = 45
-    SEARCH_MODE_DAYS = 365 * 3
+    SEARCH_MODE_MAX_DAYS = 365 * 3
+    SEARCH_MODE_DAYS = 365
     DEF_SEARCH_N = 5
 
     TODO_DAYS = {'off': 0,
@@ -215,16 +216,22 @@ class MainHandler(HandlerBase):
         date_to = date + delta_day1 * (self._days - 1)
 
         if search_str:
-            date_from = date - delta_day1 * self.SEARCH_MODE_DAYS
+            date_from = date - delta_day1 * self.SEARCH_MODE_MAX_DAYS
+            date_from1 = date - delta_day1 * self.SEARCH_MODE_DAYS
             date_to = date
 
         search_count = 0
         date1 = date_to + delta_day1
         while date1 > date_from:
-            if search_str and search_count >= search_n:
-                date_from = date1
-                break
-            
+            if search_str and search_count > 0:
+                if search_count >= search_n:
+                    date_from = date1
+                    break
+
+                if date1 <= date_from1:
+                    date_from = date1
+                    break
+
             date1 -= delta_day1
             # self._mylog.debug('date1=%s', date1)
             

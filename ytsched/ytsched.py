@@ -27,6 +27,7 @@ def htmlstr2text(intext: str) -> str:
     outtext: str
     """
     resub_tbl = {
+        r'&amp;#160;': ' ',
         r'&gt;': '>',
         r'&lt;': '<',
 #        r'&amp;': '&',
