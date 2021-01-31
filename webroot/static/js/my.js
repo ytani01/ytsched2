@@ -2,7 +2,82 @@
  *   (c) 2021 Yoichi Tanibayashi
  */
 
-let elOSD;
+/*
+ * !! Important !!
+ *
+ * new Date()の日付の区切り文字が
+ *   '/' だとJST(+09:00),
+ *   '-' だとUTC
+ * とみなされる！
+ *
+ * (ex.)
+ * > (new Date("2021/01/01")).toISOString();
+ * < "2020-12-31T15:00:00.000Z"
+ * > (new Date("2021-01-01")).toISOString();
+ * < "2021-01-01T00:00:00.000Z"
+ *
+ * ここでは、区切り文字を '-'に揃える
+ */
+
+let elOSD1, elOSD2;
+
+/**
+ * @param {bool} on
+ */
+const dispOSD = (on) => {
+    if ( ! on ) {
+        elOSD1.style.display = "none";
+        elOSD2.style.display = "none";
+        return;
+    }
+    
+    //
+    // OSD1
+    //
+    elOSD1.style.right = "10px";
+    elOSD1.style.top = "40px";
+
+    const top_date_str = getTopDateString().split('-').join('/');
+    const top_rel_days = getDaysFromToday(top_date_str);
+    top_sign_str = '';
+    if (top_rel_days > 0) {
+        top_sign_str = '+';
+    }
+    top_w_sign_str = '';
+    if (top_rel_days >= 7) {
+        top_w_sign_str = '+';
+    }
+    const top_rel_weeks = parseInt(top_rel_days / 7);
+    elOSD1.innerHTML =
+        `${top_date_str}<br />` +
+        `${top_sign_str}${top_rel_days} days<br /> ` +
+        `${top_w_sign_str}${top_rel_weeks} weeks`;
+    elOSD1.style.display = "block";
+
+    //
+    // OSD2
+    //
+    elOSD2.style.right = "10px";
+    elOSD2.style.bottom = "80px";
+
+    const bottom_date_str = getBottomDateString().split('-').join('/');
+    const bottom_rel_days = getDaysFromToday(bottom_date_str);
+    bottom_sign_str = '';
+    if (bottom_rel_days > 0) {
+        bottom_sign_str = '+';
+    }
+    bottom_w_sign_str = '';
+    if (bottom_rel_days >= 7) {
+        bottom_w_sign_str = '+';
+    }
+    const bottom_rel_weeks = parseInt(bottom_rel_days / 7);
+    elOSD2.innerHTML =
+        `${bottom_date_str}<br />` +
+        `${bottom_sign_str}${bottom_rel_days} days<br /> ` +
+        `${bottom_w_sign_str}${bottom_rel_weeks} weeks`;
+
+    elOSD2.style.display = "block";
+};
 
 /**
  * 日数計算
@@ -63,15 +138,31 @@ const getJSTDateString = (d) => {
  */
 const getTopDateString = () => {
     const el_date_from = document.getElementById("date_from");
-    const el_date_to = document.getElementById("date_to");
     const win_top = window.pageYOffset;
 
     let el_date = document.getElementById(`date-${el_date_from.value}`);
-    // console.log(`getTopDate: el_date.id=${el_date.id}`);
     while ( el_date.offsetTop < win_top ) {
-        d1 = new Date(el_date.id.replace('date-',''));
-        d1 = shiftDays(d1, 1);
-        d1_str = getJSTDateString(d1);
+        const d1 = new Date(el_date.id.replace('date-',''));
+        const d1_str = getJSTDateString(shiftDays(d1, 1));
+        el_date = document.getElementById(`date-${d1_str}`);
+    }
+    return el_date.id.replace('date-', '');
+};
+
+/**
+ *
+ * @return {String} date_str: "date-YYYY-MM-DD"
+ */
+const getBottomDateString = () => {
+    const el_date_to = document.getElementById("date_to");
+    const win_bottom = window.pageYOffset
+          + document.documentElement.clientHeight;
+
+    let el_date = document.getElementById(`date-${el_date_to.value}`);
+    // console.log(`getBottomDate: el_date.id=${el_date.id}`);
+    while ( el_date.offsetTop + el_date.offsetHeight > win_bottom ) {
+        const d1 = new Date(el_date.id.replace('date-',''));
+        const d1_str = getJSTDateString(shiftDays(d1, -1));
         el_date = document.getElementById(`date-${d1_str}`);
     }
     return el_date.id.replace('date-', '');
@@ -80,11 +171,16 @@ const getTopDateString = () => {
 /**
  * @return {number} days
  */
-const getDaysFromToday = () => {
-    const top_date_str = getTopDateString();
-    const d_top_date = new Date(top_date_str);
+const getDaysFromToday = (date_str) => {
+    /*
+     * !! Important !!
+     *
+     * new Date()の日付の区切り文字が '/' だとJST, '-'だとUTC !!
+     * 区切り文字を '-'に揃える
+     */
+    const d_date = new Date(date_str.split('/').join('-'));
     const d_today = new Date(getJSTDateString(new Date()));
-    const days = calcDays(d_today, d_top_date);
+    const days = calcDays(d_today, d_date);
     return days;
 };
 
@@ -149,10 +245,10 @@ let scrollFlag = false;
  *
  */
 const scrollHdr = (event) => {
-    elOSD.style.display = "none";
+    dispOSD(false);
 
     const top_date_str = getTopDateString();
-    const rel_days = getDaysFromToday();
+    const rel_days = getDaysFromToday(top_date_str);
     const el_rel_days = document.getElementById("rel_days");
     yyyy_str = top_date_str.substr(0,4);
     mm_dd_str = top_date_str.substr(5,5).replace('-','/');
@@ -203,39 +299,7 @@ const scrollHdr = (event) => {
  */
 let scrollHdrTimer = 0;
 const scrollHdr0 = (event) => {
-    const win_top = window.pageYOffset;
-    const win_h = document.documentElement.clientHeight;
-    const win_w = document.documentElement.clientWidth;
-
-    const osd_h = elOSD.offsetHeight;
-    const osd_w = elOSD.offsetWidth;
-    // const osd_x = win_w / 2 - osd_w / 2;
-    const osd_x = win_w - osd_w - 10;
-    const osd_y = win_top + win_h / 2 - osd_h / 2;
-    console.log(`osd_x,y=${osd_x},${osd_y}`);
-
-    const top_date_str = getTopDateString();
-    yyyy_str = top_date_str.substr(0,4);
-    mm_dd_str = top_date_str.substr(5,5).replace('-','/');
-
-    const rel_days = getDaysFromToday();
-    sign_str = '';
-    if (rel_days > 0) {
-        sign_str = '+';
-    }
-    w_sign_str = '';
-    if (rel_days >= 7) {
-        w_sign_str = '+';
-    }
-    const rel_weeks = parseInt(rel_days / 7);
-    elOSD.innerHTML =
-        `${yyyy_str}/${mm_dd_str}<br />` +
-        `${sign_str}${rel_days} days<br />` +
-        `(${w_sign_str}${rel_weeks} weeks)`;
-
-    elOSD.style.left = `${osd_x}px`;
-    elOSD.style.top = `${osd_y}px`;
-    elOSD.style.display = "block";
+    dispOSD(true);
 
     if (scrollHdrTimer > 0) {
         clearTimeout(scrollHdrTimer);
@@ -343,7 +407,7 @@ const moveToMonday = (direction=1, path, behavior="smooth") => {
     console.log(`moveToMonday:path=${path}`);
     console.log(`moveToMonday:cur_day=${getJSTString(cur_day)}`);
 
-    const wday = cur_day.getDay(); // 0:Sun, 1:Mon, ..
+    let wday = cur_day.getDay(); // 0:Sun, 1:Mon, ..
     if (wday == 0) {
         wday = 7; // Sun: 0 --> 7
     }

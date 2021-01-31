@@ -35,7 +35,8 @@
     };
 
     const onloadHdr = (event) => {
-      elOSD = document.getElementById("osd");
+      elOSD1 = document.getElementById("osd1");
+      elOSD2 = document.getElementById("osd2");
 
       const el_home_button = document.getElementById("home_button");
       el_home_button.addEventListener("mousedown", homeButtonHdr);
@@ -87,16 +88,40 @@
     <input id="search_n" name="search_n"
            type="hidden" value="{{ search_n }}" />
 
-    <div id="osd"
-         style="position: absolute;
+    <div id="osd1"
+         style="position: fixed;
                 z-index: 10;
-                text-align: center;
-                font-size: x-large;
-                text-color: black;
-                background-color: yellow;
+                text-align: right;
+                font-size: large;
+                font-weight: normal;
+                color: white;
+                line-height: 17px;
+                background-color: gray;
+                border: 1px solid;
+                border-radius: 15px 0px 0px 15px;
+                border-color: gray;
+                padding: 5px;
                 opacity: 0.6;
                 display: none;">
-      OSD
+      OSD1
+    </div>
+
+    <div id="osd2"
+         style="position: fixed;
+                z-index: 10;
+                text-align: right;
+                font-size: large;
+                font-weight: normal;
+                color: white;
+                line-height: 17px;
+                background-color: gray;
+                border: 1px solid;
+                border-radius: 15px 0px 0px 15px;
+                border-color: gray;
+                padding: 5px;
+                opacity: 0.6;
+                display: none;">
+      OSD2
     </div>
 
     {% if search_str %}
@@ -227,7 +252,7 @@
 
       {% set url = url_prefix %}
       {% set obj = {'date': str(sched_date) } %}
-      <div class="col-1 p-0 text-center"
+      <div class="col-1 p-0 text-center my-btn"
            style="background-color:{{ bg_color }};"
            onmousedown="doPost({{ url }}, {{ obj }});">
 
@@ -305,7 +330,7 @@
             {% end %}<!-- if sde.date -->
           {% end %}<!-- for sde -->
         {% end %}<!-- if today_flag and todo_days_value -->
-         <div class="text-center" style="opacity: .4;"
+         <div class="text-center my-btn" style="opacity: .4;"
            onmousedown="doPost(
                         '{{ url_prefix + 'edit/' }}',
                         {date: '{{ sched_date }}', sde_id: ''} );">
@@ -325,33 +350,27 @@
     <div class="row m-0">
 
       <!-- menu_sw -->
-      <div class="col-2 p-0 text-left">
-        <label for="menu-sw" class="m-0">
-          &nbsp;
-        </label>
-        <label for="menu-sw" class="m-0">
+      <div class="col-2 p-0 text-center">
+        <label for="menu-sw" class="m-0 my-btn">
           <i class="fas fa-bars fa-lg"
              style="vertical-align: middle;"></i>
-        </label>
-        <label for="menu-sw" class="m-0">
-          &nbsp;
         </label>
       </div><!-- col -->
 
       <!-- back -->
-      <div id="back_button" class="col-1 p-0 text-center"
-           onclick="moveToMonday(-1, '{{ url_prefix }}');">
+      <div id="back_button" class="col-1 p-0 text-center my-btn"
+           onmousedown="moveToMonday(-1, '{{ url_prefix }}');">
         <i class="fas fa-chevron-left"></i>
       </div><!-- col -->
 
       <!-- forward -->
-      <div id="forward_button" class="col-1 p-0 text-center"
-           onclick="moveToMonday(1, '{{ url_prefix }}');">
+      <div id="forward_button" class="col-1 p-0 text-center my-btn"
+           onmousedown="moveToMonday(1, '{{ url_prefix }}');">
         <i class="fas fa-chevron-right"></i>
       </div><!-- col -->
 
       <!-- home -->
-      <div id="home_button" class="col-3 p-0 text-center">
+      <div id="home_button" class="col-3 p-0 text-center my-btn">
         <span id="rel_days"
               style="display: inline-flex;
                      font-size: x-small;
@@ -372,14 +391,14 @@
           {% else %}
             {% set search_spin="" %}
           {% end %}
-          <i class="fas fa-search fa-lg {{ search_spin }}"
+          <i class="fas fa-search fa-lg my-btn {{ search_spin }}"
              style="vertical-align: middle;"
              onmousedown="document.form_search.submit();"></i>
           <input id="search_str" name="search_str"
                  type="text" size="9"
                  style="font-size: small; vertical-align: middle;"
                  value="{{ search_str }}" />
-          <i class="fas fa-backspace fa-lg"
+          <i class="fas fa-backspace fa-lg my-btn"
              style="vertical-align: middle;"
              onmousedown="search_str.value='';"></i>
 
@@ -444,7 +463,7 @@
       <div class="col-4 p-0 text-center" style="font-size: small;">
         <form id="form_filter" name="form_filter"
               action="{{ url_prefix }}" method="POST">
-          <i class="fas fa-filter fa-2x"
+          <i class="fas fa-filter fa-2x my-btn"
              style="vertical-align: middle;"
              onmousedown="document.form_filter.submit();"></i>
           <input id="filter_str" name="filter_str" type="text" size="7"

@@ -20,6 +20,7 @@
      text-overflow: ellipsis;
 
 }
+
 .longtext:focus {
     border: 1px solid #FFF;
     white-space: pre-wrap;
@@ -27,4 +28,8 @@
     overflow: visible;
     text-overflow: clip;
 
+}
+
+.my-btn:active {
+    background-color: gray !important;
 }

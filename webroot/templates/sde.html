@@ -76,8 +76,8 @@ AAA {{ detail }}
         <i class="far fa-square fa-xs" style="vertical-aline: top;"></i>
       </div>
       {% end %}<!-- if not todo -->
-      <div class="col-11 p-0"
-           onclick="doPost('{{ url }}',
+      <div class="col-11 p-0 my-btn"
+           onmousedown="doPost('{{ url }}',
                     {
                     date:'{{ sched_date }}',
                     sde_id: '{{sde.id }}',
