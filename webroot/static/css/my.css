@@ -14,6 +14,21 @@
     bottom: 42px;
 }
 
+.my-osd {
+    position: fixed;
+    z-index: 10;
+    text-align: right;
+    font-size: large;
+    font-weight: normal;
+    line-height: 17px;
+    color: #FFF;
+    background-color: #222;
+    border: 1px solid #222;
+    border-radius: 15px 0px 0px 15px;
+    padding: 5px;
+    opacity: 0.6;
+}
+
 .longtext {
      white-space: nowrap;
      overflow: hidden;

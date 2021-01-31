@@ -88,41 +88,8 @@
     <input id="search_n" name="search_n"
            type="hidden" value="{{ search_n }}" />
 
-    <div id="osd1"
-         style="position: fixed;
-                z-index: 10;
-                text-align: right;
-                font-size: large;
-                font-weight: normal;
-                color: white;
-                line-height: 17px;
-                background-color: gray;
-                border: 1px solid;
-                border-radius: 15px 0px 0px 15px;
-                border-color: gray;
-                padding: 5px;
-                opacity: 0.6;
-                display: none;">
-      OSD1
-    </div>
-
-    <div id="osd2"
-         style="position: fixed;
-                z-index: 10;
-                text-align: right;
-                font-size: large;
-                font-weight: normal;
-                color: white;
-                line-height: 17px;
-                background-color: gray;
-                border: 1px solid;
-                border-radius: 15px 0px 0px 15px;
-                border-color: gray;
-                padding: 5px;
-                opacity: 0.6;
-                display: none;">
-      OSD2
-    </div>
+    <div id="osd1" class="my-osd" style="display: none;">OSD1</div>
+    <div id="osd2" class="my-osd" style="display: none;">OSD2</div>
 
     {% if search_str %}
         {% set date_from2 = str(date_from).replace('-','/') %}
@@ -136,7 +103,7 @@
       </div>
       <div class="col-2 p-0 text-right">
         <div class="container-fluid p-0" style="opacity: 0.8;">
-          <div class="row m-0"
+          <div class="row my-btn"
                onmousedown="doPostDate(
                             '{{ url_prefix }}',
                             '{{ date }}',
@@ -150,7 +117,7 @@
              &nbsp;
             </div>
           </div>
-          <div class="row"
+          <div class="row my-btn"
                onmousedown="doPostDate(
                             '{{ url_prefix }}',
                             '{{ date }}',

@@ -34,7 +34,7 @@ const dispOSD = (on) => {
     //
     // OSD1
     //
-    elOSD1.style.right = "10px";
+    elOSD1.style.right = "5px";
     elOSD1.style.top = "40px";
 
     const top_date_str = getTopDateString().split('-').join('/');
@@ -57,7 +57,7 @@ const dispOSD = (on) => {
     //
     // OSD2
     //
-    elOSD2.style.right = "10px";
+    elOSD2.style.right = "5px";
     elOSD2.style.bottom = "80px";
 
     const bottom_date_str = getBottomDateString().split('-').join('/');
