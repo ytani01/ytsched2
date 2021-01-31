@@ -173,29 +173,9 @@
 
       <!-- 日付 -->
       {% set weekday = sched_date.weekday() %}
-      {% set bg_color = '#EFF' %}
-      {% if weekday == 0 %}
-        {% set bg_color = '#EFFFFF' %}
-      {% end %}
-      {% if weekday == 1 %}
-        {% set bg_color = '#E4F8FE' %}
-      {% end %}
-      {% if weekday == 2 %}
-        {% set bg_color = '#E0EFFD' %}
-      {% end %}
-      {% if weekday == 3 %}
-        {% set bg_color = '#D4EBFC' %}
-      {% end %}
-      {% if weekday == 4 %}
-        {% set bg_color = '#D0E0FB' %}
-      {% end %}
-      {% if weekday == 5 %}
-        {% set bg_color = '#C0D4FA' %}
-      {% end %}
-      {% if weekday == 6 %}
-        {% set bg_color = '#FFCCCC' %}
-      {% end %}
-
+      {% set bg_color_wday = [ '#EFFFFF', '#E4F8FE', '#E0EFFD', '#D4EBFC',
+                               '#D0E0FB', '#C0D4FA', '#FFCCCC' ] %}
+      {% set bg_color = bg_color_wday[weekday] %}
       {% if sched_ent['is_holiday'] %}
         {% set bg_color = '#F88' %}
       {% end %}
