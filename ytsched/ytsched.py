@@ -254,7 +254,7 @@ class SchedDataEnt:
                 sort_key = sort_key.replace(':-:', '99:99-99:99')
             else:
                 sort_key = sort_key.replace(':-:', '33:33-33:33')
-        self._mylog.debug('sort_key=\'%s\'', sort_key)
+        # self._mylog.debug('sort_key=\'%s\'', sort_key)
         return sort_key
 
     def get_date(self):
@@ -599,7 +599,7 @@ class SchedData:
         sdf: SchedDataFile
 
         """
-        self._mylog.debug('date=%s', date)
+        # self._mylog.debug('date=%s', date)
 
         try:
             sdf = self._sdf_cache[date]
@@ -608,6 +608,9 @@ class SchedData:
 
             sdf = SchedDataFile(date, self._topdir, debug=self._dbg)
             self._sdf_cache[date] = sdf
+
+        # if not sdf.sde:
+            # self._mylog.warning('%s sdf.sde=%s', date, sdf.sde)
 
         return sdf
 

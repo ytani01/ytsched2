@@ -240,7 +240,7 @@ class MainHandler(HandlerBase):
 
             out_sde = []
             for sde in sdf.sde:
-                self._mylog.debug('sde=%s', sde)
+                # self._mylog.debug('sde=%s', sde)
                 if filter_str.startswith('!'):
                     if filter_str[1:] in sde.search_str():
                         continue
@@ -263,7 +263,7 @@ class MainHandler(HandlerBase):
 
             # ToDo
             for sde in todo_sde:
-                self._mylog.debug('sde=%s', sde)
+                # self._mylog.debug('sde=%s', sde)
                 if search_str:
                     if not re.search(search_str, sde.search_str()):
                         continue

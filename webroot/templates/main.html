@@ -35,6 +35,7 @@
     };
 
     const onloadHdr = (event) => {
+      el_main = document.getElementById("main");
       elOSD1 = document.getElementById("osd1");
       elOSD2 = document.getElementById("osd2");
 
@@ -51,6 +52,7 @@
       const win_h = document.documentElement.clientHeight;
       if ( body_h < win_h ) {
         console.log(`body_h=${body_h} < win_h=${win_h}`);
+        el_main.style.visibility = "visible";
         return;
       }
       
@@ -74,7 +76,7 @@
     window.addEventListener('load', onloadHdr);
   </script>
 </header>
-<main style="background-color:#FFF;">
+<main id="main" style="background-color:#FFF; visibility: hidden;">
   <div class="container-fluid p-0">
     
     <input id="sde_align" name="sde_align"
@@ -264,8 +266,12 @@
       <!-- menu_sw -->
       <div class="col-2 p-0 text-center">
         <label for="menu-sw" class="m-0 my-btn">
+          &nbsp;
+          &nbsp;
           <i class="fas fa-bars fa-lg"
              style="vertical-align: middle;"></i>
+          &nbsp;
+          &nbsp;
         </label>
       </div><!-- col -->
 

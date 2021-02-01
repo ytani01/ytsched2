@@ -314,9 +314,12 @@ const scrollToId = (id, sde_align = "top", behavior = "smooth") => {
     scrollFlag = false;
     console.log(`scrollToId:id=${id}`);
     
+
     const body_h = document.body.clientHeight;
     const win_h = document.documentElement.clientHeight;
 
+    el_main = document.getElementById("main");
+    el_main.style.visibility = "visible";
     if (body_h <= win_h) {
         console.log(`body_h=${body_h} < win_h=${win_h}`);
         return true;
