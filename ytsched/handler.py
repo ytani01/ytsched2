@@ -47,6 +47,9 @@ class HandlerBase(tornado.web.RequestHandler):
         self._days = app.settings.get('days')
         self._mylog.debug('days=%s', self._days)
 
+        self._sd = app.settings.get('sd')
+        self._mylog.debug('sd=%s', self._sd)
+
         self._version = app.settings.get('version')
         self._mylog.debug('version=%s', self._version)
 

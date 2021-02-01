@@ -113,7 +113,9 @@
 
       <!-- 検索期間・件数 -->
       <div class="col-10 p-0 text-left">
-        <swap>{{ str(date_from).replace('-', '/') }}</swap>
+        <span style="font-size: small;">
+          {{ str(date_from).replace('-', '/')[:5] }}</span>
+        <span>{{ str(date_from).replace('-', '/')[5:] }}</span>
 
         <i class="fas fa-arrows-alt-h"></i>
 
@@ -121,7 +123,7 @@
                onchange="doPostDate('{{ url_prefix }}',
                          this.value, 0);" />
         <br />
-        目標件数
+        <span style="font-size: small;">目標件数</span>
         <select id="search_n_in" name="search_n_in"
                 style="vertical-align; middle;"
                 onchange="changeSearchN(this.value);">
@@ -326,11 +328,11 @@
        style="z-index: 1;">
 
     <div id="menu-content" class="row m-1">
-
-      <div class="col-5" style="font-size: small;">
+      <div class="col-6" style="font-size: small;">
         Version {{ version }}
+        <span style="font-size: xx-small;">({{ len(sd._sdf_cache) }})</span>
       </div>
-      <div class="col-7 text-right" style="font-size: small">
+      <div class="col-6 text-right" style="font-size: small">
         (c) 2020 <strong>{{ author }}</strong>
       </div>
       

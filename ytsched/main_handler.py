@@ -62,7 +62,7 @@ class MainHandler(HandlerBase):
             return
 
         #
-        # exec command (add/fix/del)
+        # command (add/fix/del)
         #
         cmd = self.get_argument('cmd', None)
 
@@ -191,7 +191,7 @@ class MainHandler(HandlerBase):
         #
         # load ToDo
         #
-        todo_sdf = SchedDataFile(None, self._datadir, debug=self._dbg)
+        todo_sdf = self._sd.get_sdf(None)
         todo_sde = []
         for sde in todo_sdf.sde:
             if filter_str.startswith('!'):
@@ -235,7 +235,7 @@ class MainHandler(HandlerBase):
             date1 -= delta_day1
             # self._mylog.debug('date1=%s', date1)
             
-            sdf = SchedDataFile(date1, self._datadir, debug=self._dbg)
+            sdf = self._sd.get_sdf(date1)
             # self._mylog.debug('sdf=%s', sdf)
 
             out_sde = []
@@ -298,6 +298,7 @@ class MainHandler(HandlerBase):
                     search_str=search_str,
                     search_n=search_n,
                     sde_align=sde_align,
+                    sd=self._sd,
                     version=self._version)
 
     def post(self):
@@ -440,14 +441,9 @@ class MainHandler(HandlerBase):
                                sde_type, title, place, detail,
                                debug=self._dbg)
         if new_sde.is_todo():
-            sdf = SchedDataFile(None, topdir=self._datadir,
-                                debug=self._dbg)
+            self._sd.add_sde(None, new_sde)
         else:
-            sdf = SchedDataFile(date, topdir=self._datadir,
-                                debug=self._dbg)
-
-        sdf.add_sde(new_sde)
-        sdf.save()
+            self._sd.add_sde(date, new_sde)
 
     def cmd_del(self, sde_id, date):
         """
@@ -460,6 +456,4 @@ class MainHandler(HandlerBase):
         """
         self._mylog.debug('sde_id=%s, date=%s', sde_id, date)
 
-        sdf = SchedDataFile(date, topdir=self._datadir, debug=self._dbg)
-        sdf.del_sde(sde_id)
-        sdf.save()
+        self._sd.del_sde(date, sde_id)

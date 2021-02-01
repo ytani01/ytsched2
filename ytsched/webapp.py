@@ -16,6 +16,7 @@ import tornado.web
 from . import __version__
 from .main_handler import MainHandler
 from .edit_handler import EditHandler
+from .ytsched import SchedData
 from .my_logger import get_logger
 
 
@@ -65,6 +66,7 @@ class WebServer:
         self._port = port
         self._webroot = os.path.expanduser(webroot)
         self._datadir = os.path.expanduser(datadir)
+        self._sd = SchedData(self._datadir, self._dbg)
         self._days = days
         self._size_limit = size_limit
         self._version = __version__
@@ -99,6 +101,7 @@ class WebServer:
             datadir=self._datadir,
             webroot=self._webroot,
             days=self._days,
+            sd=self._sd,
             size_limit=self._size_limit,
             version=self._version,
             debug=self._dbg

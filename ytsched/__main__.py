@@ -62,11 +62,13 @@ test """)
 @click.argument('month', type=int, default=1)
 @click.argument('day', type=int, default=1)
 @click.option('--datadir', '--data', 'datadir',
-              type=click.Path(exists=True), default='',
-              help='data directory')
+              type=click.Path(exists=True),
+              default=SchedDataFile.DEF_TOP_DIR,
+              help='data directory, default=\'%s\'' % (
+                  SchedDataFile.DEF_TOP_DIR))
 @click.option('--debug', '-d', 'debug', is_flag=True, default=False,
               help='debug flag')
-def data(year, month, day, datadir, debug):
+def x_data1(year, month, day, datadir, debug):
     """ data  """
     log = get_logger(__name__, debug)
 
