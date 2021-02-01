@@ -3,6 +3,9 @@
 {% set url = url_prefix + 'edit/' %}
 
 {% set bg_color = '#FFF' %}
+{% if sde.is_holiday() %}
+  {% set bg_color = '#FAA' %}
+{% end %}
 {% if sde.is_todo() %}
   {% set bg_color = '#FFE' %}
   {% if sde.date < today %}

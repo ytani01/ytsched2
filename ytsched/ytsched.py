@@ -85,7 +85,7 @@ class SchedDataEnt:
     TYPE_PREFIX_TODO = '□'
     TYPE_HOLYDAY = ['休日', '祝日']
 
-    TITLE_PREFIX_IMPORTANT = ['!', '！', '★', '☆']
+    TITLE_PREFIX_IMPORTANT = ['(重要)', '!', '！', '★', '☆']
     TITLE_PREFIX_CANCELED = [
         '(キャンセル',
         '(欠',
@@ -247,6 +247,9 @@ class SchedDataEnt:
         """
         """
         sort_key = '%s %s' % (self.get_date(), self.get_timestr())
+        if sort_key.endswith(':-:') and self.is_holiday():
+            sort_key = sort_key.replace(':-:', '  :  -  :  ')
+        self._mylog.debug('sort_key=\'%s\'', sort_key)
         return sort_key
 
     def get_date(self):
@@ -568,8 +571,11 @@ class SchedData:
     def __str__(self):
         """ __str__ """
         out_str = 'topdir:%s, cache_size:%s' % (
-            self._topdir, len(self._cache_size))
+            self._topdir, len(self._sdf_cache))
         return out_str
+
+    def get_cache_size(self):
+        return len(self._sdf_cache)
 
     def get_sdf(self, date: datetime.date = None) -> SchedDataFile:
         """

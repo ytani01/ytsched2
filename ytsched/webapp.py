@@ -66,7 +66,7 @@ class WebServer:
         self._port = port
         self._webroot = os.path.expanduser(webroot)
         self._datadir = os.path.expanduser(datadir)
-        self._sd = SchedData(self._datadir, self._dbg)
+        self._sd = SchedData(self._datadir, debug=self._dbg)
         self._days = days
         self._size_limit = size_limit
         self._version = __version__
