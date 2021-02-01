@@ -247,8 +247,13 @@ class SchedDataEnt:
         """
         """
         sort_key = '%s %s' % (self.get_date(), self.get_timestr())
-        if sort_key.endswith(':-:') and self.is_holiday():
-            sort_key = sort_key.replace(':-:', '  :  -  :  ')
+        if sort_key.endswith(':-:'):
+            if self.is_holiday():
+                sort_key = sort_key.replace(':-:', '  :  -  :  ')
+            elif self.title.startswith('('):
+                sort_key = sort_key.replace(':-:', '99:99-99:99')
+            else:
+                sort_key = sort_key.replace(':-:', '33:33-33:33')
         self._mylog.debug('sort_key=\'%s\'', sort_key)
         return sort_key
 
@@ -492,6 +497,7 @@ class SchedDataFile:
         """
         self._mylog.debug('sde=%s', sde)
         self.sde.append(sde)
+        self.sde = sorted(self.sde, key=lambda x: x.get_sortkey())
 
     def del_sde(self, sde_id: str = None) -> None:
         """
