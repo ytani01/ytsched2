@@ -11,7 +11,7 @@ __date__ = '2021/01'
 import re
 import datetime
 from .handler import HandlerBase
-from .ytsched import SchedDataFile, SchedDataEnt
+from .ytsched import SchedDataEnt
 
 
 class MainHandler(HandlerBase):
@@ -21,7 +21,7 @@ class MainHandler(HandlerBase):
     HTML_FILE = 'main.html'
 
     DEF_DAYS = 45
-    SEARCH_MODE_MAX_DAYS = 365 * 3
+    SEARCH_MODE_MAX_DAYS = 365 * 5
     SEARCH_MODE_DAYS = 365
     DEF_SEARCH_N = 5
 
@@ -249,7 +249,13 @@ class MainHandler(HandlerBase):
                         continue
 
                 if search_str:
-                    if not re.search(search_str, sde.search_str()):
+                    try:
+                        if not re.search(search_str, sde.search_str()):
+                            continue
+                    except re.error as ex:
+                        self._mylog.warning('%s:%s:%s:%s',
+                                            type(ex).__name__, ex,
+                                            search_str, sde.search_str())
                         continue
 
                 out_sde.append(sde)
