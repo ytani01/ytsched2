@@ -11,6 +11,7 @@ __date__ = '2021/01'
 import re
 import datetime
 from .handler import HandlerBase
+from .edit_handler import EditHandler
 from .ytsched import SchedDataEnt
 
 
@@ -62,12 +63,45 @@ class MainHandler(HandlerBase):
             return
 
         #
+        # search_str
+        #
+        search_str0 = self.get_conf(self.CONF_KEY_SEARCH_STR)
+        search_str = self.get_argument('search_str', None)
+        if search_str is not None:
+            if search_str != search_str0:
+                self.set_conf(self.CONF_KEY_SEARCH_STR, search_str)
+            else:
+                pass
+            
+        elif search_str0:
+            search_str = search_str0
+        else:
+            search_str = ''
+
+        self._mylog.debug('search_str=\'%s\'', search_str)
+
+        #
         # command (add/fix/del)
         #
         cmd = self.get_argument('cmd', None)
 
-        if cmd in ['add', 'fix', 'del']:
-            date = self.exec_update(cmd)
+        if cmd in ['add', 'fix', 'update', 'del']:
+            date, sde_id = self.exec_update(cmd)
+
+            if cmd in ['update']:
+                sdf = self._sd.get_sdf(date)
+                sde = sdf.get_sde(sde_id)
+                todo_flag = sde.is_todo()
+
+                self.render(EditHandler.HTML_FILE,
+                            title="ytsched",
+                            author=__author__,
+                            url_prefix=self._url_prefix,
+                            date=date,
+                            sde=sde,
+                            todo_flag=todo_flag,
+                            search_str=search_str,
+                            version=self._version)
 
         self._mylog.debug('date=%s', date)
 
@@ -253,9 +287,10 @@ class MainHandler(HandlerBase):
                         if not re.search(search_str, sde.search_str()):
                             continue
                     except re.error as ex:
-                        self._mylog.warning('%s:%s:%s:%s',
-                                            type(ex).__name__, ex,
-                                            search_str, sde.search_str())
+                        self._mylog.warning(
+                            '%s:%s:%s:%s',
+                            type(ex).__name__, ex,
+                            search_str, sde.search_str())
                         continue
 
                 out_sde.append(sde)
@@ -324,6 +359,8 @@ class MainHandler(HandlerBase):
         Returns
         -------
         date: datetime.date
+
+        sde_id: str
 
         """
         self._mylog.debug('')
@@ -427,8 +464,14 @@ class MainHandler(HandlerBase):
             self.cmd_add(sde_id, date, time_start, time_end,
                                 sde_type, title, place, detail)
 
-        self._mylog.debug('date=%s', date)
-        return date
+        if cmd == 'update':
+            self._mylog.debug('EXEC [%s]', cmd)
+            self.cmd_del(sde_id, orig_date)
+            self.cmd_add(sde_id, date, time_start, time_end,
+                                sde_type, title, place, detail)
+
+        self._mylog.debug('date=%s, sde_id=%s', date, sde_id)
+        return date, sde_id
 
     def cmd_add(self, sde_id, date, time_start, time_end,
                 sde_type, title, place, detail):

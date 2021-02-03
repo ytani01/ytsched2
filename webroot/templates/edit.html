@@ -98,14 +98,16 @@
         <i class="fas fa-reply fa-2x" ></i>
       </div><!-- col -->
       
-      <div class="col-1"></div>
-
       <div class="col-2 text-center my-btn"
            onmousedown="doSubmit('add');">
         <i class="fas fa-plus-square fa-2x"></i>
       </div><!-- col -->
 
-      <div class="col-1"></div>
+
+      <div class="col-2 text-center my-btn"
+           onmousedown="doSubmit('update');">
+        <i class="fas fa-sync fa-2x"></i>
+      </div><!-- col -->
 
       <div class="col-2 text-center my-btn"
            onmousedown="doSubmit('fix');">
@@ -212,7 +214,8 @@
       <!-- 詳細 -->
       <div id="div_detail" class="row p-0" style="font-size: large;">
         <div class="col p-0">
-          <textarea id="detail" name="detail" style="width: 100%;">
+          <textarea id="detail" name="detail" style="width: 100%;"
+                    onchange="doSubmit('update');">
             {{ sde.detail }}</textarea>
         </div><!-- col -->
       </div><!-- row -->
