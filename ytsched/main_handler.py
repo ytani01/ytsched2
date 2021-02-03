@@ -91,6 +91,7 @@ class MainHandler(HandlerBase):
             if cmd in ['update']:
                 sdf = self._sd.get_sdf(date)
                 sde = sdf.get_sde(sde_id)
+                date = sde.date
                 todo_flag = sde.is_todo()
 
                 self.render(EditHandler.HTML_FILE,
@@ -467,8 +468,11 @@ class MainHandler(HandlerBase):
         if cmd == 'update':
             self._mylog.debug('EXEC [%s]', cmd)
             self.cmd_del(sde_id, orig_date)
-            self.cmd_add(sde_id, date, time_start, time_end,
-                                sde_type, title, place, detail)
+            new_sde = self.cmd_add(sde_id, date, time_start, time_end,
+                                   sde_type, title, place, detail)
+            if new_sde.is_todo():
+                date = None
+                sde_id = new_sde.id
 
         self._mylog.debug('date=%s, sde_id=%s', date, sde_id)
         return date, sde_id
@@ -478,10 +482,17 @@ class MainHandler(HandlerBase):
         """
         Parameters
         ----------
+        sde_id: str
+        date: datetime.date
+        time_start, time_end:
+        sde_type: str
+        title: str
+        place: str
+        detail: str
 
         Returns
         -------
-        date: datetime.date
+        new_sde: SchedDataEnt
         
         """
         self._mylog.debug('sde_id=%s, date=%s', sde_id, date)
@@ -493,6 +504,8 @@ class MainHandler(HandlerBase):
             self._sd.add_sde(None, new_sde)
         else:
             self._sd.add_sde(date, new_sde)
+
+        return new_sde
 
     def cmd_del(self, sde_id, date):
         """

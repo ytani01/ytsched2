@@ -13,6 +13,7 @@
 {% else %}
 {% set orig_date = sde.date %}
 {% end %}
+
 <header>
   <script>
     const wdayList = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -171,15 +172,25 @@
       </div><!-- row -->
 
       <!-- 時刻 -->
+      {% set time_start_str = '' %}
+      {% set time_end_str = '' %}
+      
+      {% if sde.time_start %}
+      {% set time_start_str = str(sde.time_start) %}
+      {% end %}
+
+      {% if sde.time_end %}
+      {% set time_end_str = str(sde.time_end) %}
+      {% end %}
       <div class="row p-1" style="font-size: large">
         <div class="col">
           <input id="time_start" name="time_start"
                  style="width: 100px;"
-                 type="time" value="{{ sde.time_start }}" />
+                 type="time" value="{{ time_start_str }}" />
           ～
           <input id="time_end" name="time_end"
                  style="width: 100px;"
-                 type="time" value="{{ sde.time_end }}" />
+                 type="time" value="{{ time_end_str }}" />
         </div><!-- col -->
       </div><!-- row -->
 
