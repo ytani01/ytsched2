@@ -94,20 +94,16 @@
   <div class="container-fluid p-0 fixed-top my-bar">
     <div class="row p-0 m-1">
 
+      <!--
       <div class="col-2 text-center my-btn"
            onmousedown="history.back();">
         <i class="fas fa-reply fa-2x" ></i>
-      </div><!-- col -->
-      
-      <div class="col-2 text-center my-btn"
-           onmousedown="doSubmit('add');">
-        <i class="fas fa-plus-square fa-2x"></i>
-      </div><!-- col -->
-
+      </div>
+      -->
 
       <div class="col-2 text-center my-btn"
            onmousedown="doSubmit('update');">
-        <i class="fas fa-sync fa-2x"></i>
+        <i class="fas fa-save fa-2x"></i>
       </div><!-- col -->
 
       <div class="col-2 text-center my-btn"
@@ -115,7 +111,12 @@
         <i class="fas fa-check-square fa-2x"></i>
       </div><!-- col -->
 
-      <div class="col-2">
+      <div class="col-2 text-center my-btn"
+           onmousedown="doSubmit('add');">
+        <i class="fas fa-plus-square fa-2x"></i>
+      </div><!-- col -->
+
+      <div class="col-4">
       </div>
       
       <div class="col-2 text-center my-btn" onclick="doSubmit('del');">
