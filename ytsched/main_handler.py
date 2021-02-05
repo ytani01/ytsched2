@@ -103,6 +103,7 @@ class MainHandler(HandlerBase):
                             todo_flag=todo_flag,
                             search_str=search_str,
                             version=self._version)
+                return
 
         self._mylog.debug('date=%s', date)
 

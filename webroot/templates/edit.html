@@ -26,7 +26,22 @@
         return input;
     };
 
+    let busyFlag = false;
+
+    /**
+     * 不要？
+     */
+    const clearBusyFlag = () => {
+        busyFlag = false;
+    };
+
     const doSubmit = (cmd) => {
+        if ( busyFlag ) {
+            return;
+        }
+        busyFlag = true;
+        // setTimeout(clearBusyFlag,30000);
+        console.log(`cmd=${cmd}`);
         const form = document.forms["input_form"];
         form.appendChild(mkInput(cmd));
         form.submit();
@@ -119,7 +134,8 @@
       <div class="col-4">
       </div>
       
-      <div class="col-2 text-center my-btn" onclick="doSubmit('del');">
+      <div class="col-2 text-center my-btn"
+           onmousedown="doSubmit('del');">
         <i class="fas fa-trash-alt fa-2x"></i>
       </div><!-- col -->
 
