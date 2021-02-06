@@ -50,9 +50,6 @@ class HandlerBase(tornado.web.RequestHandler):
         self._datadir = app.settings.get('datadir')
         self._mylog.debug('datadir=%s', self._datadir)
 
-        self._conf_file = os.path.join(self._datadir, self.CONF_FNAME)
-        self._mylog.debug('conf_file=%s', self._conf_file)
-
         self._webroot = app.settings.get('webroot')
         self._mylog.debug('webroot=%s', self._webroot)
 
@@ -61,6 +58,9 @@ class HandlerBase(tornado.web.RequestHandler):
 
         self._sd = app.settings.get('sd')
         self._mylog.debug('sd=%s', self._sd)
+
+        self._conf_file = os.path.join(self._datadir, self.CONF_FNAME)
+        self._mylog.debug('conf_file=%s', self._conf_file)
 
         self._conf = self.load_conf()
 

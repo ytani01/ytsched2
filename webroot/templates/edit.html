@@ -6,6 +6,7 @@
 {% set deadline_date = '' %}
 {% set deadline_time_start = '' %}
 {% set deadline_time_end = '' %}
+
 {% if sde.is_todo() %}
 {% set deadline_date = sde.date %}
 {% set deadline_time_start = sde.time_start %}
@@ -118,7 +119,7 @@
 
       <div class="col-2 text-center my-btn"
            onmousedown="doSubmit('update');">
-        <i class="fas fa-save fa-2x"></i>
+        <i class="fas fa-sync fa-2x"></i>
       </div><!-- col -->
 
       <div class="col-2 text-center my-btn"
@@ -126,10 +127,15 @@
         <i class="fas fa-check-square fa-2x"></i>
       </div><!-- col -->
 
+      {% if new_flag %}
+      <div class="col-2 text-center">
+      </div><!-- col -->
+      {% else %}
       <div class="col-2 text-center my-btn"
            onmousedown="doSubmit('add');">
-        <i class="fas fa-plus-square fa-2x"></i>
+        <i class="fas fa-clone fa-2x"></i>
       </div><!-- col -->
+      {% end %}
 
       <div class="col-4">
       </div>

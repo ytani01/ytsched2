@@ -10,8 +10,7 @@ __date__ = '2021/01'
 
 import datetime
 from .handler import HandlerBase
-from .cmd_handler import CmdHandler
-from .ytsched import SchedDataEnt, SchedDataFile
+from .ytsched import SchedDataEnt
 
 
 class EditHandler(HandlerBase):
@@ -42,6 +41,7 @@ class EditHandler(HandlerBase):
         self._mylog.debug('date=%s, sde_id=%s, todo_flag=%s',
                           date, sde_id, todo_flag)
         self._mylog.debug('request=%s', self.request)
+        self._mylog.debug('request.path=%s', self.request.path)
 
         #
         # date
@@ -82,18 +82,20 @@ class EditHandler(HandlerBase):
         #
         # sde
         #
+        new_flag = False
+
         if sde_id:
             if todo_flag:
-                sdf = SchedDataFile(None, topdir=self._datadir,
-                                    debug=self._dbg)
+                sdf = self._sd.get_sdf(None)
             else:
-                sdf = SchedDataFile(date, topdir=self._datadir,
-                                    debug=self._dbg)
+                sdf = self._sd.get_sdf(date)
 
             sde = sdf.get_sde(sde_id)
 
         else:
             sde = SchedDataEnt('', date, debug=self._dbg)
+            self._mylog.debug('sde_id=%s', sde.id)
+            new_flag = True
 
         self.render(self.HTML_EDIT,
                     title=self._title,
@@ -102,10 +104,9 @@ class EditHandler(HandlerBase):
 
                     url_prefix=self._url_prefix,
                     post_url=self._url_prefix,
-#                    post_url='%s%s' % (
-#                        self._url_prefix, CmdHandler.URL_PATH),
                     date=date,
                     sde=sde,
+                    new_flag=new_flag,
                     todo_flag=todo_flag,
                     search_str=search_str,
                     )

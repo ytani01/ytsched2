@@ -14,13 +14,12 @@ import tornado.ioloop
 import tornado.httpserver
 import tornado.web
 
-from . import __prog_name__ as _prog_name
-from . import __author__ as _author
-from . import __version__ as _version
+from . import __prog_name__ as PROG_NAME
+from . import __author__ as AUTHOR
+from . import __version__ as VERSION
 
 from .main_handler import MainHandler
 from .edit_handler import EditHandler
-from .cmd_handler import CmdHandler
 from .ytsched import SchedData
 from .my_logger import get_logger
 
@@ -76,7 +75,7 @@ class WebServer:
         self._size_limit = size_limit
 
         if version:
-            print('%s %s by %s' % (_prog_name, _version, _author))
+            print('%s %s by %s' % (PROG_NAME, VERSION, AUTHOR))
             sys.exit(0)
 
         try:
@@ -92,8 +91,6 @@ class WebServer:
 
                 (r'%s/edit' % self.URL_PREFIX, EditHandler),
                 (r'%s/edit/' % self.URL_PREFIX, EditHandler),
-
-                (r'%s/cmd' % self.URL_PREFIX, CmdHandler),
             ],
             static_path=os.path.join(self._webroot, "static"),
             static_url_prefix=self.URL_PREFIX + '/static/',
@@ -102,9 +99,9 @@ class WebServer:
             autoreload=True,
             # xsrf_cookies=False,
 
-            title=_prog_name,
-            author=_author,
-            version=_version,
+            title=PROG_NAME,
+            author=AUTHOR,
+            version=VERSION,
 
             url_prefix=self.URL_PREFIX + '/',
 
@@ -112,6 +109,7 @@ class WebServer:
             webroot=self._webroot,
             days=self._days,
             sd=self._sd,
+
             size_limit=self._size_limit,
             debug=self._dbg
         )

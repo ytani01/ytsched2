@@ -35,15 +35,22 @@ class MainHandler(HandlerBase):
 
     COOKIE_TODO_DAYS = "todo_days"
 
-    def get(self, date=None):
+    def post(self):
+        """ POST """
+        self._mylog.debug('request=%s', self.request.__dict__)
+        self._mylog.debug('request.body_arguments=%s',
+                          self.request.body_arguments)
+
+        self.get()
+
+    def get(self):
         """
         GET method and rendering
 
         date priority
-        1. parameter
-        2. get_argument('date')
-        3. get_argument('year', 'month', 'day')
-        4. today
+        1. get_argument('date')
+        2. get_argument('year', 'month', 'day')
+        3. today
 
         Parameters
         ----------
@@ -53,6 +60,7 @@ class MainHandler(HandlerBase):
             +/- days
         """
         self._mylog.debug('request=%s', self.request)
+        self._mylog.debug('request.path=%s', self.request.path)
 
         if self.request.uri != self._url_prefix:
             self._mylog.warning('redirect: %s', self._url_prefix)
@@ -69,7 +77,7 @@ class MainHandler(HandlerBase):
                 self.set_conf(self.CONF_KEY_SEARCH_STR, search_str)
             else:
                 pass
-            
+
         elif search_str0:
             search_str = search_str0
         else:
@@ -95,41 +103,40 @@ class MainHandler(HandlerBase):
                             title=self._title,
                             author=self._author,
                             version=self._version,
-                            
+
                             url_prefix=self._url_prefix,
                             post_url=self._url_prefix,
                             date=date,
                             sde=sde,
+                            new_flag=False,
                             todo_flag=todo_flag,
                             search_str=search_str,
                             )
                 return
 
-        self._mylog.debug('date=%s', date)
-
         #
         # set Date
         #
+        date = None
+
         cur_day = datetime.date.today()
         cur_day_str = self.get_argument('cur_day', None)
         self._mylog.debug('cur_day_str=%s', cur_day_str)
         if cur_day_str:
             cur_day = datetime.date.fromisoformat(cur_day_str)
         self._mylog.debug('cur_day=%s', cur_day)
-        
-        if not date:
-            date_str = self.get_argument('date', None)
-            self._mylog.debug('date_str=%s', date_str)
-            if date_str:
-                date = datetime.date.fromisoformat(date_str)
 
-        if not date:
-            year = self.get_argument('year', None)
-            month = self.get_argument('month', None)
-            day = self.get_argument('day', None)
+        date_str = self.get_argument('date', None)
+        self._mylog.debug('date_str=%s', date_str)
+        if date_str:
+            date = datetime.date.fromisoformat(date_str)
 
-            if year and month and day:
-                date = datetime.date(int(year), int(month), int(day))
+        year = self.get_argument('year', None)
+        month = self.get_argument('month', None)
+        day = self.get_argument('day', None)
+
+        if year and month and day:
+            date = datetime.date(int(year), int(month), int(day))
 
         if not date:
             date = cur_day
@@ -186,7 +193,7 @@ class MainHandler(HandlerBase):
             filter_str = ''
 
         self._mylog.debug('filter_str=\'%s\'', filter_str)
-        
+
         #
         # search_str
         #
@@ -197,7 +204,7 @@ class MainHandler(HandlerBase):
                 self.set_conf(self.CONF_KEY_SEARCH_STR, search_str)
             else:
                 pass
-            
+
         elif search_str0:
             search_str = search_str0
         else:
@@ -270,7 +277,7 @@ class MainHandler(HandlerBase):
 
             date1 -= delta_day1
             # self._mylog.debug('date1=%s', date1)
-            
+
             sdf = self._sd.get_sdf(date1)
             # self._mylog.debug('sdf=%s', sdf)
 
@@ -345,14 +352,6 @@ class MainHandler(HandlerBase):
                     sde_align=sde_align,
                     sd=self._sd,
                     )
-
-    def post(self):
-        """ POST """
-        self._mylog.debug('request=%s', self.request.__dict__)
-        self._mylog.debug('request.body_arguments=%s',
-                          self.request.body_arguments)
-
-        self.get()
 
     def exec_update(self, cmd: str) -> datetime.date:
         """
@@ -496,7 +495,7 @@ class MainHandler(HandlerBase):
         Returns
         -------
         new_sde: SchedDataEnt
-        
+
         """
         self._mylog.debug('sde_id=%s, date=%s', sde_id, date)
 
