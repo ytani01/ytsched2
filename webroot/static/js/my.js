@@ -28,8 +28,10 @@ const dispOSD = (on) => {
     if ( ! on ) {
         elOSD1.style.display = "none";
         elOSD2.style.display = "none";
+        elGage.style.display = "none";
         return;
     }
+    const win_h = document.documentElement.clientHeight;
     
     //
     // OSD1
@@ -77,6 +79,25 @@ const dispOSD = (on) => {
         `${bottom_w_sign_str}${bottom_rel_weeks} weeks`;
 
     elOSD2.style.display = "block";
+
+    //
+    // gage
+    //
+    const gageH = elGage.style.height;
+    console.log(`gageH=${gageH}`);
+    let diffY = 0;
+    if (Math.abs(top_rel_days) >= 1) {
+        diffY = Math.log(Math.abs(top_rel_days)) * 40;
+        diffY *= top_rel_days / Math.abs(top_rel_days);
+        console.log(`diffY=${diffY}`);
+    }
+
+    const gageTop = win_h / 2 + diffY;
+    console.log(`gateTop=${gageTop}`);
+
+    elGage.style.right = "5px";
+    elGage.style.top = `${gageTop}px`;
+    elGage.style.display = "block";
 };
 
 /**

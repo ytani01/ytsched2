@@ -38,6 +38,7 @@
       el_main = document.getElementById("main");
       elOSD1 = document.getElementById("osd1");
       elOSD2 = document.getElementById("osd2");
+      elGage = document.getElementById("gage");
 
       const el_home_button = document.getElementById("home_button");
       el_home_button.addEventListener("mousedown", homeButtonHdr);
@@ -92,6 +93,9 @@
 
     <div id="osd1" class="my-osd" style="display: none;">OSD1</div>
     <div id="osd2" class="my-osd" style="display: none;">OSD2</div>
+    <div id="gage" class="my-osd" style="display: block;">
+      <i class="fas fa-caret-right fa-2x"></i>
+    </div>
 
     {% if search_str %}
         {% set date_from2 = str(date_from).replace('-','/') %}
