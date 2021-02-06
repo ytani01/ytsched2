@@ -21,6 +21,9 @@ class HandlerBase(tornado.web.RequestHandler):
     CONF_KEY_SEARCH_STR = 'SearchStr'
     CONF_KEY_SEARCH_N = 'SearchN'
 
+    HTML_MAIN = 'main.html'
+    HTML_EDIT = 'edit.html'
+
     def __init__(self, app, req):
         """ Constructor """
         self._dbg = app.settings.get('debug')
@@ -31,6 +34,15 @@ class HandlerBase(tornado.web.RequestHandler):
 
         self._app = app
         self._req = req
+
+        self._title = app.settings.get('title')
+        self._mylog.debug('title=%s', self._title)
+
+        self._author = app.settings.get('author')
+        self._mylog.debug('author=%s', self._author)
+
+        self._version = app.settings.get('version')
+        self._mylog.debug('version=%s', self._version)
 
         self._url_prefix = app.settings.get('url_prefix')
         self._mylog.debug('url_prefix=%s', self._url_prefix)
@@ -49,9 +61,6 @@ class HandlerBase(tornado.web.RequestHandler):
 
         self._sd = app.settings.get('sd')
         self._mylog.debug('sd=%s', self._sd)
-
-        self._version = app.settings.get('version')
-        self._mylog.debug('version=%s', self._version)
 
         self._conf = self.load_conf()
 

@@ -144,7 +144,7 @@
 </header>
 <main style="background-color: #FFF; padding-top: 40px;">
   <form id="input_form" name="input_form"
-        action="{{ url_prefix }}" method="POST">
+        action="{{ post_url }}" method="POST">
 
     <input id="orig_date" name="orig_date"
            type="hidden" value="{{ orig_date }}" />
@@ -249,7 +249,8 @@
       </div><!-- row -->
 
       <!-- ID -->
-      <div id="div_id" class="row text-right" style="font-size: x-small">
+      <div id="div_id" class="row text-right" style="font-size: x-small"
+           onmousedown="">
         <div class="col p-0">
           <input id="sde_id" name="sde_id" size="15"
                  type="text" value="{{ sde.id }}" readonly>

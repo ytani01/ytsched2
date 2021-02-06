@@ -1,12 +1,13 @@
 <!DOCTYPE HTML>
 {% set now = datetime.datetime.now().strftime('%FT%T') %}
+<!-- {{ static_url('abc') }} -->
 <html>
   <head lang="jp">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="UTF-8">
     <title>{{ title }}: {{ version }}</title>
 
-    <link rel="icon" href="/ytsched/static/favicon.ico">
+    <link rel="icon" href="{{ static_url('favicon.ico') }}">
 
     <link rel="stylesheet"
           href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
@@ -15,11 +16,13 @@
     <link href="https://use.fontawesome.com/releases/v5.6.1/css/all.css"
           rel="stylesheet">
 
-    <link rel="stylesheet" href="/ytsched/static/css/my.css">
+    <link rel="stylesheet" href="{{ static_url('css/my.css') }}">
 
-    <script type="text/javascript" src="/ytsched/static/js/my_cookie.js">
+    <script type="text/javascript"
+            src="{{ static_url('js/my_cookie.js') }}">
     </script>
-    <script type="text/javascript" src="/ytsched/static/js/my.js"></script>
+    <script type="text/javascript"
+            src="{{ static_url('js/my.js') }}"></script>
 
     <title>{{ title }}: {{ version }}</title>
   </head>

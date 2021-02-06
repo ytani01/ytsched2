@@ -10,6 +10,7 @@ __date__ = '2021/01'
 
 import datetime
 from .handler import HandlerBase
+from .cmd_handler import CmdHandler
 from .ytsched import SchedDataEnt, SchedDataFile
 
 
@@ -17,8 +18,6 @@ class EditHandler(HandlerBase):
     """
     Web request handler
     """
-    HTML_FILE = 'edit.html'
-
     def get(self, date=None, sde_id=None, todo_flag=False):
         """
         ``date``の優先順位
@@ -96,15 +95,20 @@ class EditHandler(HandlerBase):
         else:
             sde = SchedDataEnt('', date, debug=self._dbg)
 
-        self.render(self.HTML_FILE,
-                    title="ytsched",
-                    author=__author__,
+        self.render(self.HTML_EDIT,
+                    title=self._title,
+                    author=self._author,
+                    version=self._version,
+
                     url_prefix=self._url_prefix,
+                    post_url=self._url_prefix,
+#                    post_url='%s%s' % (
+#                        self._url_prefix, CmdHandler.URL_PATH),
                     date=date,
                     sde=sde,
                     todo_flag=todo_flag,
                     search_str=search_str,
-                    version=self._version)
+                    )
 
     def post(self):
         """

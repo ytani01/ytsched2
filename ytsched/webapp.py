@@ -13,9 +13,14 @@ import sys
 import tornado.ioloop
 import tornado.httpserver
 import tornado.web
-from . import __version__
+
+from . import __prog_name__ as _prog_name
+from . import __author__ as _author
+from . import __version__ as _version
+
 from .main_handler import MainHandler
 from .edit_handler import EditHandler
+from .cmd_handler import CmdHandler
 from .ytsched import SchedData
 from .my_logger import get_logger
 
@@ -69,10 +74,9 @@ class WebServer:
         self._sd = SchedData(self._datadir, debug=self._dbg)
         self._days = days
         self._size_limit = size_limit
-        self._version = __version__
 
         if version:
-            print(__version__)
+            print('%s %s by %s' % (_prog_name, _version, _author))
             sys.exit(0)
 
         try:
@@ -88,6 +92,8 @@ class WebServer:
 
                 (r'%s/edit' % self.URL_PREFIX, EditHandler),
                 (r'%s/edit/' % self.URL_PREFIX, EditHandler),
+
+                (r'%s/cmd' % self.URL_PREFIX, CmdHandler),
             ],
             static_path=os.path.join(self._webroot, "static"),
             static_url_prefix=self.URL_PREFIX + '/static/',
@@ -96,6 +102,10 @@ class WebServer:
             autoreload=True,
             # xsrf_cookies=False,
 
+            title=_prog_name,
+            author=_author,
+            version=_version,
+
             url_prefix=self.URL_PREFIX + '/',
 
             datadir=self._datadir,
@@ -103,7 +113,6 @@ class WebServer:
             days=self._days,
             sd=self._sd,
             size_limit=self._size_limit,
-            version=self._version,
             debug=self._dbg
         )
         self._log.debug('app=%s', self._app.__dict__)

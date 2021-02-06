@@ -11,7 +11,6 @@ __date__ = '2021/01'
 import re
 import datetime
 from .handler import HandlerBase
-from .edit_handler import EditHandler
 from .ytsched import SchedDataEnt
 
 
@@ -19,8 +18,6 @@ class MainHandler(HandlerBase):
     """
     Web request handler
     """
-    HTML_FILE = 'main.html'
-
     DEF_DAYS = 45
     SEARCH_MODE_MAX_DAYS = 365 * 5
     SEARCH_MODE_DAYS = 365
@@ -94,15 +91,18 @@ class MainHandler(HandlerBase):
                 date = sde.date
                 todo_flag = sde.is_todo()
 
-                self.render(EditHandler.HTML_FILE,
-                            title="ytsched",
-                            author=__author__,
+                self.render(self.HTML_EDIT,
+                            title=self._title,
+                            author=self._author,
+                            version=self._version,
+                            
                             url_prefix=self._url_prefix,
+                            post_url=self._url_prefix,
                             date=date,
                             sde=sde,
                             todo_flag=todo_flag,
                             search_str=search_str,
-                            version=self._version)
+                            )
                 return
 
         self._mylog.debug('date=%s', date)
@@ -324,9 +324,11 @@ class MainHandler(HandlerBase):
         #
         # render
         #
-        self.render(self.HTML_FILE,
-                    title="ytsched",
-                    author=__author__,
+        self.render(self.HTML_MAIN,
+                    title=self._title,
+                    author=self._author,
+                    version=self._version,
+
                     url_prefix=self._url_prefix,
                     today=datetime.date.today(),
                     delta_day1=delta_day1,
@@ -342,7 +344,7 @@ class MainHandler(HandlerBase):
                     search_n=search_n,
                     sde_align=sde_align,
                     sd=self._sd,
-                    version=self._version)
+                    )
 
     def post(self):
         """ POST """
