@@ -5,7 +5,7 @@
 YT scheduler
 """
 __author__ = 'Yoichi Tanibayashi'
-__version__ = '0.6.0'
+__version__ = '0.7.0-alpha1'
 
 __prog_name__ = 'Ytsched'
 
