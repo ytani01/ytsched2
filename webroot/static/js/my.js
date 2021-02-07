@@ -20,14 +20,18 @@
  */
 
 let elOSD1, elOSD2;
+let elGageR0, elGageL0;
+let elGageRBase, elGageLBase;
+let elGageR = [];
+let elGageL = [];
 
 const diffDays = [
-    -3650, -365, -92, -30, -14, -7, -3, +3, +7, +14, +30, +92, +365, +3650
+    -3650, -1826, -730, -365, -183, -61, -30, -14, -7, -3, -1, +1, +3, +7, +14, +30, +61, +183, +365, +730, +1826, +3650
 ];
 
 const day2diffY = (d) => {
     const a = 2;
-    const b = 50;
+    const b = 70;
     
     if (Math.abs(d) * a < 1) {
         return 0;
@@ -47,8 +51,9 @@ const dispOSD = (on) => {
     if ( ! on ) {
         elOSD1.style.display = "none";
         elOSD2.style.display = "none";
-        elGageR.style.display = "none";
-        elGageL.style.display = "none";
+
+        elGageR0.style.display = "none";
+        elGageL0.style.display = "none";
         elGageRBase.style.display = "none";
         elGageLBase.style.display = "none";
 
@@ -59,7 +64,11 @@ const dispOSD = (on) => {
         return;
     }
     const win_h = document.documentElement.clientHeight;
+
+    const top_date_str = getTopDateString().split('-').join('/');
+    const top_rel_days = getDaysFromToday(top_date_str);
     
+    /*
     //
     // OSD1
     //
@@ -106,12 +115,13 @@ const dispOSD = (on) => {
         `${bottom_w_sign_str}${bottom_rel_weeks} weeks`;
 
     elOSD2.style.display = "block";
-
+    */
+    
     //
     // gage
     //
-    elGageR.style.display = "block";
-    elGageL.style.display = "block";
+    elGageR0.style.display = "block";
+    elGageL0.style.display = "block";
     elGageRBase.style.display = "block";
     elGageLBase.style.display = "block";
 
@@ -120,7 +130,7 @@ const dispOSD = (on) => {
         elGageL[i].style.display = "block";
     }
 
-    const gageH = elGageL.clientHeight;
+    const gageH = elGageL0.clientHeight;
     
     const diffY = day2diffY(top_rel_days);;
     // console.log(`diffY=${diffY}`);
@@ -128,8 +138,8 @@ const dispOSD = (on) => {
     const gageBaseBottom = win_h / 2 - gageH / 2;
     const gageBottom = gageBaseBottom - diffY;
 
-    elGageR.style.bottom = `${gageBottom}px`;
-    elGageL.style.bottom = `${gageBottom}px`;
+    elGageR0.style.bottom = `${gageBottom}px`;
+    elGageL0.style.bottom = `${gageBottom}px`;
 
     elGageRBase.style.bottom = `${gageBaseBottom}px`;
     elGageLBase.style.bottom = `${gageBaseBottom}px`;
@@ -313,7 +323,7 @@ const scrollHdr = (event) => {
 
     const top_date_str = getTopDateString();
     const rel_days = getDaysFromToday(top_date_str);
-    const el_rel_days = document.getElementById("rel_days");
+    // const el_rel_days = document.getElementById("rel_days");
     yyyy_str = top_date_str.substr(0,4);
     mm_dd_str = top_date_str.substr(5,5).replace('-','/');
     sign_str = '';
@@ -322,9 +332,10 @@ const scrollHdr = (event) => {
     if (rel_weeks >= 0) {
         sign_str = '+';
     }
+    /*
     el_rel_days.innerHTML
         = `${yyyy_str}<br />[${sign_str}${rel_weeks}w]`;
-
+    */
     if ( ! scrollFlag ) {
         console.log(`scrollHdr:event=${event}, scrollFlag=${scrollFlag}`);
         return;

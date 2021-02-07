@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-{% set diffDays = ['-10Y', '-1Y', '-3M', '-1M', '-2w', '-1w', '-3d', '+3d', '+1w', '+2w', '+1M', '+3M', '+1Y', '+10Y'] %}
+{% set diffDays = ['-10Y', '-5Y', '-2Y', '-1Y', '-6M', '-2M', '-1M', '-2w', '-1w', '-3d', '-1d', '+1d', '+3d', '+1w', '+2w', '+1M', '+2M', '+6M', '+1Y', '+2Y', '+5Y', '+10Y'] %}
 <header>
   <script>
     let clickCount = 0;
@@ -40,8 +40,8 @@
       elOSD1 = document.getElementById("osd1");
       elOSD2 = document.getElementById("osd2");
 
-      elGageR = document.getElementById("gage_r");
-      elGageL = document.getElementById("gage_l");
+      elGageR0 = document.getElementById("gage_r");
+      elGageL0 = document.getElementById("gage_l");
       elGageRBase = document.getElementById("gage_r_base");
       elGageLBase = document.getElementById("gage_l_base");
 
@@ -331,12 +331,14 @@
 
       <!-- home -->
       <div id="home_button" class="col-3 p-0 text-center my-btn">
-        <span id="rel_days"
-              style="display: inline-flex;
+        <span style="display: inline-flex;
                      font-size: x-small;
                      font-weight: bold;
                      line-height: 11px;
-                     vertical-align: middle;"> </span>
+                     vertical-align: middle;">
+          {{ today.year }} /<br />
+          {{ today.strftime('%m/%d(%a)') }}
+        </span>
         <i class="fas fa-home fa-lg"
            style="vertical-align: middle;"></i>
       </div><!-- col -->
