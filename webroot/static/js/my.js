@@ -351,7 +351,7 @@ const scrollHdr0 = (event) => {
     if (scrollHdrTimer > 0) {
         clearTimeout(scrollHdrTimer);
     }
-    scrollHdrTimer = setTimeout(scrollHdr, 100);
+    scrollHdrTimer = setTimeout(scrollHdr, 1000);
 };
 
 /**
