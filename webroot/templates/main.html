@@ -38,7 +38,10 @@
       el_main = document.getElementById("main");
       elOSD1 = document.getElementById("osd1");
       elOSD2 = document.getElementById("osd2");
-      elGage = document.getElementById("gage");
+      elGageL = document.getElementById("gage_l");
+      elGageL0 = document.getElementById("gage_l0");
+      elGageR = document.getElementById("gage_r");
+      elGageR0 = document.getElementById("gage_r0");
 
       const el_home_button = document.getElementById("home_button");
       el_home_button.addEventListener("mousedown", homeButtonHdr);
@@ -91,10 +94,25 @@
     <input id="search_n" name="search_n"
            type="hidden" value="{{ search_n }}" />
 
-    <div id="osd1" class="my-osd" style="display: none;">OSD1</div>
-    <div id="osd2" class="my-osd" style="display: none;">OSD2</div>
-    <div id="gage" class="my-osd" style="display: block;">
+    <div id="osd1" class="my-osd-base my-osd"
+         style="display: none;">OSD1</div>
+    <div id="osd2" class="my-osd-base my-osd"
+         style="display: none;">OSD2</div>
+    <div id="gage_l" class="my-osd-base my-gage"
+         style="display: none;">
+      <i class="fas fa-caret-left fa-2x"></i>
+    </div>
+    <div id="gage_l0" class="my-osd-base my-gage"
+         style="display: none;">
       <i class="fas fa-caret-right fa-2x"></i>
+    </div>
+    <div id="gage_r" class="my-osd-base my-gage"
+         style="display: none;">
+      <i class="fas fa-caret-right fa-2x"></i>
+    </div>
+    <div id="gage_r0" class="my-osd-base my-gage"
+         style="display: none;">
+      <i class="fas fa-caret-left fa-2x"></i>
     </div>
 
     {% if search_str %}

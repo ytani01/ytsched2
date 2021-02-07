@@ -173,19 +173,23 @@
          style="background-color: #EEE;">
       <!-- 日付 -->
       <div class="row p-1" style="font-size: large">
-        <div class="col-4 text-center">
+        <div class="col-1 p-0 text-center my-btn">
           <i class="far fa-arrow-alt-circle-up fa-lg"
-             style="vertical-align: middle;"
+             style="vertical-align: bottom;"
              onmousedown="changeElDate(-1);"></i>
+        </div>
+        <div class="col-1 p-0 text-center my-btn">
           <i class="far fa-dot-circle fa-lg"
-             style="vertical-align: middle;"
+             style="vertical-align: bottom;"
              onmousedown="setElDate();"></i>
+        </div>
+        <div class="col-1 p-0 text-center my-btn">
           <i class="far fa-arrow-alt-circle-down fa-lg"
-             style="vertical-align: middle;"
+             style="vertical-align: bottom;"
              onmousedown="changeElDate(1);"></i>
         </div>
 
-        <div class="col-8 p-1 text-left">
+        <div class="col-9 p-1 text-left">
           <input id="date" name="date"
                  type="date" value="{{ sde.date }}"
                  onchange="update_wday();" />

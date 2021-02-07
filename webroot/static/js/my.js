@@ -28,7 +28,10 @@ const dispOSD = (on) => {
     if ( ! on ) {
         elOSD1.style.display = "none";
         elOSD2.style.display = "none";
-        elGage.style.display = "none";
+        elGageL.style.display = "none";
+        elGageL0.style.display = "none";
+        elGageR.style.display = "none";
+        elGageR0.style.display = "none";
         return;
     }
     const win_h = document.documentElement.clientHeight;
@@ -83,21 +86,41 @@ const dispOSD = (on) => {
     //
     // gage
     //
-    const gageH = elGage.style.height;
-    console.log(`gageH=${gageH}`);
-    let diffY = 0;
-    if (Math.abs(top_rel_days) >= 1) {
-        diffY = Math.log(Math.abs(top_rel_days)) * 40;
-        diffY *= top_rel_days / Math.abs(top_rel_days);
-        console.log(`diffY=${diffY}`);
-    }
+    const d2y = (d) => {
+        const a = 2;
+        const b = 50;
+        
+        if (Math.abs(d) * a < 1) {
+            return 0;
+        }
+        
+        const y = Math.log10(Math.abs(d) * a) * b;
+        if (d < 0) {
+            return -y;
+        }
+        return y;
+    };
 
-    const gageTop = win_h / 2 + diffY;
-    console.log(`gateTop=${gageTop}`);
+    const diffY = d2y(top_rel_days);;
+    console.log(`diffY=${diffY}`);
 
-    elGage.style.right = "5px";
-    elGage.style.top = `${gageTop}px`;
-    elGage.style.display = "block";
+    const gageBottom = win_h / 2 - diffY;
+    elGageL.style.left = "15px";
+    elGageL.style.bottom = `${gageBottom}px`;
+    elGageL.style.display = "block";
+
+    elGageR.style.right = "15px";
+    elGageR.style.bottom = `${gageBottom}px`;
+    elGageR.style.display = "block";
+
+    const gage0Bottom = win_h / 2;
+    elGageL0.style.left = "5px";
+    elGageL0.style.bottom = `${gage0Bottom}px`;
+    elGageL0.style.display = "block";
+
+    elGageR0.style.right = "5px";
+    elGageR0.style.bottom = `${gage0Bottom}px`;
+    elGageR0.style.display = "block";
 };
 
 /**

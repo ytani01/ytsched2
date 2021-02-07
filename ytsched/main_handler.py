@@ -238,14 +238,36 @@ class MainHandler(HandlerBase):
         todo_sde = []
         for sde in todo_sdf.sde:
             if filter_str.startswith('!'):
-                if filter_str[1:] in sde.search_str():
+                try:
+                    if re.search(filter_str[1:],
+                                  sde.search_str()):
+                        continue
+                except re.error as ex:
+                    self._mylog.warning(
+                        '%s:%s:%s:%s',
+                        type(ex).__name__, ex,
+                        filter_str, sde.search_str())
                     continue
             else:
-                if filter_str not in sde.search_str():
+                try:
+                    if not re.search(filter_str, sde.search_str()):
+                        continue
+                except re.error as ex:
+                    self._mylog.warning(
+                        '%s:%s:%s:%s',
+                        type(ex).__name__, ex,
+                        filter_str, sde.search_str())
                     continue
 
             if search_str:
-                if search_str.lower() not in sde.search_str():
+                try:
+                    if not re.search(search_str, sde.search_str()):
+                        continue
+                except re.error as ex:
+                    self._mylog.warning(
+                        '%s:%s:%s:%s',
+                        type(ex).__name__, ex,
+                        search_str, sde.search_str())
                     continue
 
             todo_sde.append(sde)
@@ -285,10 +307,25 @@ class MainHandler(HandlerBase):
             for sde in sdf.sde:
                 # self._mylog.debug('sde=%s', sde)
                 if filter_str.startswith('!'):
-                    if filter_str[1:] in sde.search_str():
+                    try:
+                        if re.search(filter_str[1:],
+                                      sde.search_str()):
+                            continue
+                    except re.error as ex:
+                        self._mylog.warning(
+                            '%s:%s:%s:%s',
+                            type(ex).__name__, ex,
+                            filter_str, sde.search_str())
                         continue
                 else:
-                    if filter_str not in sde.search_str():
+                    try:
+                        if not re.search(filter_str, sde.search_str()):
+                            continue
+                    except re.error as ex:
+                        self._mylog.warning(
+                            '%s:%s:%s:%s',
+                            type(ex).__name__, ex,
+                            filter_str, sde.search_str())
                         continue
 
                 if search_str:
