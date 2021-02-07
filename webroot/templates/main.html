@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
+{% set diffDays = ['-10Y', '-1Y', '-3M', '-1M', '-2w', '-1w', '-3d', '+3d', '+1w', '+2w', '+1M', '+3M', '+1Y', '+10Y'] %}
 <header>
   <script>
     let clickCount = 0;
@@ -38,10 +39,16 @@
       el_main = document.getElementById("main");
       elOSD1 = document.getElementById("osd1");
       elOSD2 = document.getElementById("osd2");
-      elGageL = document.getElementById("gage_l");
-      elGageL0 = document.getElementById("gage_l0");
+
       elGageR = document.getElementById("gage_r");
-      elGageR0 = document.getElementById("gage_r0");
+      elGageL = document.getElementById("gage_l");
+      elGageRBase = document.getElementById("gage_r_base");
+      elGageLBase = document.getElementById("gage_l_base");
+
+      {% for i, d in enumerate(diffDays) %}
+      elGageR[{{ i }}] = document.getElementById("gage_r{{ i }}");
+      elGageL[{{ i }}] = document.getElementById("gage_l{{ i }}");
+      {% end %}
 
       const el_home_button = document.getElementById("home_button");
       el_home_button.addEventListener("mousedown", homeButtonHdr);
@@ -98,22 +105,35 @@
          style="display: none;">OSD1</div>
     <div id="osd2" class="my-osd-base my-osd"
          style="display: none;">OSD2</div>
-    <div id="gage_l" class="my-osd-base my-gage"
-         style="display: none;">
-      <i class="fas fa-caret-left fa-2x"></i>
-    </div>
-    <div id="gage_l0" class="my-osd-base my-gage"
-         style="display: none;">
-      <i class="fas fa-caret-right fa-2x"></i>
-    </div>
+
     <div id="gage_r" class="my-osd-base my-gage"
-         style="display: none;">
+         style="display: none; right: 30px;">
       <i class="fas fa-caret-right fa-2x"></i>
     </div>
-    <div id="gage_r0" class="my-osd-base my-gage"
-         style="display: none;">
+    <div id="gage_l" class="my-osd-base my-gage"
+         style="display: none; left: 70px">
       <i class="fas fa-caret-left fa-2x"></i>
     </div>
+
+    <div id="gage_r_base" class="my-osd-base my-gage"
+         style="display: none; right: 20px;">
+      <i class="fas fa-caret-left fa-2x"></i>
+    </div>
+    <div id="gage_l_base" class="my-osd-base my-gage"
+         style="display: none; left: 60px;">
+      <i class="fas fa-caret-right fa-2x"></i>
+    </div>
+
+    {% for i, s in enumerate(diffDays) %}
+    <div id="gage_r{{ i }}" class="my-osd-base my-gage"
+         style="display: none; font-size:small; right: 5px;">
+      {{ s }}
+    </div>
+    <div id="gage_l{{ i }}" class="my-osd-base my-gage"
+         style="display: none; font-size:small; left: 40px;">
+      {{ s }}
+    </div>
+    {% end %}
 
     {% if search_str %}
         {% set date_from2 = str(date_from).replace('-','/') %}
