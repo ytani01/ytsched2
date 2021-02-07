@@ -101,26 +101,29 @@ const dispOSD = (on) => {
         return y;
     };
 
+    elGageL.style.display = "block";
+    elGageR.style.display = "block";
+    elGageL0.style.display = "block";
+    elGageR0.style.display = "block";
+
+    const gageH = elGageL.clientHeight;
+    
     const diffY = d2y(top_rel_days);;
     console.log(`diffY=${diffY}`);
 
-    const gageBottom = win_h / 2 - diffY;
-    elGageL.style.left = "15px";
-    elGageL.style.bottom = `${gageBottom}px`;
-    elGageL.style.display = "block";
+    const gage0Bottom = win_h / 2 - gageH / 2;
+    const gageBottom = gage0Bottom - diffY;
 
-    elGageR.style.right = "15px";
-    elGageR.style.bottom = `${gageBottom}px`;
-    elGageR.style.display = "block";
-
-    const gage0Bottom = win_h / 2;
     elGageL0.style.left = "5px";
     elGageL0.style.bottom = `${gage0Bottom}px`;
-    elGageL0.style.display = "block";
-
     elGageR0.style.right = "5px";
     elGageR0.style.bottom = `${gage0Bottom}px`;
-    elGageR0.style.display = "block";
+
+    elGageL.style.left = "15px";
+    elGageL.style.bottom = `${gageBottom}px`;
+    elGageR.style.right = "15px";
+    elGageR.style.bottom = `${gageBottom}px`;
+
 };
 
 /**
