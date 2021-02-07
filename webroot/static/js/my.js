@@ -63,60 +63,11 @@ const dispOSD = (on) => {
         }
         return;
     }
+
     const win_h = document.documentElement.clientHeight;
-
     const top_date_str = getTopDateString().split('-').join('/');
     const top_rel_days = getDaysFromToday(top_date_str);
-    
-    /*
-    //
-    // OSD1
-    //
-    elOSD1.style.right = "5px";
-    elOSD1.style.top = "40px";
 
-    const top_date_str = getTopDateString().split('-').join('/');
-    const top_rel_days = getDaysFromToday(top_date_str);
-    top_sign_str = '';
-    if (top_rel_days > 0) {
-        top_sign_str = '+';
-    }
-    top_w_sign_str = '';
-    if (top_rel_days >= 7) {
-        top_w_sign_str = '+';
-    }
-    const top_rel_weeks = parseInt(top_rel_days / 7);
-    elOSD1.innerHTML =
-        `${top_date_str}<br />` +
-        `${top_sign_str}${top_rel_days} days<br /> ` +
-        `${top_w_sign_str}${top_rel_weeks} weeks`;
-    elOSD1.style.display = "block";
-
-    //
-    // OSD2
-    //
-    elOSD2.style.right = "5px";
-    elOSD2.style.bottom = "80px";
-
-    const bottom_date_str = getBottomDateString().split('-').join('/');
-    const bottom_rel_days = getDaysFromToday(bottom_date_str);
-    bottom_sign_str = '';
-    if (bottom_rel_days > 0) {
-        bottom_sign_str = '+';
-    }
-    bottom_w_sign_str = '';
-    if (bottom_rel_days >= 7) {
-        bottom_w_sign_str = '+';
-    }
-    const bottom_rel_weeks = parseInt(bottom_rel_days / 7);
-    elOSD2.innerHTML =
-        `${bottom_date_str}<br />` +
-        `${bottom_sign_str}${bottom_rel_days} days<br /> ` +
-        `${bottom_w_sign_str}${bottom_rel_weeks} weeks`;
-
-    elOSD2.style.display = "block";
-    */
-    
     //
     // gage
     //
@@ -262,7 +213,7 @@ const getDaysFromToday = (date_str) => {
  *
  */
 const doPost = (path, data) => {
-    console.log(`doPost()`);
+    console.log(`doPost(${path})`);
 
     const form = document.createElement("form");
     form.setAttribute("action", path);
@@ -319,30 +270,17 @@ let scrollFlag = false;
  *
  */
 const scrollHdr = (event) => {
-    dispOSD(false);
+    // dispOSD(false);
 
-    const top_date_str = getTopDateString();
-    const rel_days = getDaysFromToday(top_date_str);
-    // const el_rel_days = document.getElementById("rel_days");
-    yyyy_str = top_date_str.substr(0,4);
-    mm_dd_str = top_date_str.substr(5,5).replace('-','/');
-    sign_str = '';
-
-    const rel_weeks = parseInt(rel_days / 7);
-    if (rel_weeks >= 0) {
-        sign_str = '+';
-    }
-    /*
-    el_rel_days.innerHTML
-        = `${yyyy_str}<br />[${sign_str}${rel_weeks}w]`;
-    */
     if ( ! scrollFlag ) {
         console.log(`scrollHdr:event=${event}, scrollFlag=${scrollFlag}`);
         return;
     }
 
+    const top_date_str = getTopDateString();
+    const rel_days = getDaysFromToday(top_date_str);
+
     const el_search = document.getElementById("search_str");
-    //console.log(`onscroll:search_str="${el_search.value}"`);
     if (el_search.value != "") {
         return;
     }
@@ -373,13 +311,20 @@ const scrollHdr = (event) => {
  *
  */
 let scrollHdrTimer = 0;
+let dispOSDTimer = 0;
 const scrollHdr0 = (event) => {
     dispOSD(true);
 
     if (scrollHdrTimer > 0) {
         clearTimeout(scrollHdrTimer);
     }
-    scrollHdrTimer = setTimeout(scrollHdr, 1000);
+    if (dispOSDTimer > 0) {
+        clearTimeout(dispOSDTimer);
+    }
+    scrollHdrTimer = setTimeout(scrollHdr, 100);
+    dispOSDTimer = setTimeout(function () {
+        dispOSD(false);
+    }, 1500);
 };
 
 /**
