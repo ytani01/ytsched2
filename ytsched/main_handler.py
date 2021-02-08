@@ -15,11 +15,11 @@ from .handler import HandlerBase
 from .ytsched import SchedDataEnt
 
 
-def days2y_offset(days: int) -> int:
+def days2y_offset(days: float) -> int:
     """
     Parameters
     ----------
-    days: int
+    days: float
 
     Returns
     -------
@@ -33,20 +33,24 @@ def days2y_offset(days: int) -> int:
     if days == 0:
         return 0
 
-    offset = round(math.log10(abs(days + dd) * a) * b)
+    offset = round(math.log10(float(abs(days)) + dd) * a + b)
+
     if days < 0:
         return -offset
     return offset
 
 
+DAYS_MONTH = (31+28+31+30+31+30+31+31+30+31+30+31)/12
+DAYS_YEAR = 365.25
 GAGE = [
-    {'label': '-10Y', 'y_offset': days2y_offset(-3650)},
-    {'label':  '-5Y', 'y_offset': days2y_offset(-1826)},
-    {'label':  '-2Y', 'y_offset': days2y_offset( -730)},
-    {'label':  '-1Y', 'y_offset': days2y_offset( -365)},
-    {'label':  '-6M', 'y_offset': days2y_offset( -183)},
-    {'label':  '-2M', 'y_offset': days2y_offset(  -61)},
-    {'label':  '-1M', 'y_offset': days2y_offset(  -30)},
+    {'label': '-20Y', 'y_offset': days2y_offset(-DAYS_YEAR * 20)},
+    {'label': '-10Y', 'y_offset': days2y_offset(-DAYS_YEAR * 10)},
+    {'label':  '-5Y', 'y_offset': days2y_offset(-DAYS_YEAR * 5)},
+    {'label':  '-2Y', 'y_offset': days2y_offset(-DAYS_YEAR * 2)},
+    {'label':  '-1Y', 'y_offset': days2y_offset(-DAYS_YEAR * 1)},
+    {'label':  '-6M', 'y_offset': days2y_offset(-DAYS_MONTH * 6)},
+    {'label':  '-2M', 'y_offset': days2y_offset(-DAYS_MONTH * 2)},
+    {'label':  '-1M', 'y_offset': days2y_offset(-DAYS_MONTH * 1)},
     {'label':  '-2w', 'y_offset': days2y_offset(  -14)},
     {'label':  '-1w', 'y_offset': days2y_offset(   -7)},
     {'label':  '-3d', 'y_offset': days2y_offset(   -3)},
@@ -55,13 +59,14 @@ GAGE = [
     {'label':  '+3d', 'y_offset': days2y_offset(   +3)},
     {'label':  '+1w', 'y_offset': days2y_offset(   +7)},
     {'label':  '+2w', 'y_offset': days2y_offset(  +14)},
-    {'label':  '+1M', 'y_offset': days2y_offset(  +30)},
-    {'label':  '+2M', 'y_offset': days2y_offset(  +61)},
-    {'label':  '+6M', 'y_offset': days2y_offset( +183)},
-    {'label':  '+1Y', 'y_offset': days2y_offset( +365)},
-    {'label':  '+2Y', 'y_offset': days2y_offset( +730)},
-    {'label':  '+5Y', 'y_offset': days2y_offset(+1826)},
-    {'label': '+10Y', 'y_offset': days2y_offset(+3650)},
+    {'label':  '+1M', 'y_offset': days2y_offset(+DAYS_MONTH * 1)},
+    {'label':  '+2M', 'y_offset': days2y_offset(+DAYS_MONTH * 2)},
+    {'label':  '+6M', 'y_offset': days2y_offset(+DAYS_MONTH * 6)},
+    {'label':  '+1Y', 'y_offset': days2y_offset(+DAYS_YEAR * 1)},
+    {'label':  '+2Y', 'y_offset': days2y_offset(+DAYS_YEAR * 2)},
+    {'label':  '+5Y', 'y_offset': days2y_offset(+DAYS_YEAR * 5)},
+    {'label': '+10Y', 'y_offset': days2y_offset(+DAYS_YEAR * 10)},
+    {'label': '+20Y', 'y_offset': days2y_offset(+DAYS_YEAR * 20)},
 ]
 
 

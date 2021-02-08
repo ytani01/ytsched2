@@ -41,6 +41,10 @@
     /* background-color: #FFF; */
     padding: 0px;
 }
+.my-gage-text {
+    display: inline-block;
+    transform: translate(0%, 50%);
+}
 
 .longtext {
      white-space: nowrap;

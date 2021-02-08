@@ -19,24 +19,20 @@
  * ここでは、区切り文字を '-'に揃える
  */
 
+let elMain;
 let elGageR0;
-let elGageRBase;
-let elGageR = [];
-
-const diffDays = [
-    -3650, -1826, -730, -365, -183, -61, -30, -14, -7, -3, -1, +1, +3, +7, +14, +30, +61, +183, +365, +730, +1826, +3650
-];
+let scrollHdrTimer = 0;
 
 const days2yOffset = (d) => {
+    const dd = 0.8;
     const a = 70;
     const b = 0;
-    const c = 0.8;
 
     if (d == 0) {
         return 0;
     }
     
-    const y = Math.round(Math.log10(Math.abs(d) + c) * a + b);
+    const y = Math.round(Math.log10(Math.abs(d) + dd) * a + b);
     if (d < 0) {
         return -y;
     }
@@ -46,14 +42,9 @@ const days2yOffset = (d) => {
 /**
  * @param {bool} on
  */
-const dispOSD = (on) => {
+const dispGage = (on) => {
     if ( ! on ) {
-        elGageR0.style.display = "block";
-        elGageRBase.style.display = "block";
-
-        for (let [i, d] of diffDays.entries()) {
-            elGageR[i].style.display = "block";
-        }
+        elGageR0.style.display = "none";
         return;
     }
 
@@ -65,23 +56,10 @@ const dispOSD = (on) => {
     // gage
     //
     const centerY = win_h / 2 + 30;
+    const gageBottom = centerY - days2yOffset(top_rel_days);
 
-    const gageH = elGageR0.clientHeight;
-    const gageBaseH = elGageRBase.clientHeight;
-    
-    const gageBottom = centerY - gageH / 2 - days2yOffset(top_rel_days);
-    const gageBaseBottom = centerY - gageBaseH / 2;
-
+    console.log(`dispGage: gageBottom=${gageBottom}`);
     elGageR0.style.bottom = `${gageBottom}px`;
-
-    elGageRBase.style.bottom = `${gageBaseBottom}px`;
-
-    const gageH1 = elGageR[0].clientHeight;
-
-    for (let [i, d] of diffDays.entries()) {
-        let bottom = centerY - gageH1 / 2 - days2yOffset(d) + 1;
-        elGageR[i].style.bottom = `${bottom}px`;
-    }
 };
 
 /**
@@ -151,6 +129,7 @@ const getTopDateString = () => {
         const d1_str = getJSTDateString(shiftDays(d1, 1));
         el_date = document.getElementById(`date-${d1_str}`);
     }
+    console.log(`getTopDateString: el_date.id=${el_date.id}`);
     return el_date.id.replace('date-', '');
 };
 
@@ -250,8 +229,6 @@ let scrollFlag = false;
  *
  */
 const scrollHdr = (event) => {
-    // dispOSD(false);
-
     if ( ! scrollFlag ) {
         console.log(`scrollHdr:event=${event}, scrollFlag=${scrollFlag}`);
         return;
@@ -290,21 +267,13 @@ const scrollHdr = (event) => {
 /**
  *
  */
-let scrollHdrTimer = 0;
-let dispOSDTimer = 0;
 const scrollHdr0 = (event) => {
-    dispOSD(true);
-
+    dispGage(true);
+    
     if (scrollHdrTimer > 0) {
         clearTimeout(scrollHdrTimer);
     }
-    if (dispOSDTimer > 0) {
-        clearTimeout(dispOSDTimer);
-    }
     scrollHdrTimer = setTimeout(scrollHdr, 100);
-    dispOSDTimer = setTimeout(function () {
-        dispOSD(false);
-    }, 1500);
 };
 
 /**
@@ -318,10 +287,10 @@ const scrollToId = (id, sde_align = "top", behavior = "smooth") => {
     const body_h = document.body.clientHeight;
     const win_h = document.documentElement.clientHeight;
 
-    el_main = document.getElementById("main");
-    el_main.style.visibility = "visible";
+    elMain.style.visibility = "visible";
     if (body_h <= win_h) {
         console.log(`body_h=${body_h} < win_h=${win_h}`);
+        dispGage(false);
         return true;
     }
 
@@ -380,21 +349,6 @@ const scrollToDate = (path, date, sde_align="top", behavior="smooth") => {
     doPost(path, {date: date, sde_align: sde_align});
     return false;
 };
-
-/*
- *
-const moveDays = (path, days, behavior="smooth") => {
-    const el = document.getElementById("cur_day");
-    let d1 = new Date(el.value);
-    d1 = shiftDays(d1, days);
-    console.log(`moveDays:d1=${d1}`);
-
-    d1_str = getJSTDateString(d1);
-    console.log(`moveDays:d1_str=${d1_str}`);
-    el.value = d1_str;
-    scrollToDate(path, d1_str, "top", behavior);
-};
- */
 
 /**
  * [Important!]

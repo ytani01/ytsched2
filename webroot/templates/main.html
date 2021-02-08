@@ -1,29 +1,5 @@
 {% extends "base.html" %}
 {% block content %}
-{% set diffDays = [
-{'label': '-10Y', 'days': -3650},
-{'label':  '-5Y', 'days': -1826},
-{'label':  '-2Y', 'days':  -730},
-{'label':  '-1Y', 'days':  -365},
-{'label':  '-6M', 'days':  -183},
-{'label':  '-2M', 'days':   -61},
-{'label':  '-1M', 'days':   -30},
-{'label':  '-2w', 'days':   -14},
-{'label':  '-1w', 'days':    -7},
-{'label':  '-3d', 'days':    -3},
-{'label':  '-1d', 'days':    -1},
-{'label':  '+1d', 'days':    +1},
-{'label':  '+3d', 'days':    +3},
-{'label':  '+1w', 'days':    +7},
-{'label':  '+2w', 'days':   +14},
-{'label':  '+1M', 'days':   +30},
-{'label':  '+2M', 'days':   +61},
-{'label':  '+6M', 'days':  +183},
-{'label':  '+1Y', 'days':  +365},
-{'label':  '+2Y', 'days':  +730},
-{'label':  '+5Y', 'days': +1826},
-{'label': '+10Y', 'days': +3650},
-] %}
 <header>
   <script>
     let clickCount = 0;
@@ -59,32 +35,46 @@
     };
 
     const onloadHdr = (event) => {
-      elMain = document.getElementById("main");
-
-      elGageR0 = document.getElementById("gage_r");
-      elGageRBase = document.getElementById("gage_r_base");
-
-      {% for i, d in enumerate(diffDays) %}
-      elGageR[{{ i }}] = document.getElementById("gage_r{{ i }}");
-      {% end %}
+      elMain = document.getElementById("main"); // declared in my.js
 
       const el_home_button = document.getElementById("home_button");
       el_home_button.addEventListener("mousedown", homeButtonHdr);
       
       const el_menu_bar = document.getElementById("menu_bar");
       const menu_bar_height = el_menu_bar.offsetHeight;
-      console.log(`onload(): menu_bar_height=${menu_bar_height}`);
-      
       document.body.style.paddingBottom = `${menu_bar_height}px`;
       
       const body_h = document.body.clientHeight;
       const win_h = document.documentElement.clientHeight;
+      const centerY = win_h / 2 + 30;
+
       if ( body_h < win_h ) {
         console.log(`body_h=${body_h} < win_h=${win_h}`);
         elMain.style.visibility = "visible";
         return;
       }
-      
+
+      const elGageRBase = document.getElementById("gage_r_base");
+
+      elGageR0 = document.getElementById("gage_r"); // declared in my.js
+      elGageRBase.style.bottom = `${centerY}px`;
+
+      let gage = [
+          {% for i, d in enumerate(gage) %}
+          {
+            id: 'gage_r{{ i }}',
+            label: '{{ d['label'] }}',
+            yOffset: {{ d['y_offset'] }}
+          },
+          {% end %}
+      ];
+
+      for (let g of gage) {
+        console.log(`g={${g.id},${g.yOffset}},${centerY - g.yOffset}`);
+        const el = document.getElementById(g.id);
+        el.style.bottom = `${centerY - g.yOffset}px`;
+      }
+
       const el_sde_align = document.getElementById("sde_align");
       const el_date = document.getElementById("date");
       scrollToDate(location.pathname,
@@ -107,7 +97,7 @@
   </script>
 </header>
 <main id="main" style="background-color:#FFF; visibility: hidden;
-                       width:calc(100% - 28px);">
+                       width:calc(100% - 21px);">
   <div class="container-fluid p-0">
     
     <!-- hidden params -->
@@ -124,19 +114,21 @@
 
     <!-- gages -->
     <div id="gage_r" class="my-osd-base my-gage"
-         style="opacity: 0.2; right: 12px;">
-      <i class="fas fa-caret-right fa-2x"></i>
+         style="opacity: 0.2; right: 5px;">
+      <!-- <i class="far fa-dot-circle"></i> -->
+      <i class="fas fa-caret-right fa-2x my-gage-text"></i>
     </div>
+
     <div id="gage_r_base" class="my-osd-base my-gage"
-         style="right: 1px;">
-      <i class="fas fa-grip-lines fa-xs"></i>
+         style="right: 0px;">
+      <i class="fas fa-grip-lines fa-xs my-gage-text"></i>
       <!-- <i class="fas fa-caret-left fa-2x"></i> -->
     </div>
 
-    {% for i, d in enumerate(diffDays) %}
-    <div id="gage_r{{ i }}" class="my-osd-base my-gage"
-         style="font-size:small; right: 1px;">
-      {{ d['label'] }}
+    {% for i, d in enumerate(gage) %}
+    <div id="gage_r{{ i }}" class="my-osd-base my-gage my-gage-text"
+         style="font-size:x-small; right:1px;">
+      <span>{{ d['label'] }}</span>
     </div>
     {% end %}
 
@@ -232,7 +224,7 @@
       {% end %}
 
       {% set url = url_prefix %}
-      {% set obj = {'date': str(sched_date) } %}
+      {% set obj = {'date': str(sched_date), 'search_str': '' } %}
       <div class="col-1 p-0 text-center my-btn"
            style="background-color: {{ bg_color }};
                   border-radius: 0px 15px 15px 0px;"
