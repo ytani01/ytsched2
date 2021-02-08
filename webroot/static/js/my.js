@@ -24,7 +24,7 @@ let elGageR0;
 let scrollHdrTimer = 0;
 
 const days2yOffset = (d) => {
-    const dd = 0.8;
+    const dd = 0.6;
     const a = 70;
     const b = 0;
 
@@ -48,17 +48,16 @@ const dispGage = (on) => {
         return;
     }
 
-    const win_h = document.documentElement.clientHeight;
     const top_date_str = getTopDateString().split('-').join('/');
     const top_rel_days = getDaysFromToday(top_date_str);
 
     //
     // gage
     //
-    const centerY = win_h / 2 + 30;
+    const centerY = document.documentElement.clientHeight / 2 + 40;
     const gageBottom = centerY - days2yOffset(top_rel_days);
 
-    console.log(`dispGage: gageBottom=${gageBottom}`);
+    // console.log(`dispGage: gageBottom=${gageBottom}`);
     elGageR0.style.bottom = `${gageBottom}px`;
 };
 
@@ -129,7 +128,7 @@ const getTopDateString = () => {
         const d1_str = getJSTDateString(shiftDays(d1, 1));
         el_date = document.getElementById(`date-${d1_str}`);
     }
-    console.log(`getTopDateString: el_date.id=${el_date.id}`);
+    // console.log(`getTopDateString: el_date.id=${el_date.id}`);
     return el_date.id.replace('date-', '');
 };
 
