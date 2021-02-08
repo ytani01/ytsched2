@@ -40,14 +40,12 @@
     color: #000;
     /* background-color: #FFF; */
     padding: 0px;
-    opacity: 0.4;
 }
 
 .longtext {
      white-space: nowrap;
      overflow: hidden;
      text-overflow: ellipsis;
-
 }
 
 .longtext:focus {

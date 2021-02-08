@@ -9,9 +9,60 @@ __author__ = 'Yoichi Tanibayashi'
 __date__ = '2021/01'
 
 import re
+import math
 import datetime
 from .handler import HandlerBase
 from .ytsched import SchedDataEnt
+
+
+def days2y_offset(days: int) -> int:
+    """
+    Parameters
+    ----------
+    days: int
+
+    Returns
+    -------
+    offset: int
+
+    """
+    dd = 0.8
+    a = 70
+    b = 0
+
+    if days == 0:
+        return 0
+
+    offset = round(math.log10(abs(days + dd) * a) * b)
+    if days < 0:
+        return -offset
+    return offset
+
+
+GAGE = [
+    {'label': '-10Y', 'y_offset': days2y_offset(-3650)},
+    {'label':  '-5Y', 'y_offset': days2y_offset(-1826)},
+    {'label':  '-2Y', 'y_offset': days2y_offset( -730)},
+    {'label':  '-1Y', 'y_offset': days2y_offset( -365)},
+    {'label':  '-6M', 'y_offset': days2y_offset( -183)},
+    {'label':  '-2M', 'y_offset': days2y_offset(  -61)},
+    {'label':  '-1M', 'y_offset': days2y_offset(  -30)},
+    {'label':  '-2w', 'y_offset': days2y_offset(  -14)},
+    {'label':  '-1w', 'y_offset': days2y_offset(   -7)},
+    {'label':  '-3d', 'y_offset': days2y_offset(   -3)},
+    {'label':  '-1d', 'y_offset': days2y_offset(   -1)},
+    {'label':  '+1d', 'y_offset': days2y_offset(   +1)},
+    {'label':  '+3d', 'y_offset': days2y_offset(   +3)},
+    {'label':  '+1w', 'y_offset': days2y_offset(   +7)},
+    {'label':  '+2w', 'y_offset': days2y_offset(  +14)},
+    {'label':  '+1M', 'y_offset': days2y_offset(  +30)},
+    {'label':  '+2M', 'y_offset': days2y_offset(  +61)},
+    {'label':  '+6M', 'y_offset': days2y_offset( +183)},
+    {'label':  '+1Y', 'y_offset': days2y_offset( +365)},
+    {'label':  '+2Y', 'y_offset': days2y_offset( +730)},
+    {'label':  '+5Y', 'y_offset': days2y_offset(+1826)},
+    {'label': '+10Y', 'y_offset': days2y_offset(+3650)},
+]
 
 
 class MainHandler(HandlerBase):
@@ -388,6 +439,7 @@ class MainHandler(HandlerBase):
                     search_n=search_n,
                     sde_align=sde_align,
                     sd=self._sd,
+                    gage=GAGE,
                     )
 
     def exec_update(self, cmd: str) -> datetime.date:

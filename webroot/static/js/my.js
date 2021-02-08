@@ -19,25 +19,24 @@
  * ここでは、区切り文字を '-'に揃える
  */
 
-let elOSD1, elOSD2;
-let elGageR0, elGageL0;
-let elGageRBase, elGageLBase;
+let elGageR0;
+let elGageRBase;
 let elGageR = [];
-let elGageL = [];
 
 const diffDays = [
     -3650, -1826, -730, -365, -183, -61, -30, -14, -7, -3, -1, +1, +3, +7, +14, +30, +61, +183, +365, +730, +1826, +3650
 ];
 
-const day2diffY = (d) => {
-    const a = 2;
-    const b = 70;
-    
-    if (Math.abs(d) * a < 1) {
+const days2yOffset = (d) => {
+    const a = 70;
+    const b = 0;
+    const c = 0.8;
+
+    if (d == 0) {
         return 0;
     }
     
-    const y = Math.round(Math.log10(Math.abs(d) * a) * b);
+    const y = Math.round(Math.log10(Math.abs(d) + c) * a + b);
     if (d < 0) {
         return -y;
     }
@@ -49,17 +48,11 @@ const day2diffY = (d) => {
  */
 const dispOSD = (on) => {
     if ( ! on ) {
-        elOSD1.style.display = "none";
-        elOSD2.style.display = "none";
-
-        elGageR0.style.display = "none";
-        elGageL0.style.display = "none";
-        elGageRBase.style.display = "none";
-        elGageLBase.style.display = "none";
+        elGageR0.style.display = "block";
+        elGageRBase.style.display = "block";
 
         for (let [i, d] of diffDays.entries()) {
-            elGageR[i].style.display = "none";
-            elGageL[i].style.display = "none";
+            elGageR[i].style.display = "block";
         }
         return;
     }
@@ -71,36 +64,23 @@ const dispOSD = (on) => {
     //
     // gage
     //
-    elGageR0.style.display = "block";
-    elGageL0.style.display = "block";
-    elGageRBase.style.display = "block";
-    elGageLBase.style.display = "block";
+    const centerY = win_h / 2 + 30;
 
-    for (let [i, d] of diffDays.entries()) {
-        elGageR[i].style.display = "block";
-        elGageL[i].style.display = "block";
-    }
-
-    const gageH = elGageL0.clientHeight;
+    const gageH = elGageR0.clientHeight;
+    const gageBaseH = elGageRBase.clientHeight;
     
-    const diffY = day2diffY(top_rel_days);;
-    // console.log(`diffY=${diffY}`);
-
-    const gageBaseBottom = win_h / 2 - gageH / 2;
-    const gageBottom = gageBaseBottom - diffY;
+    const gageBottom = centerY - gageH / 2 - days2yOffset(top_rel_days);
+    const gageBaseBottom = centerY - gageBaseH / 2;
 
     elGageR0.style.bottom = `${gageBottom}px`;
-    elGageL0.style.bottom = `${gageBottom}px`;
 
     elGageRBase.style.bottom = `${gageBaseBottom}px`;
-    elGageLBase.style.bottom = `${gageBaseBottom}px`;
 
-    const gageH1 = elGageL[0].clientHeight;
+    const gageH1 = elGageR[0].clientHeight;
 
     for (let [i, d] of diffDays.entries()) {
-        let bottom = win_h / 2 - gageH1 / 2 - day2diffY(d) + 1;
+        let bottom = centerY - gageH1 / 2 - days2yOffset(d) + 1;
         elGageR[i].style.bottom = `${bottom}px`;
-        elGageL[i].style.bottom = `${bottom}px`;
     }
 };
 

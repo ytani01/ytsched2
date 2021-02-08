@@ -1,6 +1,29 @@
 {% extends "base.html" %}
 {% block content %}
-{% set diffDays = ['-10Y', '-5Y', '-2Y', '-1Y', '-6M', '-2M', '-1M', '-2w', '-1w', '-3d', '-1d', '+1d', '+3d', '+1w', '+2w', '+1M', '+2M', '+6M', '+1Y', '+2Y', '+5Y', '+10Y'] %}
+{% set diffDays = [
+{'label': '-10Y', 'days': -3650},
+{'label':  '-5Y', 'days': -1826},
+{'label':  '-2Y', 'days':  -730},
+{'label':  '-1Y', 'days':  -365},
+{'label':  '-6M', 'days':  -183},
+{'label':  '-2M', 'days':   -61},
+{'label':  '-1M', 'days':   -30},
+{'label':  '-2w', 'days':   -14},
+{'label':  '-1w', 'days':    -7},
+{'label':  '-3d', 'days':    -3},
+{'label':  '-1d', 'days':    -1},
+{'label':  '+1d', 'days':    +1},
+{'label':  '+3d', 'days':    +3},
+{'label':  '+1w', 'days':    +7},
+{'label':  '+2w', 'days':   +14},
+{'label':  '+1M', 'days':   +30},
+{'label':  '+2M', 'days':   +61},
+{'label':  '+6M', 'days':  +183},
+{'label':  '+1Y', 'days':  +365},
+{'label':  '+2Y', 'days':  +730},
+{'label':  '+5Y', 'days': +1826},
+{'label': '+10Y', 'days': +3650},
+] %}
 <header>
   <script>
     let clickCount = 0;
@@ -36,18 +59,13 @@
     };
 
     const onloadHdr = (event) => {
-      el_main = document.getElementById("main");
-      elOSD1 = document.getElementById("osd1");
-      elOSD2 = document.getElementById("osd2");
+      elMain = document.getElementById("main");
 
       elGageR0 = document.getElementById("gage_r");
-      elGageL0 = document.getElementById("gage_l");
       elGageRBase = document.getElementById("gage_r_base");
-      elGageLBase = document.getElementById("gage_l_base");
 
       {% for i, d in enumerate(diffDays) %}
       elGageR[{{ i }}] = document.getElementById("gage_r{{ i }}");
-      elGageL[{{ i }}] = document.getElementById("gage_l{{ i }}");
       {% end %}
 
       const el_home_button = document.getElementById("home_button");
@@ -63,13 +81,14 @@
       const win_h = document.documentElement.clientHeight;
       if ( body_h < win_h ) {
         console.log(`body_h=${body_h} < win_h=${win_h}`);
-        el_main.style.visibility = "visible";
+        elMain.style.visibility = "visible";
         return;
       }
       
       const el_sde_align = document.getElementById("sde_align");
       const el_date = document.getElementById("date");
-      scrollToDate(location.pathname, el_date.value, el_sde_align.value,
+      scrollToDate(location.pathname,
+                   el_date.value, el_sde_align.value,
                    "auto");
       
       const el_search = document.getElementById("search_str");
@@ -87,9 +106,11 @@
     window.addEventListener('load', onloadHdr);
   </script>
 </header>
-<main id="main" style="background-color:#FFF; visibility: hidden;">
+<main id="main" style="background-color:#FFF; visibility: hidden;
+                       width:calc(100% - 28px);">
   <div class="container-fluid p-0">
     
+    <!-- hidden params -->
     <input id="sde_align" name="sde_align"
            type="hidden" value="{{ sde_align }}" />
     <input id="date_from" name="date_from"
@@ -101,37 +122,21 @@
     <input id="search_n" name="search_n"
            type="hidden" value="{{ search_n }}" />
 
-    <div id="osd1" class="my-osd-base my-osd"
-         style="display: none;">OSD1</div>
-    <div id="osd2" class="my-osd-base my-osd"
-         style="display: none;">OSD2</div>
-
+    <!-- gages -->
     <div id="gage_r" class="my-osd-base my-gage"
-         style="display: none; right: 30px;">
+         style="opacity: 0.2; right: 12px;">
       <i class="fas fa-caret-right fa-2x"></i>
     </div>
-    <div id="gage_l" class="my-osd-base my-gage"
-         style="display: none; left: 60px">
-      <i class="fas fa-caret-left fa-2x"></i>
-    </div>
-
     <div id="gage_r_base" class="my-osd-base my-gage"
-         style="display: none; right: 20px;">
-      <i class="fas fa-caret-left fa-2x"></i>
-    </div>
-    <div id="gage_l_base" class="my-osd-base my-gage"
-         style="display: none; left: 50px;">
-      <i class="fas fa-caret-right fa-2x"></i>
+         style="right: 1px;">
+      <i class="fas fa-grip-lines fa-xs"></i>
+      <!-- <i class="fas fa-caret-left fa-2x"></i> -->
     </div>
 
-    {% for i, s in enumerate(diffDays) %}
+    {% for i, d in enumerate(diffDays) %}
     <div id="gage_r{{ i }}" class="my-osd-base my-gage"
-         style="display: none; font-size:small; right: 5px;">
-      {{ s }}
-    </div>
-    <div id="gage_l{{ i }}" class="my-osd-base my-gage"
-         style="display: none; font-size:small; left: 40px;">
-      {{ s }}
+         style="font-size:small; right: 1px;">
+      {{ d['label'] }}
     </div>
     {% end %}
 
