@@ -3,20 +3,6 @@
  */
 
 /*
- * !! Important !!
- *
- * new Date()の日付の区切り文字が
- *   '/' だとJST(+09:00),
- *   '-' だとUTC
- * とみなされる！
- *
- * (ex.)
- * > (new Date("2021/01/01")).toISOString();
- * < "2020-12-31T15:00:00.000Z"
- * > (new Date("2021-01-01")).toISOString();
- * < "2021-01-01T00:00:00.000Z"
- *
- * ここでは、区切り文字を '-'に揃える
  */
 
 let elMain;
@@ -40,16 +26,16 @@ const days2yOffset = (d) => {
 };
 
 /**
- * @param {bool} on
+ * @param {String} date_str   'YYYY-mm-dd'
  */
-const dispGage = (on) => {
-    if ( ! on ) {
+const dispGage = (date_str) => {
+    if ( ! date_str ) {
         elGageR0.style.display = "none";
         return;
     }
 
-    const top_date_str = getTopDateString().split('-').join('/');
-    const top_rel_days = getDaysFromToday(top_date_str);
+    console.log(`date_str=${date_str}`);
+    const top_rel_days = getDaysFromToday(date_str);
 
     //
     // gage
@@ -59,19 +45,6 @@ const dispGage = (on) => {
 
     // console.log(`dispGage: gageBottom=${gageBottom}`);
     elGageR0.style.bottom = `${gageBottom}px`;
-};
-
-/**
- * 日数計算
- *
- * @param {Date} d_from
- * @param {Date} d_to
- *
- * @return {number} days
- */
-const calcDays = (d_from, d_to) => {
-    const days = (d_to - d_from) / (24 * 60 * 60* 1000);
-    return days;
 };
 
 /**
@@ -88,35 +61,57 @@ const shiftDays = (d, days) => {
 };
 
 /**
- * get JST string: "YYYY-mm-ddTHH:MM:SS.SSSZ"
+ * get Localtime string: "YYYY-mm-ddTHH:MM:SS.SSSZ"
+ *
+ * !! Important !!
+ *
+ * new Date()の日付の区切り文字が
+ *   '/' だとJST(+09:00),
+ *   '-' だとUTC
+ * とみなされる！
+ *
+ * (ex.)
+ * > (new Date("2021/01/01")).toISOString();
+ * < "2020-12-31T15:00:00.000Z"
+ * > (new Date("2021-01-01")).toISOString();
+ * < "2021-01-01T00:00:00.000Z"
+ *
+ * ここでは、区切り文字を '-'に統一して、全てLocaltimeとみなす。
  *
  * `toLocaleDateString`が機能しない環境があるので、
  * あえて、面倒な変換を行う(!?)
  *
- * @param {Date} d
- *
- * @return {String} jst_str
- */
-const getJSTString = (d) => {
-    tz_msec = d.getTimezoneOffset() / 60 * 3600 * 1000;
-    const jst_str = (new Date(d.getTime() - tz_msec)).toISOString();
-    return jst_str;
-};
-
-/**
- * get JST date string: "YYYY-mm-dd"
+ * タイムゾーンの時差だけずらして、toISOString()を呼ぶ。
+ * 末尾の 'Z'は削除する。
  *
  * @param {Date} d
  *
- * @return {String} jst_date_str
+ * @return {String} localtime_str "2021-01-01T12:34:56.789"
  */
-const getJSTDateString = (d) => {
-    return getJSTString(d).replace(/T.*$/, '');
+const getLocaltimeString = (d) => {
+    const utc_msec = d.getTime();
+    const offset_msec = d.getTimezoneOffset() / 60 * 3600 * 1000;
+    const localtime_msec = utc_msec - offset_msec;
+    const local_d = new Date(localtime_msec);
+    const localtime_str = local_d.toISOString().slice(0,-1);
+    return localtime_str;
 };
 
 /**
+ * get Localtime date string: "YYYY-mm-dd"
  *
- * @return {String} date_str: "date-YYYY-MM-DD"
+ * @param {Date} d
+ *
+ * @return {String} jst_date_str  ex. "2021-01-01"
+ */
+const getLocaltimeDateString = (d) => {
+    return getLocaltimeString(d).replace(/T.*$/, '');
+};
+
+/**
+ * 画面の一番上に表示されている日付を取得
+ *
+ * @return {String} date_str: "YYYY-MM-DD"
  */
 const getTopDateString = () => {
     const el_date_from = document.getElementById("date_from");
@@ -125,7 +120,7 @@ const getTopDateString = () => {
     let el_date = document.getElementById(`date-${el_date_from.value}`);
     while ( el_date.offsetTop < win_top ) {
         const d1 = new Date(el_date.id.replace('date-',''));
-        const d1_str = getJSTDateString(shiftDays(d1, 1));
+        const d1_str = getLocaltimeDateString(shiftDays(d1, 1));
         el_date = document.getElementById(`date-${d1_str}`);
     }
     // console.log(`getTopDateString: el_date.id=${el_date.id}`);
@@ -133,8 +128,9 @@ const getTopDateString = () => {
 };
 
 /**
+ * 画面の一番下に表示されている日付を取得
  *
- * @return {String} date_str: "date-YYYY-MM-DD"
+ * @return {String} date_str: "YYYY-MM-DD"
  */
 const getBottomDateString = () => {
     const el_date_to = document.getElementById("date_to");
@@ -145,34 +141,59 @@ const getBottomDateString = () => {
     // console.log(`getBottomDate: el_date.id=${el_date.id}`);
     while ( el_date.offsetTop + el_date.offsetHeight > win_bottom ) {
         const d1 = new Date(el_date.id.replace('date-',''));
-        const d1_str = getJSTDateString(shiftDays(d1, -1));
+        const d1_str = getLocaltimeDateString(shiftDays(d1, -1));
         el_date = document.getElementById(`date-${d1_str}`);
     }
     return el_date.id.replace('date-', '');
 };
 
 /**
+ * 日数計算
+ *
+ * @param {Date} d_from
+ * @param {Date} d_to
+ *
+ * @return {number} days
+ */
+const calcDays = (d_from, d_to) => {
+    const days = (d_to - d_from) / (24 * 60 * 60* 1000);
+    return days;
+};
+
+/**
+ * 今日からの日数
+ *
+ * !! Important !!
+ *
+ * new Date()の日付の区切り文字は、
+ * '/' だとJST, '-'だとUTCと見なされるが、
+ *
+ * ここでは、どちらもLocaltimeと見なす。
+ *
+ * (ex.)
+ * new Date('2021/01/01') - new Date('2021-01-01T00:00:00.000Z')
+ * 2021/01/01,00:00:00(JST) - 2021/01/01,00:00:00(UTC) = -9h
+ *
+ * @param {String} date_str  ex. "2021-01-01" or "2021/01/01"
+ *
  * @return {number} days
  */
 const getDaysFromToday = (date_str) => {
-    /*
-     * !! Important !!
-     *
-     * new Date()の日付の区切り文字が '/' だとJST, '-'だとUTC !!
-     * 区切り文字を '-'に揃える
-     */
-    const d_date = new Date(date_str.split('/').join('-'));
-    const d_today = new Date(getJSTDateString(new Date()));
+    const d_date = new Date(date_str.split('-').join('/'));
+    const d_today = new Date(getLocaltimeDateString(new Date()));
     const days = calcDays(d_today, d_date);
     return days;
 };
 
 /**
+ * formタグを新たに生成し、
+ * hiddenタイプの inputタグを生成して、
+ * POSTする。
  *
+ * @param {String} path
+ * @param {Object} data   {param1_name: value1, param2_name: value2, ..}
  */
 const doPost = (path, data) => {
-    console.log(`doPost(${path})`);
-
     const form = document.createElement("form");
     form.setAttribute("action", path);
     form.setAttribute("method", "POST");
@@ -192,20 +213,25 @@ const doPost = (path, data) => {
 };
 
 /**
- *
+ * @param {String} path
+ * @param {String} date   'YYYY-mm-dd'
+ * @param {number} days
+ * @param {String} sde_align
  */
 const doPostDate = (path, date, days = 0, sde_align = undefined) => {
     console.log(`doPostDate: sde_align=${sde_align}`);
-    let d1 = new Date(date);
+
+    // dateをJSTとみなすために、区切りを '/'に変換
+    let d1 = new Date(date.split('-').join('/'));
     d1 = shiftDays(d1, days);
-    d1_str = getJSTDateString(d1);
+    d1_str = getLocaltimeDateString(d1);
     console.log(`date=${date}, d1_str=${d1_str}`);
 
     data_obj = {date: d1_str};
     if ( sde_align ) {
-        data_obj["sde_align"] = sde_align;
+        data_obj.sde_align = sde_align;
     }
-    doPost(path, {date: d1_str});
+    doPost(path, data_obj);
 };
 
 /**
@@ -267,7 +293,8 @@ const scrollHdr = (event) => {
  *
  */
 const scrollHdr0 = (event) => {
-    dispGage(true);
+    const top_date_str = getTopDateString();
+    dispGage(top_date_str);
     
     if (scrollHdrTimer > 0) {
         clearTimeout(scrollHdrTimer);
@@ -289,7 +316,6 @@ const scrollToId = (id, sde_align = "top", behavior = "smooth") => {
     elMain.style.visibility = "visible";
     if (body_h <= win_h) {
         console.log(`body_h=${body_h} < win_h=${win_h}`);
-        dispGage(false);
         return true;
     }
 
@@ -361,7 +387,7 @@ const moveToMonday = (direction=1, path, behavior="smooth") => {
     const el_cur_day = document.getElementById("cur_day");
     let cur_day = new Date(el_cur_day.value);
     console.log(`moveToMonday:path=${path}`);
-    console.log(`moveToMonday:cur_day=${getJSTString(cur_day)}`);
+    console.log(`moveToMonday:cur_day=${getLocaltimeString(cur_day)}`);
 
     let wday = cur_day.getDay(); // 0:Sun, 1:Mon, ..
     if (wday == 0) {
@@ -384,12 +410,12 @@ const moveToMonday = (direction=1, path, behavior="smooth") => {
     
     let d1 = new Date(el_cur_day.value);
     d1 = shiftDays(d1, days);
-    d1_str = getJSTDateString(d1);
+    d1_str = getLocaltimeDateString(d1);
     console.log(`moveToMonday:d1_str=${d1_str}`);
 
     let d2 = new Date(el_cur_day.value);
     d2 = shiftDays(d2, days2);
-    d2_str = getJSTDateString(d2);
+    d2_str = getLocaltimeDateString(d2);
     console.log(`moveToMonday:d2_str=${d2_str}`);
 
     el_d2 = document.getElementById(`date-${d2_str}`);
