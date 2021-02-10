@@ -74,6 +74,7 @@ class MainHandler(HandlerBase):
 
     TODO_DAYS = {'off': 0,
                  '1W': 7,
+                 '2W': 14,
                  '1M': 30,
                  '3M': 93,
                  '1Y': 365,
