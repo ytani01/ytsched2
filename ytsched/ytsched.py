@@ -246,7 +246,9 @@ class SchedDataEnt:
     def get_sortkey(self):
         """
         """
-        sort_key = '%s %s' % (self.get_date(), self.get_timestr())
+        sort_key = '%02d%02d%02d %s' % (
+            self.date.year, self.date.month, self.date.day,
+            self.get_timestr())
         if sort_key.endswith(':-:'):
             if self.is_holiday():
                 sort_key = sort_key.replace(':-:', '  :  -  :  ')
