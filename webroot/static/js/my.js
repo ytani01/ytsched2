@@ -9,20 +9,26 @@ let elMain;
 let elGageR0;
 let scrollHdrTimer = 0;
 
-const days2yOffset = (d) => {
+/**
+ * @param {number} days
+ *
+ * @return {number} yOffset
+ */
+const days2yOffset = (days) => {
     const dd = 0.6;
     const a = 70;
     const b = 0;
 
-    if (d == 0) {
+    // console.log(`days=${days}`);
+    if (days == 0) {
         return 0;
     }
     
-    const y = Math.round(Math.log10(Math.abs(d) + dd) * a + b);
-    if (d < 0) {
-        return -y;
+    const yOffset = Math.round(Math.log10(Math.abs(days) + dd) * a + b);
+    if (days < 0) {
+        return -yOffset;
     }
-    return y;
+    return yOffset;
 };
 
 /**
@@ -34,14 +40,16 @@ const dispGage = (date_str) => {
         return;
     }
 
-    console.log(`date_str=${date_str}`);
+    // console.log(`date_str=${date_str}`);
     const top_rel_days = getDaysFromToday(date_str);
 
     //
     // gage
     //
     const centerY = document.documentElement.clientHeight / 2 + 40;
-    const gageBottom = centerY - days2yOffset(top_rel_days);
+    const yOffset = days2yOffset(top_rel_days);
+    // console.log(`centerY=${centerY}, yOffset=${yOffset}`);
+    const gageBottom = centerY - yOffset;
 
     // console.log(`dispGage: gageBottom=${gageBottom}`);
     elGageR0.style.bottom = `${gageBottom}px`;
@@ -179,7 +187,7 @@ const calcDays = (d_from, d_to) => {
  * @return {number} days
  */
 const getDaysFromToday = (date_str) => {
-    const d_date = new Date(date_str.split('-').join('/'));
+    const d_date = new Date(date_str.split('/').join('-'));
     const d_today = new Date(getLocaltimeDateString(new Date()));
     const days = calcDays(d_today, d_date);
     return days;

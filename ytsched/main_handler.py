@@ -23,7 +23,7 @@ def days2y_offset(days: float) -> int:
 
     Returns
     -------
-    offset: int
+    y_offset: int
 
     """
     dd = 0.6
@@ -33,11 +33,11 @@ def days2y_offset(days: float) -> int:
     if days == 0:
         return 0
 
-    offset = round(math.log10(float(abs(days)) + dd) * a + b)
+    y_offset = round(math.log10(float(abs(days)) + dd) * a + b)
 
     if days < 0:
-        return -offset
-    return offset
+        return -y_offset
+    return y_offset
 
 
 DAYS_MONTH = (31+28+31+30+31+30+31+31+30+31+30+31)/12
