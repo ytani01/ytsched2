@@ -43,23 +43,23 @@ def days2y_offset(days: float) -> int:
 DAYS_MONTH = (31+28+31+30+31+30+31+31+30+31+30+31)/12
 DAYS_YEAR = 365.25
 GAGE = [
-    {'label': '-20Y', 'y_offset': days2y_offset(-DAYS_YEAR * 20)},
+    {'label': '-30Y', 'y_offset': days2y_offset(-DAYS_YEAR * 30)},
     {'label': '-10Y', 'y_offset': days2y_offset(-DAYS_YEAR * 10)},
     {'label':  '-3Y', 'y_offset': days2y_offset(-DAYS_YEAR * 3)},
     {'label':  '-1Y', 'y_offset': days2y_offset(-DAYS_YEAR * 1)},
     {'label':  '-3M', 'y_offset': days2y_offset(-DAYS_MONTH * 3)},
     {'label':  '-1M', 'y_offset': days2y_offset(-DAYS_MONTH * 1)},
     {'label':  '-1w', 'y_offset': days2y_offset(   -7)},
-    {'label':  '-2d', 'y_offset': days2y_offset(   -2)},
-    {'label':  '+2d', 'y_offset': days2y_offset(   +2)},
+    {'label':  '-3d', 'y_offset': days2y_offset(   -3)},
+
+    {'label':  '+3d', 'y_offset': days2y_offset(   +3)},
     {'label':  '+1w', 'y_offset': days2y_offset(   +7)},
     {'label':  '+1M', 'y_offset': days2y_offset(+DAYS_MONTH * 1)},
     {'label':  '+3M', 'y_offset': days2y_offset(+DAYS_MONTH * 3)},
     {'label':  '+1Y', 'y_offset': days2y_offset(+DAYS_YEAR * 1)},
-    {'label':  '+2Y', 'y_offset': days2y_offset(+DAYS_YEAR * 2)},
-    {'label':  '+5Y', 'y_offset': days2y_offset(+DAYS_YEAR * 5)},
+    {'label':  '+3Y', 'y_offset': days2y_offset(+DAYS_YEAR * 3)},
     {'label': '+10Y', 'y_offset': days2y_offset(+DAYS_YEAR * 10)},
-    {'label': '+20Y', 'y_offset': days2y_offset(+DAYS_YEAR * 20)},
+    {'label': '+30Y', 'y_offset': days2y_offset(+DAYS_YEAR * 30)},
 ]
 
 
@@ -67,7 +67,7 @@ class MainHandler(HandlerBase):
     """
     Web request handler
     """
-    DEF_DAYS = 50
+    DEF_DAYS = 40
     SEARCH_MODE_MAX_DAYS = 365 * 5
     SEARCH_MODE_DAYS = 365
     DEF_SEARCH_N = 5
