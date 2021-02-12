@@ -41,7 +41,7 @@
   {% end %}
 {% end %}
 
-{% set sde_title = '(no title)' %}
+{% set sde_title = '__' %}
 {% if sde.title %}
   {% set sde_title = sde.title %}
 {% end %}
@@ -83,7 +83,9 @@ AAA {{ detail }}
     <div class="row m-0">
       {% if not sde.is_todo() %}
       <div class="col-1 p-0 text-left"
-           style="font-size:xx-small; font-weight:bold; line-height: 12px">
+           style="font-size:xx-small;
+                  font-weight:bold;
+                  line-height: 12px">
         {{ time_start }}<br/>{{ time_end }}
       </div>
       {% else %}
