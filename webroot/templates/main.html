@@ -160,9 +160,9 @@
 
       <!-- 検索期間・件数 -->
       <div class="col-10 p-0 text-left">
-        <span style="font-size: small;">
-          {{ str(date_from).replace('-', '/')[:5] }}</span>
-        <span>{{ str(date_from).replace('-', '/')[5:] }}</span>
+        <span style="font-size: large;">
+          {{ date_from.strftime('%Y/%m/%d') }}
+        </span>
 
         <i class="fas fa-arrows-alt-h"></i>
 
@@ -183,7 +183,7 @@
           {% end %}
         </select>
         {% set days = date_to - date_from + delta_day1 %}
-        ({{ str(days)[:-9] }})
+        (in {{ str(days)[:-9] }})
       </div>
     </div>
     {% end %}
@@ -196,12 +196,11 @@
     {% set sched_date = sched_ent['date'] %}
 
     <!-- {{ sched_date }} -->
+    {% set today_flag = False %}
+    {% set date_border = 'border: 2px solid #888 !important;' %}
     {% if sched_date == today %}
       {% set today_flag = True %}
-      {% set border = 'border: 6px solid #1DF !important;' %}
-    {% else %}
-      {% set today_flag = False %}
-      {% set border = 'border: 2px solid #888 !important;' %}
+      {% set date_border = 'border: 4px solid #28F !important;' %}
     {% end %}
 
     {% if sched_date == date %}
@@ -220,7 +219,7 @@
          class="row p-0 m-0 border"
          style="background-color: #EEE;
                 border-radius: 0px 15px 15px 0px;
-                {{ border }}">
+                {{ date_border }}">
 
       <!-- 日付 -->
       {% set weekday = sched_date.weekday() %}
@@ -232,28 +231,26 @@
       {% set obj = {'date': str(sched_date), 'search_str': '' } %}
       <div class="col-1 p-0 text-center my-btn {{ class_blink }}"
            style="background-color: {{ bg_color }};
-                  border-radius: 0px 15px 15px 0px;"
+                  border: 1px #888 solid;
+                  border-radius: 0px 5px 10px 0px;"
            onmousedown="doPost({{ url }}, {{ obj }});">
 
+        {% set font_size = 'large' %}
+        {% set font_weight = 'unset' %}
         {% if today_flag %}
-          {% set font_size = 'x-large' %}
           {% set font_weight = 'bold' %}
-        {% else %}
-          {% set font_size = 'large' %}
-          {% set font_weight = 'unset' %}
         {% end %}
 
         <div style="text-align: left;
                     font-size: x-small;
                     font-weight: {{ font_weight }};
                     line-height: 12px;">
-          {{ sched_date.year }}<br />
-          {{ '%02d' % sched_ent['date'].month }} /
+          {{ sched_date.strftime('%y/%m') }}
         </div>
         <div style="text-align: center;
                     font-size: {{ font_size }};
                     font-weight: {{ font_weight }};
-                    line-height: 24px">
+                    line-height: 16px">
           {{ '%02d' % sched_date.day }}
         </div>
         <div style="text-align: right;
@@ -265,10 +262,10 @@
         {% set days = (sched_date - today).days %}
         {% from monthdelta import monthmod %}
         {% set months = monthmod(today, sched_date) %}
-        <div style="text-align: left;
-                    font-size:x-small;
+        <div style="text-align: center;
+                    font-size: x-small;
                     font-weight:{{ font_weight }};
-                    line-height: 12px">
+                    line-height: 14px">
           {{ '%+d' % days }}
         </div>
       </div><!-- col -->
