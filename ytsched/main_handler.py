@@ -112,10 +112,12 @@ class MainHandler(HandlerBase):
         self._mylog.debug('request=%s', self.request)
         self._mylog.debug('request.path=%s', self.request.path)
 
+        """
         if self.request.uri != self._url_prefix:
             self._mylog.warning('redirect: %s', self._url_prefix)
             self.redirect(self._url_prefix)
             return
+        """
 
         modified_sde_id = self.get_argument('sde_id', '')
 

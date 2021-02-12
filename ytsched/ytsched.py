@@ -13,6 +13,7 @@ import os
 import shutil
 import re
 import datetime
+import collections
 from .my_logger import get_logger
 
 
@@ -553,7 +554,8 @@ class SchedData:
     sdf1, sf2, ..    : SchedDataFile
 
     """
-    DEF_CACHE_SIZE = 1000
+    DEF_CACHE_SIZE = 10000
+    CACHE_DISCARD_RATE = 0.1
 
     _mylog = get_logger(__name__, False)
 
@@ -574,13 +576,26 @@ class SchedData:
         self._cache_size = cache_size
         self._topdir = topdir
 
-        self._sdf_cache = {}
+        self._sdf_cache = collections.OrderedDict()
 
     def __str__(self):
         """ __str__ """
         out_str = 'topdir:%s, cache_size:%s' % (
             self._topdir, len(self._sdf_cache))
         return out_str
+
+    def get_keys(self):
+        """
+        Returns
+        -------
+        date_list: list of str ['2021-01-01', '2021-01-02', .. ]
+        
+        """
+        date_list = []
+        for k in self._sdf_cache.keys():
+            date_list.append('%s' % k)
+
+        return date_list
 
     def get_cache_size(self):
         return len(self._sdf_cache)
@@ -604,12 +619,24 @@ class SchedData:
         # self._mylog.debug('date=%s', date)
 
         try:
-            sdf = self._sdf_cache[date]
+            # self._mylog.debug('_sdf.keys=%s', self.get_keys())
+            sdf = self._sdf_cache.pop(date)
+            self._sdf_cache[date] = sdf
+            # self._mylog.debug('_sdf.keys=%s', self.get_keys())
         except KeyError:
-            self._mylog.debug('cache miss: date=%s', date)
+            self._mylog.warning('cache miss: date=%s', date)
+
+            if self.get_cache_size() >= self._cache_size:
+                discard_size = int(
+                    self._cache_size * self.CACHE_DISCARD_RATE)
+                for i in range(discard_size):
+                    sdf = self._sdf_cache.popitem(last=False)
+                    # self._mylog.debug('discard[%s/%s]: date=%s',
+                    #                   i + 1, discard_size, sdf[0])
 
             sdf = SchedDataFile(date, self._topdir, debug=self._dbg)
             self._sdf_cache[date] = sdf
+            # self._mylog.debug('_sdf.keys=%s', self.get_keys())
 
         # if not sdf.sde:
             # self._mylog.warning('%s sdf.sde=%s', date, sdf.sde)
