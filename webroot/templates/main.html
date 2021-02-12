@@ -198,14 +198,16 @@
     <!-- {{ sched_date }} -->
     {% if sched_date == today %}
       {% set today_flag = True %}
-    {% else %}
-      {% set today_flag = False %}
-    {% end %}
-
-    {% if today_flag %}
       {% set border = 'border: 6px solid #1DF !important;' %}
     {% else %}
+      {% set today_flag = False %}
       {% set border = 'border: 2px solid #888 !important;' %}
+    {% end %}
+
+    {% if sched_date == date %}
+      {% set class_blink = 'blink' %}
+    {% else %}
+      {% set class_blink = '' %}
     {% end %}
 
     {% if search_str %}
@@ -228,7 +230,7 @@
 
       {% set url = url_prefix %}
       {% set obj = {'date': str(sched_date), 'search_str': '' } %}
-      <div class="col-1 p-0 text-center my-btn"
+      <div class="col-1 p-0 text-center my-btn {{ class_blink }}"
            style="background-color: {{ bg_color }};
                   border-radius: 0px 15px 15px 0px;"
            onmousedown="doPost({{ url }}, {{ obj }});">

@@ -1,3 +1,19 @@
+@keyframes blink-border {
+    0% { border-color: #F00 !important; }
+    100% { border-color:#fff !important; }
+}
+
+
+@keyframes blink {
+    0% { opacity: 0.1; }
+    100% { opacity: 1; }
+}
+
+.blink {
+    animation: blink .5s ease-in-out infinite alternate;
+    animation-iteration-count: 10;
+}
+
 .my-bar {
     color: white;
     background-color: #48C;

@@ -117,6 +117,8 @@ class MainHandler(HandlerBase):
             self.redirect(self._url_prefix)
             return
 
+        modified_sde_id = self.get_argument('sde_id', '')
+
         #
         # search_str
         #
@@ -430,6 +432,7 @@ class MainHandler(HandlerBase):
                     date_from=date_from,
                     date_to=date_to,
                     sched=sched,
+                    modified_sde_id=modified_sde_id,
                     todo=todo_sde,
                     todo_days_list=self.TODO_DAYS,
                     todo_days_value=todo_days_value,
