@@ -554,7 +554,7 @@ class SchedData:
     sdf1, sf2, ..    : SchedDataFile
 
     """
-    DEF_CACHE_SIZE = 10000
+    DEF_CACHE_SIZE = 20000
     CACHE_DISCARD_RATE = 0.1
 
     _mylog = get_logger(__name__, False)
