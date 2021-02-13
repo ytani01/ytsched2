@@ -36,7 +36,7 @@
         busyFlag = false;
     };
 
-    const doSubmit = (cmd) => {
+    const submitCmd = (cmd) => {
         if ( busyFlag ) {
             return;
         }
@@ -45,6 +45,7 @@
         console.log(`cmd=${cmd}`);
         const form = document.forms["input_form"];
         form.appendChild(mkInput(cmd));
+        loadingSpinner(true);
         form.submit();
     };
 
@@ -105,6 +106,13 @@
     window.addEventListener('rotationchange', function() {
       changeDetailHeight();
     });
+
+    const onloadHdr = (event) => {
+      elLoadingSpinner = document.getElementById("loadingSpinner");
+      loadingSpinner(false);
+    };      
+
+    window.addEventListener('load', onloadHdr);
   </script>
   
   <div id="menu" name="menu"
@@ -119,12 +127,12 @@
       -->
 
       <div class="col-2 text-center my-btn"
-           onmousedown="doSubmit('update');">
+           onmousedown="submitCmd('update');">
         <i class="fas fa-sync fa-2x"></i>
       </div><!-- col -->
 
       <div class="col-2 text-center my-btn"
-           onmousedown="doSubmit('fix');">
+           onmousedown="submitCmd('fix');">
         <i class="fas fa-check-square fa-2x"></i>
       </div><!-- col -->
 
@@ -133,7 +141,7 @@
       </div><!-- col -->
       {% else %}
       <div class="col-2 text-center my-btn"
-           onmousedown="doSubmit('add');">
+           onmousedown="submitCmd('add');">
         <i class="fas fa-clone fa-2x"></i>
       </div><!-- col -->
       {% end %}
@@ -142,7 +150,7 @@
       </div>
       
       <div class="col-2 text-center my-btn"
-           onmousedown="doSubmit('del');">
+           onmousedown="submitCmd('del');">
         <i class="fas fa-trash-alt fa-2x"></i>
       </div><!-- col -->
 
@@ -150,6 +158,14 @@
   </div><!-- container -->
 </header>
 <main style="background-color: #FFF; padding-bottom: 45px;">
+  <div id="loadingSpinner"
+       style="position: fixed;
+              left: 50%; bottom: 55%; transform: translate(-50%, 50%);
+              opacity: 0.3;
+              z-index: 1000;">
+    <!-- <i class="fas fa-sync fa-9x fa-spin"></i> -->
+    <i class="fas fa-spinner fa-9x fa-spin"></i>
+  </div>
   <form id="input_form" name="input_form"
         action="{{ post_url }}" method="POST">
 
@@ -254,7 +270,7 @@
       <div id="div_detail" class="row p-0" style="font-size: large;">
         <div class="col p-0">
           <textarea id="detail" name="detail" style="width: 100%;"
-                    onchange="doSubmit('update');">
+                    onchange="submitCmd('update');">
             {{ sde.detail }}</textarea>
         </div><!-- col -->
       </div><!-- row -->
