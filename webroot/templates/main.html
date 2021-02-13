@@ -254,10 +254,11 @@
         {% end %}
 
         <div style="text-align: left;
-                    font-size: x-small;
                     font-weight: {{ font_weight }};
                     line-height: 12px;">
-          {{ sched_date.strftime('%y/%m') }}
+          <span style="font-size: xx-small;">
+            {{ sched_date.strftime('%y/') }}</span><span style="font-size: small;">{{ sched_date.strftime('%m') }}
+          </span>
         </div>
         <div style="text-align: center;
                     font-size: {{ font_size }};
