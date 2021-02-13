@@ -67,7 +67,7 @@ class MainHandler(HandlerBase):
     """
     Web request handler
     """
-    DEF_DAYS = 40
+    DEF_DAYS = 50
     SEARCH_MODE_MAX_DAYS = 365 * 5
     SEARCH_MODE_DAYS = 365
     DEF_SEARCH_N = 5
