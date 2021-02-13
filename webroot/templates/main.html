@@ -35,6 +35,9 @@
     };
 
     const onloadHdr = (event) => {
+      elLoadingSpinner = document.getElementById("loadingSpinner");
+      loadingSpinner(false);
+      
       elMain = document.getElementById("main"); // declared in my.js
 
       const el_home_button = document.getElementById("home_button");
@@ -104,6 +107,14 @@
 </header>
 <main id="main" style="background-color:#FFF; visibility: hidden;
                        padding-left:22px">
+  <div id="loadingSpinner"
+       style="position: fixed;
+              left: 50%; bottom: 55%; transform: translate(-50%, 50%);
+              opacity: 0.3;
+              z-index: 1000;">
+    <!-- <i class="fas fa-sync fa-9x fa-spin"></i> -->
+    <i class="fas fa-spinner fa-9x fa-spin"></i>
+  </div>
   <div class="container-fluid p-0">
     
     <!-- hidden params -->
@@ -152,7 +163,7 @@
                         '{{ url_prefix }}',
                         '{{ date }}',
                         {{ str(date_from - date_to)[:-14] }} );">
-        <i class="fas fa-search fa-lg fa-spin"
+        <i class="fas fa-search fa-lg"
            style="vertical-align: middle;"></i><br />
         <i class="fas fa-arrow-alt-circle-up fa-lg"
            style="vertical-align: middle;"></i>
@@ -229,7 +240,8 @@
 
       {% set url = url_prefix %}
       {% set obj = {'date': str(sched_date), 'search_str': '' } %}
-      <div class="col-1 p-0 text-center my-btn {{ class_blink }}"
+      <div class="col-1 p-0 text-center my-btn
+                  {{ class_blink }}"
            style="background-color: {{ bg_color }};
                   border: 1px #888 solid;
                   border-radius: 0px 5px 10px 0px;"
@@ -352,14 +364,9 @@
         <form id="form_search" name="form_search"
               action="{{ url_prefix }}" method="POST">
 
-          {% if search_str %}
-            {% set search_spin="fa-spin" %}
-          {% else %}
-            {% set search_spin="" %}
-          {% end %}
-          <i class="fas fa-search fa-lg my-btn {{ search_spin }}"
+          <i class="fas fa-search fa-lg my-btn"
              style="vertical-align: middle;"
-             onmousedown="document.form_search.submit();"></i>
+             onmousedown="doSubmit('form_search');"></i>
           <input id="search_str" name="search_str"
                  type="text" size="9"
                  style="font-size: small; vertical-align: middle;"
@@ -410,7 +417,7 @@
              style="vertical-align: middle;"></i>
           <select id="todo_days" name="todo_days"
                   style="vertical-align: middle;"
-                  onchange="document.todo_days_form.submit();">
+                  onchange="doSubmit('todo_days_form');">
             {% for opt in todo_days_list %}
             {% if todo_days_list[opt] == todo_days_value %}
             <option value="{{ todo_days_list[opt] }}" selected>
@@ -432,7 +439,7 @@
               action="{{ url_prefix }}" method="POST">
           <i class="fas fa-filter fa-2x my-btn"
              style="vertical-align: middle;"
-             onmousedown="document.form_filter.submit();"></i>
+             onmousedown="doSubmit('form_filter');"></i>
           <input id="filter_str" name="filter_str" type="text" size="7"
                  style="vertical-align: middle;"
                  value="{{ filter_str }}" />

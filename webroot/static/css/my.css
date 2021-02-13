@@ -1,17 +1,27 @@
-@keyframes blink-border {
-    0% { border-color: #F00 !important; }
-    100% { border-color:#fff !important; }
+@keyframes blinkborder {
+    0% { border: 1px solid #00F !important };
+    50% { border: 1px solid #F00 !important };
 }
 
 
+.blinkborder {
+/*    border: 1px solid #0F0 !important; */
+    animation: blinkborder 1s alternate !important;
+}
+
 @keyframes blink {
-    0% { opacity: 0.1; }
-    100% { opacity: 1; }
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 1;
+        background-color: #8F8;
+    }
 }
 
 .blink {
-    animation: blink .5s ease-in-out infinite alternate;
-    animation-iteration-count: 10;
+    animation: blink .5s ease-in-out alternate;
+    animation-iteration-count: 8;
 }
 
 .my-bar {

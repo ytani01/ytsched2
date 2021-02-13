@@ -5,9 +5,21 @@
 /*
  */
 
+let elLoadingSpinner;
 let elMain;
 let elGageR0;
 let scrollHdrTimer = 0;
+
+/**
+ *
+ */
+const loadingSpinner = (on) => {
+    if (on) {
+        elLoadingSpinner.style.display = "block";
+    } else {
+        elLoadingSpinner.style.display = "none";
+    }
+};
 
 /**
  * @param {number} days
@@ -194,6 +206,15 @@ const getDaysFromToday = (date_str) => {
 };
 
 /**
+ *
+ */
+const doSubmit = (id) => {
+    loadingSpinner(true);
+    const el = document.getElementById(id);
+    el.submit();
+};
+
+/**
  * formタグを新たに生成し、
  * hiddenタイプの inputタグを生成して、
  * POSTする。
@@ -202,6 +223,8 @@ const getDaysFromToday = (date_str) => {
  * @param {Object} data   {param1_name: value1, param2_name: value2, ..}
  */
 const doPost = (path, data) => {
+    loadingSpinner(true);
+
     const form = document.createElement("form");
     form.setAttribute("action", path);
     form.setAttribute("method", "POST");

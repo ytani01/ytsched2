@@ -73,12 +73,13 @@ class MainHandler(HandlerBase):
     DEF_SEARCH_N = 5
 
     TODO_DAYS = {'off': 0,
-                 '1W': 7,
-                 '2W': 14,
-                 '1M': 30,
-                 '3M': 93,
-                 '1Y': 365,
-                 '10Y': 365 * 10 + 2,
+                 '3d': 3,
+                 '1w': 7,
+                 '2w': 14,
+                 '1m': 30,
+                 '3m': 93,
+                 '1y': 365,
+                 '10y': 365 * 10 + 2,
                  'all': 365 * 100
                  }
     DEF_TODO_DAYS = 365
