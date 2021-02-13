@@ -406,12 +406,10 @@ class MainHandler(HandlerBase):
             if search_str and not out_sde:
                 continue
 
-            out_sde2 = sorted(out_sde, key=lambda x: x.get_sortkey())
-
             sched.append({
                 'date': date1,
                 'is_holiday': sdf.is_holiday,
-                'sde': out_sde2
+                'sde': out_sde
             })
 
         sched = sched[::-1]
