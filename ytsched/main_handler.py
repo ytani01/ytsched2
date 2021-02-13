@@ -292,27 +292,21 @@ class MainHandler(HandlerBase):
         todo_sdf = self._sd.get_sdf(None)
         todo_sde = []
         for sde in todo_sdf.sde:
-            if filter_str.startswith('!'):
-                try:
-                    if re.search(filter_str[1:],
-                                  sde.search_str()):
+            try:
+                if filter_str.startswith('!'):
+                    if re.search(filter_str[1:], sde.search_str()):
                         continue
-                except re.error as ex:
-                    self._mylog.warning(
-                        '%s:%s:%s:%s',
-                        type(ex).__name__, ex,
-                        filter_str, sde.search_str())
-                    continue
-            else:
-                try:
+
+                else:
                     if not re.search(filter_str, sde.search_str()):
                         continue
-                except re.error as ex:
-                    self._mylog.warning(
-                        '%s:%s:%s:%s',
-                        type(ex).__name__, ex,
-                        filter_str, sde.search_str())
-                    continue
+
+            except re.error as ex:
+                self._mylog.warning(
+                    '%s:%s:%s:%s',
+                    type(ex).__name__, ex,
+                    filter_str, sde.search_str())
+                continue
 
             if search_str:
                 try:

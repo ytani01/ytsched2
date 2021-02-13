@@ -2,9 +2,6 @@
  *   (c) 2021 Yoichi Tanibayashi
  */
 
-/*
- */
-
 let elLoadingSpinner;
 let elMain;
 let elGageR0;
@@ -389,7 +386,7 @@ const scrollToId = (id, sde_align = "top", behavior = "smooth") => {
 /**
  *
  */
-const scrollToDate = (path, date, sde_align="top", behavior="smooth") => {
+const scrollToDate = (path, date, sde_align="top", behavior="smooth", push_flag=true) => {
     scrollFlag = false;
     console.log(`scrollToDate:date=${date}, sde_align=${sde_align}`);
     
