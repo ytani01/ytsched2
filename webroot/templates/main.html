@@ -286,18 +286,23 @@
       <!-- スケジュール -->
       <div class="col-11 p-0">
         <!-- Normal Schedule -->
-        {% for sde in sched_ent['sde'] %}
-          {% include sde.html %}
-        {% end %}
-        
+        {% set sde1 = sched_ent['sde'] %}
+
         {% if today_flag and todo_days_value %}
           <!-- ToDo -->
           {% for sde in todo %}
             {% if sde.date <= today + delta_day1 * todo_days_value %}
-              {% include sde.html %}
+              {% set sde1.append(sde) %}
             {% end %}<!-- if sde.date -->
           {% end %}<!-- for sde -->
         {% end %}<!-- if today_flag and todo_days_value -->
+
+        {% set sde2 = sorted(sde1, key=lambda x: x.get_sortkey()) %}
+        {% for sde in sde2 %}
+          {% include sde.html %}
+        {% end %}
+        
+         <!-- スケジュール追加ボタン -->                              
          <div class="text-center my-btn" style="opacity: .4;"
            onmousedown="doPost(
                         '{{ url_prefix + 'edit/' }}',
