@@ -43,23 +43,23 @@ def days2y_offset(days: float) -> int:
 DAYS_MONTH = (31+28+31+30+31+30+31+31+30+31+30+31)/12
 DAYS_YEAR = 365.25
 GAGE = [
-    {'label': '-30Y', 'y_offset': days2y_offset(-DAYS_YEAR * 30)},
-    {'label': '-10Y', 'y_offset': days2y_offset(-DAYS_YEAR * 10)},
-    {'label':  '-3Y', 'y_offset': days2y_offset(-DAYS_YEAR * 3)},
-    {'label':  '-1Y', 'y_offset': days2y_offset(-DAYS_YEAR * 1)},
-    {'label':  '-3M', 'y_offset': days2y_offset(-DAYS_MONTH * 3)},
-    {'label':  '-1M', 'y_offset': days2y_offset(-DAYS_MONTH * 1)},
+    {'label': '-30y', 'y_offset': days2y_offset(-DAYS_YEAR * 30)},
+    {'label': '-10y', 'y_offset': days2y_offset(-DAYS_YEAR * 10)},
+    {'label':  '-3y', 'y_offset': days2y_offset(-DAYS_YEAR * 3)},
+    {'label':  '-1y', 'y_offset': days2y_offset(-DAYS_YEAR * 1)},
+    {'label':  '-3m', 'y_offset': days2y_offset(-DAYS_MONTH * 3)},
+    {'label':  '-1m', 'y_offset': days2y_offset(-DAYS_MONTH * 1)},
     {'label':  '-1w', 'y_offset': days2y_offset(   -7)},
     {'label':  '-3d', 'y_offset': days2y_offset(   -3)},
 
     {'label':  '+3d', 'y_offset': days2y_offset(   +3)},
     {'label':  '+1w', 'y_offset': days2y_offset(   +7)},
-    {'label':  '+1M', 'y_offset': days2y_offset(+DAYS_MONTH * 1)},
-    {'label':  '+3M', 'y_offset': days2y_offset(+DAYS_MONTH * 3)},
-    {'label':  '+1Y', 'y_offset': days2y_offset(+DAYS_YEAR * 1)},
-    {'label':  '+3Y', 'y_offset': days2y_offset(+DAYS_YEAR * 3)},
-    {'label': '+10Y', 'y_offset': days2y_offset(+DAYS_YEAR * 10)},
-    {'label': '+30Y', 'y_offset': days2y_offset(+DAYS_YEAR * 30)},
+    {'label':  '+1m', 'y_offset': days2y_offset(+DAYS_MONTH * 1)},
+    {'label':  '+3m', 'y_offset': days2y_offset(+DAYS_MONTH * 3)},
+    {'label':  '+1y', 'y_offset': days2y_offset(+DAYS_YEAR * 1)},
+    {'label':  '+3y', 'y_offset': days2y_offset(+DAYS_YEAR * 3)},
+    {'label': '+10y', 'y_offset': days2y_offset(+DAYS_YEAR * 10)},
+    {'label': '+30y', 'y_offset': days2y_offset(+DAYS_YEAR * 30)},
 ]
 
 
