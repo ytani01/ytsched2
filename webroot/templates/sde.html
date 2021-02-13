@@ -54,13 +54,14 @@
 {% set detail = sde.detail.rstrip('\n') %}
 AAA {{ detail }}
 
+{% set type_font_style="font-size: small; font-weight: normal" %}
+{% set title_font_style="font-size: medium; font-weight: normal" %}
 {% if sde.is_important() %}
+  {% set type_font_style="font-size: small; font-weight: bold" %}
   {% set title_font_style="font-size: medium; font-weight: bold" %}
 {% else %}
   {% if sde_title.startswith('(')  %}
     {% set title_font_style="font-size: small; font-weight: normal" %}
-  {% else %}
-    {% set title_font_style="font-size: medium; font-weight: normal" %}
   {% end %}
 {% end %}
 
@@ -127,7 +128,7 @@ AAA {{ detail }}
         </span>
         {% end %}<!-- if todo -->
 
-        <span style="font-size: small;">
+        <span style="{{ type_font_style }}">
           {{ sde_type }}
         </span>
         <span style="{{ title_font_style }}">

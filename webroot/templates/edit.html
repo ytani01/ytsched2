@@ -90,7 +90,10 @@
       const id_h = el_id.offsetHeight;
 
       const win_h = document.documentElement.clientHeight
-      const detail_h = win_h - detail_y - id_h - 7 - 50;
+      const detail_h = win_h - detail_y - id_h - 7 - 150;
+      if (detail_h < 100) {
+            detail_h = 100;
+      }
 
       el_detail.style.height = `${detail_h}px`;
     };
@@ -239,18 +242,18 @@
       </div><!-- row -->
 
       <!-- Type -->
-      <div class="row" style="font-size: x-large;">
-        <div class="col">
-          <span style="font-size: xx-large; font-width: bold;">【</span>
+      <div class="row">
+        <div class="col" style="font-size: large;">
+          <span style="font-size: x-large; font-width: bold;">【</span>
           <input id="sde_type" name="sde_type"
                  type="text" value="{{ sde.type }}"
                  style="width:70%;" />
-          <span style="font-size: xx-large; font-width: bold">】</span>
+          <span style="font-size: x-large; font-width: bold">】</span>
         </div><!-- col -->
       </div><!-- row -->
 
       <!-- タイトル -->
-      <div class="row" style="font-size: x-large;">
+      <div class="row" style="font-size: large;">
         <div class="col">
           <input id="title" name="title" style="width: 100%;"
                  type="text" value="{{ sde.title }}" />
@@ -258,7 +261,7 @@
       </div><!-- row -->
 
       <!-- 場所 -->
-      <div class="row" style="font-size: x-large;">
+      <div class="row" style="font-size: large;">
         <div class="col">
           <span style="font-size: large">@</span>
           <input id="place" name="place" style="width: 93.5%;"
