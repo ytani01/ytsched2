@@ -94,7 +94,7 @@ class EditHandler(HandlerBase):
 
         else:
             sde = SchedDataEnt('', date, debug=self._dbg)
-            self._mylog.debug('sde_id=%s', sde.id)
+            self._mylog.debug('sde_id=%s', sde.sde_id)
             new_flag = True
 
         self.render(self.HTML_EDIT,

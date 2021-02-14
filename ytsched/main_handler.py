@@ -145,23 +145,29 @@ class MainHandler(HandlerBase):
         #
         cmd = self.get_argument('cmd', None)
 
+        modified_date = None
+        modified_sde_id = None
         if cmd in ['add', 'fix', 'update', 'del']:
-            date, sde_id = self.exec_update(cmd)
+            modified_date, modified_sde_id = self.exec_update(cmd)
+            self._mylog.debug('modified_date=%s, modified_sde_id=%s',
+                              modified_date, modified_sde_id)
 
-            if cmd in ['update']:
-                sdf = self._sd.get_sdf(date)
-                sde = sdf.get_sde(sde_id)
-                date = sde.date
+            if cmd not in ['del']:
+                sdf = self._sd.get_sdf(modified_date)
+                sde = sdf.get_sde(modified_sde_id)
+                self._mylog.debug('sde=%s', sde)
+
                 todo_flag = sde.is_todo()
 
+            if cmd in ['update']:
                 self.render(self.HTML_EDIT,
                             title=self._title,
                             author=self._author,
                             version=self._version,
-
                             url_prefix=self._url_prefix,
+
                             post_url=self._url_prefix,
-                            date=date,
+                            date=modified_date,
                             sde=sde,
                             new_flag=False,
                             todo_flag=todo_flag,
@@ -185,6 +191,9 @@ class MainHandler(HandlerBase):
         self._mylog.debug('date_str=%s', date_str)
         if date_str:
             date = datetime.date.fromisoformat(date_str)
+
+        if modified_date:
+            date = modified_date
 
         year = self.get_argument('year', None)
         month = self.get_argument('month', None)
@@ -421,8 +430,8 @@ class MainHandler(HandlerBase):
                     title=self._title,
                     author=self._author,
                     version=self._version,
-
                     url_prefix=self._url_prefix,
+
                     today=datetime.date.today(),
                     delta_day1=delta_day1,
                     date=date,
@@ -441,7 +450,7 @@ class MainHandler(HandlerBase):
                     gage=GAGE,
                     )
 
-    def exec_update(self, cmd: str) -> datetime.date:
+    def exec_update(self, cmd: str) -> (datetime.date, str):
         """
         Parameters
         ----------
@@ -450,15 +459,13 @@ class MainHandler(HandlerBase):
         Returns
         -------
         date: datetime.date
-
-        sde_id: str
-
+            更新された日付
+        modified_sde_id: str
+            更新されたスケジュールID
         """
         self._mylog.debug('')
 
-        #
         # get orig_date
-        #
         orig_date = None
         orig_date_str = self.get_argument('orig_date', None)
         if orig_date_str:
@@ -466,9 +473,7 @@ class MainHandler(HandlerBase):
 
         self._mylog.debug('orig_date=%s', orig_date)
 
-        #
         # get (new) date
-        #
         date_str = self.get_argument('date', None)
         if date_str:
             date = datetime.date.fromisoformat(date_str)
@@ -477,9 +482,7 @@ class MainHandler(HandlerBase):
 
         self._mylog.debug('date=%s', date)
 
-        #
         # get times
-        #
         time_start_str = self.get_argument('time_start', None)
         if time_start_str:
             time_start = datetime.time.fromisoformat(time_start_str)
@@ -495,29 +498,21 @@ class MainHandler(HandlerBase):
         self._mylog.debug('time_start, time_end: %s-%s',
                           time_start, time_end)
 
-        #
         # get sde_type
-        #
         sde_type = self.get_argument('sde_type', '')
 #        if SchedDataEnt.type_is_todo(sde_type):
 #            date = datetime.date.today()
 
-        #
         # title & place
-        #
         title = self.get_argument('title', '')
         place = self.get_argument('place', '')
         self._mylog.debug('[%s]%s@%s', sde_type, title, place)
 
-        #
         # detail
-        #
         detail = self.get_argument('detail', '')
         self._mylog.debug('detail:\'%s\'', detail)
 
-        #
         # deadlines
-        #
         deadline_date = self.get_argument('deadline_date', None)
         deadline_time_start = self.get_argument('deadline_time_start',
                                                 None)
@@ -532,40 +527,36 @@ class MainHandler(HandlerBase):
                 detail)
             self._mylog.debug('[fix] date=%s', date)
             self._mylog.debug('[fix] detail=%s', detail)
-        #
+
         # sde_id
-        #
         sde_id = self.get_argument('sde_id')
         self._mylog.debug('sde_id=%s', sde_id)
 
-        #
         # exec cmd
-        #
-        if cmd == 'add':
-            self.cmd_add(None, date, time_start, time_end,
-                         sde_type, title, place, detail)
+        self._mylog.debug('EXEC: %s', cmd)
 
-        if cmd == 'del':
-            self.cmd_del(sde_id, orig_date)
-            date = orig_date
+        new_sde = None
+        modified_sde_id = None
 
-        if cmd == 'fix':
-            self._mylog.debug('EXEC [%s]', cmd)
-            self.cmd_del(sde_id, orig_date)
-            self.cmd_add(sde_id, date, time_start, time_end,
-                                sde_type, title, place, detail)
+        if cmd in ['add']:
+            sde_id = None
 
-        if cmd == 'update':
-            self._mylog.debug('EXEC [%s]', cmd)
+        if cmd in ['del', 'fix', 'update']:
             self.cmd_del(sde_id, orig_date)
+
+        if cmd in ['add', 'fix', 'update']:
             new_sde = self.cmd_add(sde_id, date, time_start, time_end,
                                    sde_type, title, place, detail)
+
+        if new_sde:
+            modified_sde_id = new_sde.sde_id
+            date = new_sde.date
             if new_sde.is_todo():
                 date = None
-                sde_id = new_sde.id
 
-        self._mylog.debug('date=%s, sde_id=%s', date, sde_id)
-        return date, sde_id
+        self._mylog.debug('date=%s, modified_sde_id=%s',
+                          date, modified_sde_id)
+        return date, modified_sde_id
 
     def cmd_add(self, sde_id, date, time_start, time_end,
                 sde_type, title, place, detail):

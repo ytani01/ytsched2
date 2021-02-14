@@ -67,14 +67,14 @@ AAA {{ detail }}
 
 -->
 <input id="sde_id" name="sde_id"
-       type="hidden" value="{{ sde.id }}" />
+       type="hidden" value="{{ sde.sde_id }}" />
 
 {% if sde.is_canceled() %}
 <del>
 {% end %}
 
 {% set class_blink = '' %}
-{% if sde.id == modified_sde_id %}
+{% if sde.sde_id == modified_sde_id %}
   {% set class_blink = 'blink' %}
 {% end %}
 
@@ -99,7 +99,7 @@ AAA {{ detail }}
                     {
                     orig_date: '{{ orig_date }}',
                     date:'{{ sched_date }}',
-                    sde_id: '{{ sde.id }}',
+                    sde_id: '{{ sde.sde_id }}',
                     todo_flag: {{ str(sde.is_todo()).lower() }},
                     cur_date: '{{ date }}',
                     date_from: '{{ date_from }}',

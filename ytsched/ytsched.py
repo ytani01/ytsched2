@@ -99,7 +99,7 @@ class SchedDataEnt:
 
     _mylog = get_logger(__name__, False)
 
-    def __init__(self, id=None,
+    def __init__(self, sde_id=None,
                  date: datetime.date = datetime.date.today(),
                  time_start: datetime.time = '',
                  time_end: datetime.time = '',
@@ -110,10 +110,10 @@ class SchedDataEnt:
         self.__class__._mylog = get_logger(self.__class__.__name__,
                                            self._dbg)
         self._mylog.debug('(%s)%s %s-%s [%s] %s @%s:\'%s\'',
-                          id, date, time_start, time_end,
+                          sde_id, date, time_start, time_end,
                           sde_type, title, place, detail)
 
-        self.id = id
+        self.sde_id = sde_id
         self.date = date
         self.time_start = time_start
         self.time_end = time_end
@@ -125,12 +125,12 @@ class SchedDataEnt:
         if not self.title:
             self.title = self.TITLE_NULL
 
-        if not self.id:
-            self.id = SchedDataEnt.new_id()
+        if not self.sde_id:
+            self.sde_id = SchedDataEnt.new_id()
 
     def __str__(self):
         """ str(self) """
-        out_str = '(%s) ' % (self.id)
+        out_str = '(%s) ' % (self.sde_id)
         out_str += self.date.strftime('%Y/%m/%d ')
 
         if self.time_start:
@@ -167,7 +167,7 @@ class SchedDataEnt:
         time_str = time_start_str + '-' + time_end_str
         text_htmlstr = text2htmlstr(self.detail)
 
-        return '\t'.join([self.id, date_str, time_str,
+        return '\t'.join([self.sde_id, date_str, time_str,
                           self.type, self.title, self.place,
                           text_htmlstr])
 
@@ -186,9 +186,9 @@ class SchedDataEnt:
 
     @classmethod
     def new_id(cls):
-        id = str(time.time()).replace('.', '-')
-        cls._mylog.debug('id=%s', id)
-        return id
+        sde_id = str(time.time()).replace('.', '-')
+        cls._mylog.debug('sde_id=%s', sde_id)
+        return sde_id
 
     @classmethod
     def type_is_todo(cls, sde_type: str) -> bool:
@@ -511,7 +511,7 @@ class SchedDataFile:
         """
         self._mylog.debug('sde_id=%s', sde_id)
         for sde in self.sde:
-            if sde.id == sde_id:
+            if sde.sde_id == sde_id:
                 self._mylog.debug('DEL:%s', sde)
                 self.sde.remove(sde)
                 break
@@ -533,7 +533,7 @@ class SchedDataFile:
         self._mylog.debug('sde_id=%s', sde_id)
 
         for sde in self.sde:
-            if sde_id == sde.id:
+            if sde_id == sde.sde_id:
                 return sde
 
         return None
