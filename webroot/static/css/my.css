@@ -21,7 +21,7 @@
 
 .blink {
     animation: blink .5s ease-in-out alternate;
-    animation-iteration-count: 8;
+    animation-iteration-count: 10;
 }
 
 .my-bar {
