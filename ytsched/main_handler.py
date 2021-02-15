@@ -158,6 +158,10 @@ class MainHandler(HandlerBase):
                 self._mylog.debug('sde=%s', sde)
 
                 todo_flag = sde.is_todo()
+                if todo_flag:
+                    modified_date = sde.date
+
+            self._mylog.debug('modified_date=%s', modified_date)
 
             if cmd in ['update']:
                 self.render(self.HTML_EDIT,
