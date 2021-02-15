@@ -107,9 +107,8 @@ AAA {{ detail }}
                     search_str: '{{ search_str }}',
                     });">
         {% if sde.is_todo() %}
-
           {% if sde.date != sched_date %}
-          {% set sde_date = str(sde.date).replace('-', '/') %}
+            {% set sde_date = str(sde.date).replace('-', '/') %}
         <span style="font-size:xx-small;
                      font-weight:bold;
                      display:inline-flex;
@@ -117,7 +116,7 @@ AAA {{ detail }}
                      line-height:12px">
           {{ sde_date[0:4] }}<br />{{ sde_date[5:] }}
         </span>
-          {% end %}<!-- sde.date != sched_date -->
+          {% end %}
 
         <span style="font-size:xx-small;
                      font-weight:bold;
@@ -126,7 +125,7 @@ AAA {{ detail }}
                      line-height:12px">
           {{ time_start }}<br />{{ time_end }}
         </span>
-        {% end %}<!-- if todo -->
+        {% end %}
 
         <span style="{{ type_font_style }}">
           {{ sde_type }}
