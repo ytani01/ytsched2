@@ -478,11 +478,10 @@ class MainHandler(HandlerBase):
         self._mylog.debug('orig_date=%s', orig_date)
 
         # get (new) date
+        date = None
         date_str = self.get_argument('date', None)
         if date_str:
             date = datetime.date.fromisoformat(date_str)
-        else:
-            date = datetime.date.today()
 
         self._mylog.debug('date=%s', date)
 
@@ -502,34 +501,39 @@ class MainHandler(HandlerBase):
         self._mylog.debug('time_start, time_end: %s-%s',
                           time_start, time_end)
 
-        # get sde_type
+        # get sde_type, title, place
         sde_type = self.get_argument('sde_type', '')
-#        if SchedDataEnt.type_is_todo(sde_type):
-#            date = datetime.date.today()
-
-        # title & place
         title = self.get_argument('title', '')
         place = self.get_argument('place', '')
         self._mylog.debug('[%s]%s@%s', sde_type, title, place)
 
-        # detail
+        # get detail
         detail = self.get_argument('detail', '')
         self._mylog.debug('detail:\'%s\'', detail)
 
-        # deadlines
-        deadline_date = self.get_argument('deadline_date', None)
-        deadline_time_start = self.get_argument('deadline_time_start',
-                                                None)
-        deadline_time_end = self.get_argument('deadline_time_end', None)
+        # set deadline_*
+        deadline_date_str = self.get_argument('deadline_date', '')
+        deadline_time_start_str = self.get_argument(
+            'deadline_time_start', '')
+        deadline_time_end_str = self.get_argument('deadline_time_end', '')
+        if deadline_time_end_str:
+            deadline_time_end_str = '-' + deadline_time_end_str
+        self._mylog.debug('deadline: %s %s%s',
+                          deadline_date_str,
+                          deadline_time_start_str, deadline_time_end_str)
 
-        if deadline_date and not SchedDataEnt.type_is_todo(sde_type):
+        if deadline_date_str and not SchedDataEnt.type_is_todo(sde_type):
             date = datetime.date.today()
-            time_start, time_end = None, None
-            detail = '〆%s %s-%s\n%s' % (
-                deadline_date.replace('-', '/'),
-                deadline_time_start, deadline_time_end,
-                detail)
             self._mylog.debug('[fix] date=%s', date)
+
+            time_start = datetime.datetime.now().time()
+            self._mylog.debug('[fix] time_start=%s', time_start)
+            time_end = None
+
+            detail = '〆%s %s%s\n%s' % (
+                deadline_date_str.replace('-', '/'),
+                deadline_time_start_str, deadline_time_end_str,
+                detail)
             self._mylog.debug('[fix] detail=%s', detail)
 
         # sde_id
@@ -546,7 +550,7 @@ class MainHandler(HandlerBase):
             sde_id = None
 
         if cmd in ['del', 'fix', 'update']:
-            self.cmd_del(sde_id, orig_date)
+            self.cmd_del(orig_date, sde_id)
 
         if cmd in ['add', 'fix', 'update']:
             new_sde = self.cmd_add(sde_id, date, time_start, time_end,
@@ -592,15 +596,15 @@ class MainHandler(HandlerBase):
 
         return new_sde
 
-    def cmd_del(self, sde_id, date):
+    def cmd_del(self, date, sde_id):
         """
         Parameters
         ----------
+        date: datetime.date
+
         sde_id: str
 
-        date:
-
         """
-        self._mylog.debug('sde_id=%s, date=%s', sde_id, date)
+        self._mylog.debug('date=%s, sde_id=%s', date, sde_id)
 
         self._sd.del_sde(date, sde_id)
