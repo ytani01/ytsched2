@@ -25,7 +25,7 @@
         scrollToDate('{{ url_prefix }}', '{{ today }}', 'top');
         
       } else { // double click
-        event.preventDefault() ;
+        //event.preventDefault() ;
 	clickCount = 0;
 	console.log( "double click" ) ;
         
@@ -244,7 +244,7 @@
                   {{ class_blink }}"
            style="background-color: {{ bg_color }};
                   border: 1px #888 solid;
-                  border-radius: 0px 2px 10px 0px;"
+                  border-radius: 0px 10px 10px 0px;"
            onmousedown="doPost({{ url }}, {{ obj }});">
 
         {% set font_size = 'large' %}
@@ -257,7 +257,11 @@
                     font-weight: {{ font_weight }};
                     line-height: 12px;">
           <span style="font-size: xx-small;">
-            {{ sched_date.strftime('%y/') }}</span><span style="font-size: small;">{{ sched_date.strftime('%m') }}
+            {{ sched_date.strftime('%Y') }}
+          </span>
+          <br />
+          <span style="font-size: small;">
+            {{ sched_date.strftime('%m/') }}
           </span>
         </div>
         <div style="text-align: center;
@@ -289,13 +293,12 @@
         {% set sde1 = sched_ent['sde'] %}
 
         {% if today_flag and todo_days_value %}
-          <!-- ToDo -->
           {% for sde in todo %}
             {% if sde.date <= today + delta_day1 * todo_days_value %}
               {% set sde1.append(sde) %}
-            {% end %}<!-- if sde.date -->
-          {% end %}<!-- for sde -->
-        {% end %}<!-- if today_flag and todo_days_value -->
+            {% end %}
+          {% end %}
+        {% end %}
 
         {% set sde2 = sorted(sde1, key=lambda x: x.get_sortkey()) %}
         {% for sde in sde2 %}
@@ -303,7 +306,8 @@
         {% end %}
         
          <!-- スケジュール追加ボタン -->                              
-         <div class="text-center my-btn" style="opacity: .4;"
+         <div class="text-center my-btn"
+              style="opacity: .4;"
            onmousedown="doPost(
                         '{{ url_prefix + 'edit/' }}',
                         {date: '{{ sched_date }}', sde_id: ''} );">

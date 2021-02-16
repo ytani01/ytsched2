@@ -46,24 +46,7 @@
   {% set sde_title = sde.title %}
 {% end %}
 
-{% set place = '' %}
-{% if sde.place %}
-  {% set place = '@' + sde.place %}
-{% end %}
-
 {% set detail = sde.detail.rstrip('\n') %}
-AAA {{ detail }}
-
-{% set type_font_style="font-size: small; font-weight: normal" %}
-{% set title_font_style="font-size: medium; font-weight: normal" %}
-{% if sde.is_important() %}
-  {% set type_font_style="font-size: small; font-weight: bold" %}
-  {% set title_font_style="font-size: medium; font-weight: bold" %}
-{% else %}
-  {% if sde_title.startswith('(')  %}
-    {% set title_font_style="font-size: small; font-weight: normal" %}
-  {% end %}
-{% end %}
 
 -->
 <input id="sde_id" name="sde_id"
@@ -79,7 +62,8 @@ AAA {{ detail }}
 {% end %}
 
 <div class="container-fluid p-0 border {{ class_blink }}"
-     style="background-color:{{ bg_color }};
+     style="font-size: 0;
+            background-color: {{ bg_color }};
             border-radius: 0px 15px 15px 10px;">
     <div class="row m-0">
       {% if not sde.is_todo() %}
@@ -127,23 +111,27 @@ AAA {{ detail }}
         </span>
         {% end %}
 
-        <span style="{{ type_font_style }}">
-          {{ sde_type }}
-        </span>
-        <span style="{{ title_font_style }}">
-          {{ sde_title }}
-        </span>
+        {% set type_font="font-size: small; font-weight: normal" %}
+        {% set title_font="font-size: medium; font-weight: normal" %}
+        {% if sde.is_important() %}
+          {% set type_font="font-size: small; font-weight: bold" %}
+          {% set title_font="font-size: medium; font-weight: bold" %}
+        {% end %}
+        <span style="{{ type_font }}">{{ sde_type }}</span>
+        <span style="{{ title_font }}">{{ sde_title }}</span>
+        {% if sde.place %}
         <span style="font-size: small">
-          {{ place }}
+          @{{ sde.place }}
         </span>
-      </div><!-- col -->
-    </div><!-- row -->
+        {% end %}
+      </div>
+    </div>
     {% if detail %}
     <div class="row m-0">
-      <div class="col-1 p-0"></div><!-- col -->
+      <div class="col-1 p-0"></div>
       <div class="col-11 p-0 longtext" tabindex="0"
-           style="font-size: small;">{{ detail }}</div><!-- col -->
-    </div><!-- row -->
+           style="font-size: small;">{{ detail }}</div>
+    </div>
     {% end %}
 </div><!-- container -->
 {% if sde.is_canceled() %}
