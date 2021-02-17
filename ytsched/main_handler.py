@@ -40,8 +40,10 @@ def days2y_offset(days: float) -> int:
     return y_offset
 
 
-DAYS_MONTH = (31+28+31+30+31+30+31+31+30+31+30+31)/12
-DAYS_YEAR = 365.25
+DAYS_YEAR = 31 + 28.25 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 + 30 + 31
+DAYS_MONTH = DAYS_YEAR / 12
+print('DAYS_YEAR=%s, DAYS_MONTH=%s' % (DAYS_YEAR, DAYS_MONTH))
+
 GAGE = [
     {'label': '-30y', 'y_offset': days2y_offset(-DAYS_YEAR * 30)},
     {'label': '-10y', 'y_offset': days2y_offset(-DAYS_YEAR * 10)},
@@ -95,30 +97,9 @@ class MainHandler(HandlerBase):
         self.get()
 
     def get(self):
-        """
-        GET method and rendering
-
-        date priority
-        1. get_argument('date')
-        2. get_argument('year', 'month', 'day')
-        3. today
-
-        Parameters
-        ----------
-        date: str
-
-        days: int
-            +/- days
-        """
+        """ GET method and rendering """
         self._mylog.debug('request=%s', self.request)
         self._mylog.debug('request.path=%s', self.request.path)
-
-        """
-        if self.request.uri != self._url_prefix:
-            self._mylog.warning('redirect: %s', self._url_prefix)
-            self.redirect(self._url_prefix)
-            return
-        """
 
         modified_sde_id = self.get_argument('sde_id', '')
 
@@ -127,7 +108,7 @@ class MainHandler(HandlerBase):
         #
         search_str0 = self.get_conf(self.CONF_KEY_SEARCH_STR)
         search_str = self.get_argument('search_str', None)
-        if search_str is not None:
+        if search_str:
             if search_str != search_str0:
                 self.set_conf(self.CONF_KEY_SEARCH_STR, search_str)
             else:
@@ -135,6 +116,7 @@ class MainHandler(HandlerBase):
 
         elif search_str0:
             search_str = search_str0
+
         else:
             search_str = ''
 
@@ -182,14 +164,14 @@ class MainHandler(HandlerBase):
         #
         # set Date
         #
-        date = None
+        cur_day = datetime.date.today() # default
 
-        cur_day = datetime.date.today()
         cur_day_str = self.get_argument('cur_day', None)
-        self._mylog.debug('cur_day_str=%s', cur_day_str)
         if cur_day_str:
             cur_day = datetime.date.fromisoformat(cur_day_str)
         self._mylog.debug('cur_day=%s', cur_day)
+
+        date = None # default
 
         date_str = self.get_argument('date', None)
         self._mylog.debug('date_str=%s', date_str)
@@ -218,8 +200,6 @@ class MainHandler(HandlerBase):
         self._mylog.debug('todo_days_value0=%s', todo_days_value0)
 
         todo_days_value = self.get_argument('todo_days', None)
-        self._mylog.debug('todo_days_value=%s', todo_days_value)
-
         if todo_days_value:
             if todo_days_value != todo_days_value0:
                 self.set_conf(self.CONF_KEY_TODO_DAYS, todo_days_value)
@@ -228,6 +208,7 @@ class MainHandler(HandlerBase):
 
         elif todo_days_value0:
             todo_days_value = todo_days_value0
+
         else:
             todo_days_value = self.DEF_TODO_DAYS
 
@@ -247,9 +228,10 @@ class MainHandler(HandlerBase):
         # filter_str
         #
         filter_str0 = self.get_conf(self.CONF_KEY_FILTER_STR)
-        filter_str = self.get_argument('filter_str', None)
-
-        if filter_str is not None:
+        self._mylog.debug('filter_str0=%a', filter_str0)
+        filter_str = self.get_argument('filter_str', '')
+        self._mylog.debug('filter_str=%a', filter_str)
+        if filter_str:
             if filter_str != filter_str0:
                 self.set_conf(self.CONF_KEY_FILTER_STR, filter_str)
             else:
@@ -257,16 +239,18 @@ class MainHandler(HandlerBase):
 
         elif filter_str0:
             filter_str = filter_str0
+
         else:
             filter_str = ''
 
-        self._mylog.debug('filter_str=\'%s\'', filter_str)
+        self._mylog.debug('filter_str=%a', filter_str)
 
         #
         # search_str
         #
         search_str0 = self.get_conf(self.CONF_KEY_SEARCH_STR)
         search_str = self.get_argument('search_str', None)
+        self._mylog.debug('search_str=\'%s\'', search_str)
         if search_str is not None:
             if search_str != search_str0:
                 self.set_conf(self.CONF_KEY_SEARCH_STR, search_str)
@@ -302,9 +286,14 @@ class MainHandler(HandlerBase):
         #
         # load ToDo
         #
+        today = datetime.date.today()
+
         todo_sdf = self._sd.get_sdf(None)
         todo_sde = []
         for sde in todo_sdf.sde:
+            if sde.date > today + datetime.timedelta(todo_days_value):
+                continue
+            
             try:
                 if filter_str.startswith('!'):
                     if re.search(filter_str[1:], sde.search_str()):
@@ -325,6 +314,7 @@ class MainHandler(HandlerBase):
                 try:
                     if not re.search(search_str, sde.search_str()):
                         continue
+
                 except re.error as ex:
                     self._mylog.warning(
                         '%s:%s:%s:%s',
@@ -334,20 +324,24 @@ class MainHandler(HandlerBase):
 
             todo_sde.append(sde)
 
+        todo_sde = sorted(todo_sde, key=lambda x: x.get_sortkey())
+        
         #
         # load schedule data
         #
         sched = []
-        delta_day1 = datetime.timedelta(1)
-        date_from = date - delta_day1 * self._days
-        date_to = date + delta_day1 * (self._days - 1)
+        date_from = date - datetime.timedelta(self._days)
+        date_to = date + datetime.timedelta(self._days - 1)
 
         if search_str:
-            date_from = date - delta_day1 * self.SEARCH_MODE_MAX_DAYS
-            date_from1 = date - delta_day1 * self.SEARCH_MODE_DAYS
+            date_from = date - datetime.timedelta(
+                self.SEARCH_MODE_MAX_DAYS)
+            date_from1 = date - datetime.timedelta(
+                self.SEARCH_MODE_DAYS)
             date_to = date
 
         search_count = 0
+        delta_day1 = datetime.timedelta(1)
         date1 = date_to + delta_day1
         while date1 > date_from:
             if search_str and search_count > 0:
@@ -360,10 +354,8 @@ class MainHandler(HandlerBase):
                     break
 
             date1 -= delta_day1
-            # self._mylog.debug('date1=%s', date1)
 
             sdf = self._sd.get_sdf(date1)
-            # self._mylog.debug('sdf=%s', sdf)
 
             out_sde = []
             for sde in sdf.sde:
@@ -406,7 +398,6 @@ class MainHandler(HandlerBase):
 
             # ToDo
             for sde in todo_sde:
-                # self._mylog.debug('sde=%s', sde)
                 if search_str:
                     if not re.search(search_str, sde.search_str()):
                         continue

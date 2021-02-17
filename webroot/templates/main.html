@@ -277,8 +277,6 @@
           ({{ sched_date.strftime('%a') }})
         </div>
         {% set days = (sched_date - today).days %}
-        {% from monthdelta import monthmod %}
-        {% set months = monthmod(today, sched_date) %}
         <div style="text-align: center;
                     font-size: x-small;
                     font-weight:{{ font_weight }};
@@ -294,9 +292,7 @@
 
         {% if today_flag and todo_days_value %}
           {% for sde in todo %}
-            {% if sde.date <= today + delta_day1 * todo_days_value %}
-              {% set sde1.append(sde) %}
-            {% end %}
+            {% set sde1.append(sde) %}
           {% end %}
         {% end %}
 
