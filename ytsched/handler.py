@@ -50,9 +50,6 @@ class HandlerBase(tornado.web.RequestHandler):
         self._datadir = app.settings.get('datadir')
         self._mylog.debug('datadir=%s', self._datadir)
 
-        self._webroot = app.settings.get('webroot')
-        self._mylog.debug('webroot=%s', self._webroot)
-
         self._days = app.settings.get('days')
         self._mylog.debug('days=%s', self._days)
 

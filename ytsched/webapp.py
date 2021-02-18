@@ -32,8 +32,8 @@ class WebServer:
 
     DEF_PORT = 10085
     DEF_WEBROOT = './webroot/'
-    DEF_WORKDIR = '~/ytsched'
-    DEF_DATADIR = DEF_WORKDIR + '/data'
+    DEF_WORKDIR = os.path.expanduser('~/ytsched')
+    DEF_DATADIR = os.path.join(DEF_WORKDIR, 'data')
 
     DEF_SIZE_LIMIT = 100*1024*1024  # 100MB
 
@@ -93,11 +93,9 @@ class WebServer:
                 (r'%s/edit/' % self.URL_PREFIX, EditHandler),
             ],
             static_path=os.path.join(self._webroot, "static"),
-            static_url_prefix=self.URL_PREFIX + '/static/',
             template_path=os.path.join(self._webroot, "templates"),
 
             autoreload=True,
-            # xsrf_cookies=False,
 
             title=PROG_NAME,
             author=AUTHOR,
@@ -106,11 +104,9 @@ class WebServer:
             url_prefix=self.URL_PREFIX + '/',
 
             datadir=self._datadir,
-            webroot=self._webroot,
             days=self._days,
             sd=self._sd,
 
-            size_limit=self._size_limit,
             debug=self._dbg
         )
         self._log.debug('app=%s', self._app.__dict__)
