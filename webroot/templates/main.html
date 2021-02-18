@@ -63,7 +63,7 @@
       ];
 
       for (let g of gage) {
-        console.log(`g={${g.id},${g.yOffset}},${centerY - g.yOffset}`);
+        // console.log(`g={${g.id},${g.yOffset}},${centerY - g.yOffset}`);
         const el = document.getElementById(g.id);
         el.style.bottom = `${centerY - g.yOffset}px`;
       }
