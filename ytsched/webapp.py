@@ -93,6 +93,7 @@ class WebServer:
                 (r'%s/edit/' % self.URL_PREFIX, EditHandler),
             ],
             static_path=os.path.join(self._webroot, "static"),
+            static_url_prefix=self.URL_PREFIX + '/static/',
             template_path=os.path.join(self._webroot, "templates"),
 
             autoreload=True,
