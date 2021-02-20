@@ -74,14 +74,14 @@ class MainHandler(HandlerBase):
     SEARCH_MODE_DAYS = 365
     DEF_SEARCH_N = 5
 
-    TODO_DAYS = {'off': 0,
+    TODO_DAYS = {'off': -1,
+                 'today': 0,
+                 '1d': 1,
                  '3d': 3,
                  '1w': 7,
                  '2w': 14,
                  '1m': 30,
-                 '3m': 93,
                  '1y': 365,
-                 '10y': 365 * 10 + 2,
                  'all': 365 * 100
                  }
     DEF_TODO_DAYS = 365
@@ -290,10 +290,8 @@ class MainHandler(HandlerBase):
 
         todo_sdf = self._sd.get_sdf(None)
         todo_sde = []
+        todo_today_sde = []
         for sde in todo_sdf.sde:
-            if sde.date > today + datetime.timedelta(todo_days_value):
-                continue
-            
             try:
                 if filter_str.startswith('!'):
                     if re.search(filter_str[1:], sde.search_str()):
@@ -324,7 +322,17 @@ class MainHandler(HandlerBase):
 
             todo_sde.append(sde)
 
+            if sde.date > today + datetime.timedelta(todo_days_value):
+                continue
+
+            if sde.date == today:
+                continue
+
+            todo_today_sde.append(sde)
+
         todo_sde = sorted(todo_sde, key=lambda x: x.get_sortkey())
+        todo_today_sde = sorted(todo_today_sde,
+                                key=lambda x: x.get_sortkey())
         
         #
         # load schedule data
@@ -435,6 +443,7 @@ class MainHandler(HandlerBase):
                     sched=sched,
                     modified_sde_id=modified_sde_id,
                     todo=todo_sde,
+                    todo_today_sde=todo_today_sde,
                     todo_days_list=self.TODO_DAYS,
                     todo_days_value=todo_days_value,
                     filter_str=filter_str,

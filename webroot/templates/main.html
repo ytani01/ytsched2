@@ -132,7 +132,6 @@
     <!-- gages -->
     <div id="gage_r" class="my-osd-base my-gage"
          style="left: 1px; opacity: 0.2;">
-      <!-- <i class="far fa-dot-circle"></i> -->
       <i class="fas fa-caret-right fa-2x my-gage-text"></i>
     </div>
 
@@ -290,8 +289,8 @@
         <!-- Normal Schedule -->
         {% set sde1 = sched_ent['sde'] %}
 
-        {% if today_flag and todo_days_value %}
-          {% for sde in todo %}
+        {% if today_flag and todo_days_value >= 0 %}
+          {% for sde in todo_today_sde %}
             {% set sde1.append(sde) %}
           {% end %}
         {% end %}
