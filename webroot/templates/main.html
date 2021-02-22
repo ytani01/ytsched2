@@ -282,21 +282,12 @@
                     line-height: 14px">
           {{ '%+d' % days }}
         </div>
-      </div><!-- col -->
+      </div>
 
       <!-- スケジュール -->
       <div class="col-11 p-0">
-        <!-- Normal Schedule -->
-        {% set sde1 = sched_ent['sde'] %}
-
-        {% if today_flag and todo_days_value >= 0 %}
-          {% for sde in todo_today_sde %}
-            {% set sde1.append(sde) %}
-          {% end %}
-        {% end %}
-
-        {% set sde2 = sorted(sde1, key=lambda x: x.get_sortkey()) %}
-        {% for sde in sde2 %}
+        <!-- Schedule -->
+        {% for sde in sched_ent['sde'] %}
           {% include sde.html %}
         {% end %}
         

@@ -164,14 +164,14 @@ class MainHandler(HandlerBase):
         #
         # set Date
         #
-        cur_day = datetime.date.today() # default
+        cur_day = datetime.date.today()  # default
 
         cur_day_str = self.get_argument('cur_day', None)
         if cur_day_str:
             cur_day = datetime.date.fromisoformat(cur_day_str)
         self._mylog.debug('cur_day=%s', cur_day)
 
-        date = None # default
+        date = None  # default
 
         date_str = self.get_argument('date', None)
         self._mylog.debug('date_str=%s', date_str)
@@ -289,8 +289,8 @@ class MainHandler(HandlerBase):
         today = datetime.date.today()
 
         todo_sdf = self._sd.get_sdf(None)
-        todo_sde = []
-        todo_today_sde = []
+        todo_sde = []  # 後に、日々のスケジュール`out_sde`に統合
+        todo_today_sde = []  # 期限は先だが、今日に表示すべきToDo
         for sde in todo_sdf.sde:
             try:
                 if filter_str.startswith('!'):
@@ -321,6 +321,7 @@ class MainHandler(HandlerBase):
                     continue
 
             todo_sde.append(sde)
+            self._mylog.debug('sde=%s', sde)
 
             if sde.date > today + datetime.timedelta(todo_days_value):
                 continue
@@ -329,11 +330,8 @@ class MainHandler(HandlerBase):
                 continue
 
             todo_today_sde.append(sde)
+            self._mylog.debug('sde=%s', sde)
 
-        todo_sde = sorted(todo_sde, key=lambda x: x.get_sortkey())
-        todo_today_sde = sorted(todo_today_sde,
-                                key=lambda x: x.get_sortkey())
-        
         #
         # load schedule data
         #
@@ -404,19 +402,27 @@ class MainHandler(HandlerBase):
                 out_sde.append(sde)
                 search_count += 1
 
-            # ToDo
-            for sde in todo_sde:
-                if search_str:
-                    if not re.search(search_str, sde.search_str()):
-                        continue
+            if todo_days_value >= 0:
+                # todo_sde
+                for sde in todo_sde:
+                    if search_str:
+                        if not re.search(search_str, sde.search_str()):
+                            continue
 
-                if sde.date == date1:
-                    out_sde.append(sde)
-                    if sde.date == datetime.date.today():
-                        todo_sde.remove(sde)
+                    if sde.date == date1:
+                        out_sde.append(sde)
+                        self._mylog.debug('out_sde.append:%s', sde)
+
+                # todo_today_sde
+                if not search_str:
+                    if date1 == datetime.date.today():
+                        for sde in todo_today_sde:
+                            out_sde.append(sde)
 
             if search_str and not out_sde:
                 continue
+
+            out_sde = sorted(out_sde, key=lambda x: x.get_sortkey())
 
             sched.append({
                 'date': date1,
@@ -442,8 +448,6 @@ class MainHandler(HandlerBase):
                     date_to=date_to,
                     sched=sched,
                     modified_sde_id=modified_sde_id,
-                    todo=todo_sde,
-                    todo_today_sde=todo_today_sde,
                     todo_days_list=self.TODO_DAYS,
                     todo_days_value=todo_days_value,
                     filter_str=filter_str,
