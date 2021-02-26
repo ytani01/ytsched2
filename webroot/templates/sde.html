@@ -74,9 +74,9 @@
         {{ time_start }}<br/>{{ time_end }}
       </div>
       {% else %}
-      <div class="col-1 p-0 text-center">
-        <i class="far fa-square fa-xs"
-           style="font-size: large;"></i>
+      <div class="col-1 p-1 text-center">
+        <i class="far fa-square"
+           style="font-size: small;"></i>
       </div>
       {% end %}<!-- if not todo -->
       <div class="col-11 p-0 my-btn"
@@ -121,7 +121,7 @@
         <span style="{{ type_font }}">{{ sde_type }}</span>
         <span style="{{ title_font }}">{{ sde_title }}</span>
         {% if sde.place %}
-        <span style="font-size: small">
+        <span style="font-size: small;">
           @{{ sde.place }}
         </span>
         {% end %}
@@ -129,7 +129,16 @@
     </div>
     {% if detail %}
     <div class="row m-0">
-      <div class="col-1 p-0"></div>
+      <input id="detail-sw-{{ sde.sde_id }}"
+             type="checkbox"
+             class="longtext-sw"
+             style="display: none;">
+      <div class="col-1 p-0 m-0 text-right my-btn"
+           style="font-size: small; line-height: 10px">
+        <label class="m-1" for="detail-sw-{{ sde.sde_id }}">
+          <i class="fas fa-arrow-right"></i>
+        </label>
+      </div>
       <div class="col-11 p-0 longtext" tabindex="0"
            style="font-size: small;">{{ detail }}</div>
     </div>

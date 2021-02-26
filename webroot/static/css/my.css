@@ -73,15 +73,29 @@
 }
 
 .longtext {
-     white-space: nowrap;
-     overflow: hidden;
-     text-overflow: ellipsis;
+    border: 1px solid #CCC;
+    border-radius: 0px 0px 10px 0px;
+    width: auto;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
+/*
 .longtext:focus {
-    border: 1px solid #FFF;
-    white-space: pre-wrap;
+    border: 1px solid #888;
     width: auto;
+    white-space: pre-wrap;
+    overflow: visible;
+    text-overflow: clip;
+}
+*/
+
+.longtext-sw:checked ~ .longtext {
+    border: 1px solid #CCC;
+    border-radius: 0px 0px 10px 0px;
+    width: auto;
+    white-space: pre-wrap;
     overflow: visible;
     text-overflow: clip;
 }
