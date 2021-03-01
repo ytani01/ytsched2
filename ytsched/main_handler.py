@@ -243,6 +243,7 @@ class MainHandler(HandlerBase):
         else:
             filter_str = ''
 
+        filter_str = filter_str.lower()
         self._mylog.debug('filter_str=%a', filter_str)
 
         #
@@ -262,6 +263,7 @@ class MainHandler(HandlerBase):
         else:
             search_str = ''
 
+        search_str = search_str.lower()
         self._mylog.debug('search_str=\'%s\'', search_str)
 
         #
@@ -389,6 +391,9 @@ class MainHandler(HandlerBase):
                         continue
 
                 if search_str:
+                    if sde.date == datetime.date(2021, 3, 1):
+                        self._mylog.debug('sde.search_str()=%s',
+                                          sde.search_str())
                     try:
                         if not re.search(search_str, sde.search_str()):
                             continue
