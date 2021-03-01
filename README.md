@@ -97,6 +97,31 @@
     UI工夫して対応するしかない
 
 
+## 使用環境
+
+### クライアント = スマホ、タブレット、PC
+
+Google Chrome ブラウザ
+
+
+### サーバ
+
+OS: Linux, FreeBSD
+言語: Python3
+
+
+### セキュリティのためのリバースプロキシ: Nginx, Apacheなど
+
+* SSL
+* Basic認証
+* クライアント証明書
+
+
+## Install
+
+TBD
+
+
 ## memo
 
 ### Javascript ``Date``の罠
