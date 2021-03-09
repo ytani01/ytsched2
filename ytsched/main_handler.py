@@ -532,10 +532,16 @@ class MainHandler(HandlerBase):
                           deadline_time_start_str, deadline_time_end_str)
 
         if deadline_date_str and not SchedDataEnt.type_is_todo(sde_type):
+            #
+            # ToDoが完了した場合
+            # ``date``, ``time_start``を現在日時にする
+            #
             date = datetime.date.today()
             self._mylog.debug('[fix] date=%s', date)
 
             time_start = datetime.datetime.now().time()
+            # msec を切り捨てる
+            time_start = datetime.time.fromisoformat(time_start.strftime('%H:%M'))
             self._mylog.debug('[fix] time_start=%s', time_start)
             time_end = None
 
