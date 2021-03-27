@@ -9,6 +9,8 @@
 
 {% set orig_date = sched_date %}
 
+{% set sw_id = 'sw%s-%s' % (sde.sde_id, today_flag) %}
+
 {% if sde.is_todo() %}
   {% set orig_date = None %}
 
@@ -129,14 +131,17 @@
     </div>
     {% if detail %}
     <div class="row m-0">
-      <input id="detail-sw-{{ sde.sde_id }}"
+      <input id="{{ sw_id }}"
              type="checkbox"
              class="longtext-sw"
              style="display: none;">
-      <div class="col-1 p-0 m-0 text-right my-btn"
-           style="font-size: small; line-height: 10px">
-        <label class="m-1" for="detail-sw-{{ sde.sde_id }}">
-          <i class="fas fa-arrow-right"></i>
+      <div class="col-1 p-0 m-0 text-center my-btn longtext-sw-label"
+           style="font-size: small; line-height: 10px;">
+        <label class="m-1" for="{{ sw_id }}">
+          &nbsp;
+          &nbsp;
+          &nbsp;
+          <i class="fas fa-angle-down"></i>
         </label>
       </div>
       <div class="col-11 p-0 longtext" tabindex="0"

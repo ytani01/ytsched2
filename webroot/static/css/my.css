@@ -91,6 +91,9 @@
 }
 */
 
+.longtext-sw-label {
+}
+
 .longtext-sw:checked ~ .longtext {
     border: 1px solid #CCC;
     border-radius: 0px 0px 10px 0px;
@@ -98,6 +101,10 @@
     white-space: pre-wrap;
     overflow: visible;
     text-overflow: clip;
+}
+
+.longtext-sw:checked ~ .longtext-sw-label {
+    transform: scale(1,-1);
 }
 
 .my-btn:active {
