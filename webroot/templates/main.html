@@ -230,8 +230,15 @@
 
       <!-- 日付 -->
       {% set weekday = sched_date.weekday() %}
-      {% set bg_color_wday = [ '#EFFFFF', '#E4F8FE', '#E0EFFD', '#D4EBFC',
-                               '#D0E0FB', '#C0D4FA', '#FFCCCC' ] %}
+      {% set bg_color_wday = [
+      '#30E0FF',
+      '#80E8FF',
+      '#B0F0FF',
+      '#D0F8FF',
+      '#F0FFFF',
+      '#FFEEEE',
+      '#FFCCCC'
+      ] %}
       {% set bg_color = bg_color_wday[weekday] %}
 
       {% set url = url_prefix %}
