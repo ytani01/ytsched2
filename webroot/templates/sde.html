@@ -114,17 +114,17 @@
         </span>
         {% end %}
 
-        {% set type_font="font-size: small; font-weight: normal" %}
+        {% set type_font="font-size: x-small; font-weight: bold" %}
         {% set title_font="font-size: medium; font-weight: normal" %}
         {% if sde.is_important() %}
-          {% set type_font="font-size: small; font-weight: bold" %}
+          {% set type_font="font-size: x-small; font-weight: bold" %}
           {% set title_font="font-size: medium; font-weight: bold" %}
         {% end %}
-        <span style="{{ type_font }}">{{ sde_type }}</span>
+        <span style="{{ type_font }}">{{ sde_type }} &nbsp;</span>
         <span style="{{ title_font }}">{{ sde_title }}</span>
         {% if sde.place %}
         <span style="font-size: small;">
-          @{{ sde.place }}
+          &nbsp; @{{ sde.place }}
         </span>
         {% end %}
       </div>
@@ -142,7 +142,7 @@
         </label>
       </div>
       <div class="col-11 p-0 longtext" tabindex="0"
-           style="font-size: small;">{{ detail }}</div>
+           style="font-size: x-small;">{{ detail }}</div>
     </div>
     {% end %}
 </div><!-- container -->
